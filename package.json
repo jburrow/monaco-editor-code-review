@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "examples": "node node_modules/http-server/bin/http-server ",
+    "docs": "echo \"Browser to http://localhost:8080/docs/example.html\" && node node_modules/http-server/bin/http-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
