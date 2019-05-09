@@ -1,6 +1,6 @@
-const monacoWindow = window;
-class ReviewComment {
-    constructor(lineNumber, author, dt, text, comments) {
+var monacoWindow = window;
+var ReviewComment = /** @class */ (function () {
+    function ReviewComment(lineNumber, author, dt, text, comments) {
         this.author = author;
         this.dt = dt;
         this.lineNumber = lineNumber;
@@ -10,12 +10,13 @@ class ReviewComment {
         this.deleted = false;
         this.viewZoneId = null;
     }
-}
+    return ReviewComment;
+}());
 function createReviewManager(editor, currentUser, comments) {
     return new ReviewManager(editor, currentUser, comments);
 }
-class ReviewManager {
-    constructor(editor, currentUser, comments) {
+var ReviewManager = /** @class */ (function () {
+    function ReviewManager(editor, currentUser, comments) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
@@ -28,7 +29,8 @@ class ReviewManager {
             this.refreshComments();
         }
     }
-    createControlPanel() {
+    ReviewManager.prototype.createControlPanel = function () {
+        var _this = this;
         this.controlsWidget = {
             domNode: null,
             allowEditorOverflow: true,
@@ -37,10 +39,10 @@ class ReviewManager {
             },
             getDomNode: function () {
                 if (!this.domNode) {
-                    const add = document.createElement('button');
+                    var add = document.createElement('button');
                     add.innerText = '+';
                     add.name = 'add';
-                    const remove = document.createElement('button');
+                    var remove = document.createElement('button');
                     remove.innerText = '-';
                     remove.name = 'remove';
                     this.domNode = document.createElement('span');
@@ -50,11 +52,11 @@ class ReviewManager {
                 }
                 return this.domNode;
             },
-            getPosition: () => {
-                if (this.activeComment) {
+            getPosition: function () {
+                if (_this.activeComment) {
                     return {
                         position: {
-                            lineNumber: this.activeComment.lineNumber,
+                            lineNumber: _this.activeComment.lineNumber,
                         },
                         preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
                     };
@@ -62,12 +64,12 @@ class ReviewManager {
             }
         };
         this.editor.addContentWidget(this.controlsWidget);
-    }
-    configureControlsWidget(comment) {
+    };
+    ReviewManager.prototype.configureControlsWidget = function (comment) {
         this.activeComment = comment;
         this.editor.layoutContentWidget(this.controlsWidget);
-    }
-    handleMouseDown(ev) {
+    };
+    ReviewManager.prototype.handleMouseDown = function (ev) {
         if (ev.target.element.tagName === 'BUTTON') {
             if (ev.target.element.name === 'add') {
                 this.captureComment();
@@ -78,8 +80,9 @@ class ReviewManager {
             this.configureControlsWidget(null);
         }
         else if (ev.target.detail) {
-            let activeComment = null;
-            for (const item of this.iterateComments()) {
+            var activeComment = null;
+            for (var _i = 0, _a = this.iterateComments(); _i < _a.length; _i++) {
+                var item = _a[_i];
                 if (item.comment.viewZoneId == ev.target.detail.viewZoneId) {
                     activeComment = item.comment;
                     break;
@@ -87,54 +90,59 @@ class ReviewManager {
             }
             this.configureControlsWidget(activeComment);
         }
-    }
-    addComment(lineNumber, text) {
+    };
+    ReviewManager.prototype.addComment = function (lineNumber, text) {
         if (this.activeComment) {
-            const comment = new ReviewComment(this.activeComment.lineNumber, this.currentUser, new Date(), text);
+            var comment = new ReviewComment(this.activeComment.lineNumber, this.currentUser, new Date(), text);
             this.activeComment.comments.push(comment);
         }
         else {
-            const comment = new ReviewComment(lineNumber, this.currentUser, new Date(), text);
+            var comment = new ReviewComment(lineNumber, this.currentUser, new Date(), text);
             this.comments.push(comment);
         }
         this.refreshComments();
-    }
-    *iterateComments(comments, depth, countByLineNumber) {
+    };
+    ReviewManager.prototype.iterateComments = function (comments, depth, countByLineNumber, results) {
+        results = results || [];
         depth = depth || 0;
         comments = comments || this.comments;
         countByLineNumber = countByLineNumber || {};
-        for (const comment of comments) {
+        for (var _i = 0, comments_1 = comments; _i < comments_1.length; _i++) {
+            var comment = comments_1[_i];
             countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1;
-            yield { depth, comment, count: countByLineNumber[comment.lineNumber] };
-            yield* this.iterateComments(comment.comments, depth + 1, countByLineNumber);
+            results.push({ depth: depth, comment: comment, count: countByLineNumber[comment.lineNumber] });
+            this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
         }
-        return;
-    }
-    removeComment(comment) {
-        for (const item of this.iterateComments([comment])) {
+        return results;
+    };
+    ReviewManager.prototype.removeComment = function (comment) {
+        for (var _i = 0, _a = this.iterateComments([comment]); _i < _a.length; _i++) {
+            var item = _a[_i];
             item.comment.deleted = true;
         }
         this.refreshComments();
-    }
-    refreshComments() {
-        this.editor.changeViewZones((changeAccessor) => {
-            for (const item of this.iterateComments(this.comments, 0)) {
+    };
+    ReviewManager.prototype.refreshComments = function () {
+        var _this = this;
+        this.editor.changeViewZones(function (changeAccessor) {
+            for (var _i = 0, _a = _this.iterateComments(_this.comments, 0); _i < _a.length; _i++) {
+                var item = _a[_i];
                 if (!item.comment.viewZoneId) {
-                    const domNode = document.createElement('div');
+                    var domNode = document.createElement('div');
                     domNode.style.marginLeft = (25 * (item.depth + 1)) + 50 + "";
                     domNode.style.width = "100";
                     domNode.style.display = 'inline';
                     //TODO - Figure out a nice way to in-line an icon maybe via font?
-                    const icon = document.createElement('span');
+                    var icon = document.createElement('span');
                     icon.style.backgroundColor = '#c9c9c9';
                     icon.innerText = '...';
-                    const author = document.createElement('span');
+                    var author = document.createElement('span');
                     author.innerText = item.comment.author || ' ';
                     author.style.marginRight = "10";
-                    const dt = document.createElement('span');
+                    var dt = document.createElement('span');
                     dt.innerText = item.comment.dt.toLocaleString();
                     dt.style.marginRight = "10";
-                    const text = document.createElement('span');
+                    var text = document.createElement('span');
                     text.innerText = item.comment.text;
                     domNode.appendChild(icon);
                     domNode.appendChild(dt);
@@ -151,17 +159,18 @@ class ReviewManager {
                 }
             }
         });
-    }
-    captureComment() {
-        let promptMessage = 'Mesage';
+    };
+    ReviewManager.prototype.captureComment = function () {
+        var promptMessage = 'Mesage';
         if (this.activeComment) {
             promptMessage += '- ' + this.activeComment.text;
         }
-        const line = this.editor.getPosition().lineNumber;
-        const message = prompt(promptMessage);
+        var line = this.editor.getPosition().lineNumber;
+        var message = prompt(promptMessage);
         this.addComment(line, message);
-    }
-    addActions() {
+    };
+    ReviewManager.prototype.addActions = function () {
+        var _this = this;
         this.editor.addAction({
             id: 'my-unique-id-add',
             label: 'Add Comment',
@@ -172,11 +181,12 @@ class ReviewManager {
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 0,
-            run: () => {
-                this.captureComment();
+            run: function () {
+                _this.captureComment();
                 return null;
             }
         });
-    }
-}
+    };
+    return ReviewManager;
+}());
 //# sourceMappingURL=index.js.map

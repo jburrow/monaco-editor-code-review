@@ -31,6 +31,14 @@ function createReviewManager(editor: any, currentUser: string, comments: ReviewC
     return new ReviewManager(editor, currentUser, comments);
 }
 
+
+interface ReviewCommentIterItem{
+    depth:number;
+    comment: ReviewComment,
+    count:number
+}
+
+
 class ReviewManager {
     currentUser: string;
     editor: any;
@@ -134,18 +142,19 @@ class ReviewManager {
         this.refreshComments()
     }
 
-    * iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any) {
+    iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?:ReviewCommentIterItem[]) {
+        results = results||[];
         depth = depth || 0;
         comments = comments || this.comments;
         countByLineNumber = countByLineNumber || {};
 
         for(const comment of comments){            
             countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
-            yield { depth, comment, count: countByLineNumber[comment.lineNumber] }
-            yield* this.iterateComments(comment.comments, depth + 1, countByLineNumber);
+            results.push({ depth, comment, count: countByLineNumber[comment.lineNumber] })
+            this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
         }
 
-        return;
+        return results;
     }
 
     removeComment(comment:ReviewComment) {
