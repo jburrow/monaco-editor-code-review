@@ -1,0 +1,17 @@
+{
+  "name": "monaco-review",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "examples": "node node_modules/http-server/bin/http-server ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^0.11.1",
+    "monaco-editor": "^0.17.0"
+  }
+}

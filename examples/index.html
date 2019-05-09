@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
+    <script src="../index.js"></script>
+  </head>
+
+  <body>
+    <h5>Press CTRL+F10 to add comment or ContextMenu</h5>
+    <div id="container" style="height:80%;"></div>
+  </body>
+</html>
+
+<script>
+  function ensureMonacoIsAvailable() {
+    return new Promise(resolve => {
+      if (!window.require) {
+        console.warn(
+          "Unable to find a local node_modules folder - so dynamically using cdn instead"
+        );
+        var prefix = "https://microsoft.github.io/monaco-editor";
+        scriptTag = document.createElement("script");
+        scriptTag.src = prefix + "/node_modules/monaco-editor/min/vs/loader.js";
+        scriptTag.onload = () => {
+          console.debug("Monaco loader is initialized");
+          resolve(prefix);
+        };
+        document.body.appendChild(scriptTag);
+      } else {
+        resolve("..");
+      }
+    });
+  }
+
+  async function init() {
+    var prefix = await ensureMonacoIsAvailable();
+    var response = await fetch("../index.js");
+    var text = await response.text();
+
+    require.config({
+      paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
+    });
+
+    require(["vs/editor/editor.main"], function() {
+      var editor = monaco.editor.create(document.getElementById("container"), {
+        value: text,
+        language: "javascript",
+        glyphMargin: true,
+        contextmenu: true
+      });
+
+      var rm = createReviewManager(editor, "mr reviewer", [
+        new Comment(
+          10,
+          "another reviewer",
+          new Date("2019-01-01"),
+          "this code isn't very good",
+          [
+            new Comment(
+              10,
+              "original author",
+              new Date("2019-01-01"),
+              "I think you will find it is good enough"
+            )
+          ]
+        )
+      ]);
+    });
+  }
+
+  init();
+</script>
