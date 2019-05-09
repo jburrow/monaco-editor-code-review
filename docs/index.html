@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
-    <script src="../index.js"></script>
+    <script src="../dist/index.js"></script>
   </head>
 
   <body>
@@ -33,7 +33,7 @@
 
   async function init() {
     var prefix = await ensureMonacoIsAvailable();
-    var response = await fetch("../index.js");
+    var response = await fetch("../src/index.ts");
     var text = await response.text();
 
     require.config({
@@ -43,20 +43,20 @@
     require(["vs/editor/editor.main"], function() {
       var editor = monaco.editor.create(document.getElementById("container"), {
         value: text,
-        language: "javascript",
+        language: "typescript",
         glyphMargin: true,
         contextmenu: true
       });
 
       var rm = createReviewManager(editor, "mr reviewer", [
-        new Comment(
-          10,
+        new ReviewComment(
+          24,
           "another reviewer",
           new Date("2019-01-01"),
           "this code isn't very good",
           [
-            new Comment(
-              10,
+            new ReviewComment(
+              24,
               "original author",
               new Date("2019-01-01"),
               "I think you will find it is good enough"

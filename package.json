@@ -2,16 +2,18 @@
   "name": "monaco-review",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "docs": "echo \"Browser to http://localhost:8080/docs/example.html\" && node node_modules/http-server/bin/http-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docs": "echo \"Browser to http://localhost:8080/docs/index.html\" && node node_modules/http-server/bin/http-server",
+    "compile": "node node_modules/typescript/bin/tsc",
+    "watch": "node node_modules/typescript/bin/tsc --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
     "http-server": "^0.11.1",
-    "monaco-editor": "^0.17.0"
+    "monaco-editor": "^0.17.0",
+    "typescript": "^3.4.5"
   }
 }
