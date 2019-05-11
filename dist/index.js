@@ -8,6 +8,7 @@ var ReviewComment = /** @class */ (function () {
         this.comments = comments || [];
         //HACK - this is runtime state - and should be moved
         this.deleted = false;
+        this.isDirty = false;
         this.viewZoneId = null;
     }
     return ReviewComment;
@@ -66,8 +67,31 @@ var ReviewManager = /** @class */ (function () {
         this.editor.addContentWidget(this.controlsWidget);
     };
     ReviewManager.prototype.configureControlsWidget = function (comment) {
-        this.activeComment = comment;
+        this.setActiveComment(comment);
         this.editor.layoutContentWidget(this.controlsWidget);
+    };
+    ReviewManager.prototype.setActiveComment = function (comment) {
+        var lineNumbersToMakeDirty = [];
+        if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
+            lineNumbersToMakeDirty.push(this.activeComment.lineNumber);
+        }
+        if (comment) {
+            lineNumbersToMakeDirty.push(comment.lineNumber);
+        }
+        this.activeComment = comment;
+        if (lineNumbersToMakeDirty.length > 0) {
+            this.markLineNumberDirty(lineNumbersToMakeDirty);
+        }
+        this.refreshComments();
+    };
+    ReviewManager.prototype.markLineNumberDirty = function (lineNumbers) {
+        var comments = this.iterateComments();
+        for (var _i = 0, comments_1 = comments; _i < comments_1.length; _i++) {
+            var c = comments_1[_i];
+            if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
+                c.comment.isDirty = true;
+            }
+        }
     };
     ReviewManager.prototype.handleMouseDown = function (ev) {
         if (ev.target.element.tagName === 'BUTTON') {
@@ -107,8 +131,8 @@ var ReviewManager = /** @class */ (function () {
         depth = depth || 0;
         comments = comments || this.comments;
         countByLineNumber = countByLineNumber || {};
-        for (var _i = 0, comments_1 = comments; _i < comments_1.length; _i++) {
-            var comment = comments_1[_i];
+        for (var _i = 0, comments_2 = comments; _i < comments_2.length; _i++) {
+            var comment = comments_2[_i];
             countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1;
             results.push({ depth: depth, comment: comment, count: countByLineNumber[comment.lineNumber] });
             this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
@@ -127,24 +151,35 @@ var ReviewManager = /** @class */ (function () {
         this.editor.changeViewZones(function (changeAccessor) {
             for (var _i = 0, _a = _this.iterateComments(_this.comments, 0); _i < _a.length; _i++) {
                 var item = _a[_i];
+                if (item.comment.deleted) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                    continue;
+                }
+                if (item.comment.isDirty) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                    item.comment.viewZoneId = null;
+                    item.comment.isDirty = false;
+                }
                 if (!item.comment.viewZoneId) {
                     var domNode = document.createElement('div');
+                    var isActive = _this.activeComment == item.comment;
                     domNode.style.marginLeft = (25 * (item.depth + 1)) + 50 + "";
                     domNode.style.width = "100";
                     domNode.style.display = 'inline';
-                    //TODO - Figure out a nice way to in-line an icon maybe via font?
-                    var icon = document.createElement('span');
-                    icon.style.backgroundColor = '#c9c9c9';
-                    icon.innerText = '...';
+                    domNode.className = isActive ? 'reviewComment-active' : 'reviewComment-inactive';
+                    var status_1 = document.createElement('span');
+                    status_1.className = isActive ? 'reviewComment-selection-active' : 'reviewComment-selection-inactive';
+                    status_1.innerText = isActive ? '>>' : '---';
                     var author = document.createElement('span');
+                    author.className = 'reviewComment-author';
                     author.innerText = item.comment.author || ' ';
-                    author.style.marginRight = "10";
                     var dt = document.createElement('span');
+                    dt.className = 'reviewComment-dt';
                     dt.innerText = item.comment.dt.toLocaleString();
-                    dt.style.marginRight = "10";
                     var text = document.createElement('span');
+                    text.className = 'reviewComment-text';
                     text.innerText = item.comment.text;
-                    domNode.appendChild(icon);
+                    domNode.appendChild(status_1);
                     domNode.appendChild(dt);
                     domNode.appendChild(author);
                     domNode.appendChild(text);
@@ -153,9 +188,6 @@ var ReviewManager = /** @class */ (function () {
                         heightInLines: 1,
                         domNode: domNode
                     });
-                }
-                if (item.comment.deleted) {
-                    changeAccessor.removeZone(item.comment.viewZoneId);
                 }
             }
         });

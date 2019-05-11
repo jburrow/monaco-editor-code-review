@@ -13,6 +13,7 @@ class ReviewComment {
 
     deleted: boolean;
     viewZoneId: number;
+    isDirty: boolean;
 
     constructor(lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
         this.author = author;
@@ -23,6 +24,7 @@ class ReviewComment {
 
         //HACK - this is runtime state - and should be moved
         this.deleted = false;
+        this.isDirty = false;
         this.viewZoneId = null;
     }
 }
@@ -32,10 +34,10 @@ function createReviewManager(editor: any, currentUser: string, comments: ReviewC
 }
 
 
-interface ReviewCommentIterItem{
-    depth:number;
+interface ReviewCommentIterItem {
+    depth: number;
     comment: ReviewComment,
-    count:number
+    count: number
 }
 
 
@@ -103,12 +105,41 @@ class ReviewManager {
         this.editor.addContentWidget(this.controlsWidget);
     }
 
-    configureControlsWidget(comment:ReviewComment) {
-        this.activeComment = comment;
+    configureControlsWidget(comment: ReviewComment) {
+        this.setActiveComment(comment);
+
         this.editor.layoutContentWidget(this.controlsWidget);
     }
 
-    handleMouseDown(ev:any) {
+    setActiveComment(comment: ReviewComment) {
+        const lineNumbersToMakeDirty = [];
+        if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
+            lineNumbersToMakeDirty.push(this.activeComment.lineNumber);
+        }
+        if (comment) {
+            lineNumbersToMakeDirty.push(comment.lineNumber);
+        }
+
+        this.activeComment = comment;
+        if (lineNumbersToMakeDirty.length > 0) {
+            this.markLineNumberDirty(lineNumbersToMakeDirty);
+        }
+
+        this.refreshComments();
+
+
+    }
+
+    markLineNumberDirty(lineNumbers: number[]) {
+        const comments = this.iterateComments();
+        for (const c of comments) {
+            if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
+                c.comment.isDirty = true;
+            }
+        }
+    }
+
+    handleMouseDown(ev: any) {
         if (ev.target.element.tagName === 'BUTTON') {
             if (ev.target.element.name === 'add') {
                 this.captureComment()
@@ -118,7 +149,7 @@ class ReviewManager {
 
             this.configureControlsWidget(null);
         } else if (ev.target.detail) {
-            let activeComment:ReviewComment = null;
+            let activeComment: ReviewComment = null;
             for (const item of this.iterateComments()) {
                 if (item.comment.viewZoneId == ev.target.detail.viewZoneId) {
                     activeComment = item.comment;
@@ -130,7 +161,7 @@ class ReviewManager {
         }
     }
 
-    addComment(lineNumber:number, text:string) {        
+    addComment(lineNumber: number, text: string) {
         if (this.activeComment) {
             const comment = new ReviewComment(this.activeComment.lineNumber, this.currentUser, new Date(), text)
             this.activeComment.comments.push(comment);
@@ -142,13 +173,13 @@ class ReviewManager {
         this.refreshComments()
     }
 
-    iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?:ReviewCommentIterItem[]) {
-        results = results||[];
+    iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
+        results = results || [];
         depth = depth || 0;
         comments = comments || this.comments;
         countByLineNumber = countByLineNumber || {};
 
-        for(const comment of comments){            
+        for (const comment of comments) {
             countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
             results.push({ depth, comment, count: countByLineNumber[comment.lineNumber] })
             this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
@@ -157,40 +188,54 @@ class ReviewManager {
         return results;
     }
 
-    removeComment(comment:ReviewComment) {
+    removeComment(comment: ReviewComment) {
         for (const item of this.iterateComments([comment])) {
             item.comment.deleted = true;
         }
         this.refreshComments();
     }
 
-    refreshComments() {        
+    refreshComments() {
         this.editor.changeViewZones((changeAccessor) => {
             for (const item of this.iterateComments(this.comments, 0)) {
+                if (item.comment.deleted) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                    continue;
+                }
+
+                if (item.comment.isDirty) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                    item.comment.viewZoneId = null;
+                    item.comment.isDirty = false;
+                }
+
                 if (!item.comment.viewZoneId) {
                     const domNode = document.createElement('div');
+                    const isActive = this.activeComment == item.comment;
 
                     domNode.style.marginLeft = (25 * (item.depth + 1)) + 50 + "";
                     domNode.style.width = "100";
                     domNode.style.display = 'inline';
+                    domNode.className = isActive ? 'reviewComment-active' : 'reviewComment-inactive';
 
-                    //TODO - Figure out a nice way to in-line an icon maybe via font?
-                    const icon = document.createElement('span');
-                    icon.style.backgroundColor = '#c9c9c9';
-                    icon.innerText = '...';
+                    const status = document.createElement('span');
+                    status.className = isActive ? 'reviewComment-selection-active' : 'reviewComment-selection-inactive'
+                    status.innerText = isActive ? '>>' : '---';
 
                     const author = document.createElement('span');
+                    author.className = 'reviewComment-author'
                     author.innerText = item.comment.author || ' ';
-                    author.style.marginRight = "10";
 
                     const dt = document.createElement('span');
+                    dt.className = 'reviewComment-dt'
                     dt.innerText = item.comment.dt.toLocaleString();
-                    dt.style.marginRight = "10";
 
                     const text = document.createElement('span');
+                    text.className = 'reviewComment-text'
                     text.innerText = item.comment.text;
 
-                    domNode.appendChild(icon);
+                    domNode.appendChild(status);
+
                     domNode.appendChild(dt);
                     domNode.appendChild(author);
                     domNode.appendChild(text);
@@ -201,12 +246,7 @@ class ReviewManager {
                         domNode: domNode
                     });
                 }
-
-                if (item.comment.deleted) {
-                    changeAccessor.removeZone(item.comment.viewZoneId);
-                }
             }
-
         });
     }
 
@@ -217,7 +257,7 @@ class ReviewManager {
         }
 
         const line = this.editor.getPosition().lineNumber;
-        const message = prompt(promptMessage);        
+        const message = prompt(promptMessage);
 
         this.addComment(line, message);
     }

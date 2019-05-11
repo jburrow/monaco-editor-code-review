@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "docs": "echo \"Browser to http://localhost:8080/docs/index.html\" && node node_modules/http-server/bin/http-server",
+    "docs": "node node_modules/http-server/bin/http-server",
     "compile": "node node_modules/typescript/bin/tsc",
     "watch": "node node_modules/typescript/bin/tsc --watch"
   },
