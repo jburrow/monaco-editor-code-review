@@ -109,14 +109,14 @@
   }
 
   function initReviewManager(editor) {
-    var rm = createReviewManager(editor, "mr reviewer", [
-      new ReviewComment(
+    var rm = window.exports.createReviewManager(editor, "mr reviewer", [
+      new window.exports.ReviewComment(
         24,
         "another reviewer",
         new Date("2019-01-01"),
         "this code isn't very good",
         [
-          new ReviewComment(
+          new window.exports.ReviewComment(
             24,
             "original author",
             new Date("2019-01-01"),
