@@ -15,7 +15,7 @@ var editor = monaco.editor.create(document.getElementById("container"), {
         language: "javascript",        
         contextmenu: true
       });
-var rm = createReviewManager(editor, "name-of-current-user");
+var rm = MonacoEditorCodeReview.createReviewManager(editor, "name-of-current-user");
 ```
 
 Users can use context-menu or keyboard short-cut to comment code
