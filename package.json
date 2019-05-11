@@ -4,15 +4,15 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "docs": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
-    "compile": "node node_modules/typescript/bin/tsc",
-    "watch": "node node_modules/typescript/bin/tsc --watch"
+    "dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
+    "compile": "node node_modules/webpack/bin/webpack.js",    
+    "watch": "node node_modules/webpack/bin/webpack.js --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
-    "declaration-bundler-webpack-plugin": "^1.0.3",
+    "jest": "^24.8.0",
     "monaco-editor": "^0.17.0",
     "ts-loader": "^6.0.0",
     "typescript": "^3.4.5",

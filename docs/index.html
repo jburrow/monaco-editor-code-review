@@ -1,12 +1,51 @@
 <html>
   <head>
+    <script>window.exports = {};</script>
     <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
     <script src="../dist/index.js"></script>
+
+    <style>
+      .reviewComment-active {
+        /* border-bottom: 1px dashed grey; */
+      }
+
+      .reviewComment-inactive {
+        /* margin-bottom: 1px; */
+      }
+
+      .reviewComment-selection-active {        
+        /* background-color: pink; */        
+        margin-right: 7px;
+      }
+
+      .reviewComment-selection-inactive {
+        /* background-color: cadetblue; */        
+        margin-right: 10px;
+      }
+
+      .reviewComment-author {
+        /* background-color: yellow; */
+        margin-right: 10px;
+      }
+
+      .reviewComment-dt {
+        /* background-color: orange; */
+        margin-right: 10px;
+      }
+
+      .reviewComment-text {
+        /* background-color: lightcoral; */
+      }
+      
+    </style>
   </head>
 
   <body>
     <h5>Press CTRL+F10 to add comment or ContextMenu</h5>
-    <div id="container" style="height:80%;"></div>
+    <h6>Regular Editor</h6>
+    <div id="containerEditor" style="height:40%;"></div>
+    <h6>Diff Editor</h6>
+    <div id="containerDiff" style="height:40%;"></div>
   </body>
 </html>
 
@@ -41,30 +80,51 @@
     });
 
     require(["vs/editor/editor.main"], function() {
-      var editor = monaco.editor.create(document.getElementById("container"), {
-        value: text,
-        language: "typescript",
-        glyphMargin: true,
-        contextmenu: true
+      var editor = monaco.editor.create(
+        document.getElementById("containerEditor"),
+        {
+          value: text,
+          language: "typescript",
+          glyphMargin: true,
+          contextmenu: true
+        }
+      );
+
+      initReviewManager(editor);
+
+      var originalModel = monaco.editor.createModel(text, "typescript");
+
+      var modifiedModel = monaco.editor.createModel(text, "typescript");
+
+      var diffEditor = monaco.editor.createDiffEditor(
+        document.getElementById("containerDiff")
+      );
+      diffEditor.setModel({
+        original: originalModel,
+        modified: modifiedModel
       });
 
-      var rm = createReviewManager(editor, "mr reviewer", [
-        new ReviewComment(
-          24,
-          "another reviewer",
-          new Date("2019-01-01"),
-          "this code isn't very good",
-          [
-            new ReviewComment(
-              24,
-              "original author",
-              new Date("2019-01-01"),
-              "I think you will find it is good enough"
-            )
-          ]
-        )
-      ]);
+      initReviewManager(diffEditor.modifiedEditor);
     });
+  }
+
+  function initReviewManager(editor) {
+    var rm = createReviewManager(editor, "mr reviewer", [
+      new ReviewComment(
+        24,
+        "another reviewer",
+        new Date("2019-01-01"),
+        "this code isn't very good",
+        [
+          new ReviewComment(
+            24,
+            "original author",
+            new Date("2019-01-01"),
+            "I think you will find it is good enough"
+          )
+        ]
+      )
+    ]);
   }
 
   init();
