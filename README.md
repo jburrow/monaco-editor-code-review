@@ -25,3 +25,7 @@ Users can use context-menu or keyboard short-cut to comment code
 
 
 ![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/docs/screenshot.png?raw=true)
+
+## Motivation
+
+Your first reaction might be there is no need for this because github or gitlab all have excellent code review tools, and you are right! However - Monaco can be embedded in many types of applications, and this library enables you integrate a light way of allowing users to annotate documents rendered in it. 
