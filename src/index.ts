@@ -4,7 +4,7 @@ interface MonacoWindow {
 
 const monacoWindow = (window as any) as MonacoWindow;
 
-class ReviewComment {
+export class ReviewComment {
     author: string;
     dt: Date;
     lineNumber: number;
@@ -27,7 +27,7 @@ class ReviewComment {
     }
 }
 
-function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[]) {
+export function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[]) {
     return new ReviewManager(editor, currentUser, comments);
 }
 
@@ -73,7 +73,7 @@ class ReviewManager {
             getDomNode: function () {
                 if (!this.domNode) {
                     const add = document.createElement('button');
-                    add.innerText = '+';
+                    add.innerText = '???';
                     add.name = 'add';
 
                     const remove = document.createElement('button');

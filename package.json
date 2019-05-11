@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "docs": "echo \"Browser to http://localhost:8080/docs/index.html\" && node node_modules/http-server/bin/http-server",
+    "docs": "echo \"Browser to http://localhost:8080/docs/index.html\" && node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
     "compile": "node node_modules/typescript/bin/tsc",
     "watch": "node node_modules/typescript/bin/tsc --watch"
   },
@@ -12,8 +12,12 @@
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
-    "http-server": "^0.11.1",
+    "declaration-bundler-webpack-plugin": "^1.0.3",
     "monaco-editor": "^0.17.0",
-    "typescript": "^3.4.5"
+    "ts-loader": "^6.0.0",
+    "typescript": "^3.4.5",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.3.1"
   }
 }
