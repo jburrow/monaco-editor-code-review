@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "docs": "echo \"Browser to http://localhost:8080/docs/index.html\" && node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
+    "docs": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
     "compile": "node node_modules/typescript/bin/tsc",
     "watch": "node node_modules/typescript/bin/tsc --watch"
   },
