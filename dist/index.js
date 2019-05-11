@@ -13,23 +13,37 @@ var ReviewComment = /** @class */ (function () {
     }
     return ReviewComment;
 }());
-function createReviewManager(editor, currentUser, comments) {
-    return new ReviewManager(editor, currentUser, comments);
+function createReviewManager(editor, currentUser, comments, onChange) {
+    var rm = new ReviewManager(editor, currentUser, onChange);
+    rm.load(comments);
+    return rm;
 }
 var ReviewManager = /** @class */ (function () {
-    function ReviewManager(editor, currentUser, comments) {
+    function ReviewManager(editor, currentUser, onChange) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
-        this.comments = comments || [];
+        this.comments = [];
         this.controlsWidget = null;
+        this.onChange = onChange;
         this.addActions();
         this.createControlPanel();
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        if (this.comments.length) {
-            this.refreshComments();
-        }
     }
+    ReviewManager.prototype.load = function (comments) {
+        var _this = this;
+        this.editor.changeViewZones(function (changeAccessor) {
+            for (var _i = 0, _a = _this.iterateComments(); _i < _a.length; _i++) {
+                var item = _a[_i];
+                if (item.comment.viewZoneId) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                }
+            }
+            // Should this be inside this callback?
+            _this.comments = comments;
+            _this.refreshComments();
+        });
+    };
     ReviewManager.prototype.createControlPanel = function () {
         var _this = this;
         this.controlsWidget = {
@@ -125,6 +139,9 @@ var ReviewManager = /** @class */ (function () {
             this.comments.push(comment);
         }
         this.refreshComments();
+        if (this.onChange) {
+            this.onChange(this.comments);
+        }
     };
     ReviewManager.prototype.iterateComments = function (comments, depth, countByLineNumber, results) {
         results = results || [];
@@ -145,6 +162,9 @@ var ReviewManager = /** @class */ (function () {
             item.comment.deleted = true;
         }
         this.refreshComments();
+        if (this.onChange) {
+            this.onChange(this.comments);
+        }
     };
     ReviewManager.prototype.refreshComments = function () {
         var _this = this;
@@ -199,7 +219,9 @@ var ReviewManager = /** @class */ (function () {
         }
         var line = this.editor.getPosition().lineNumber;
         var message = prompt(promptMessage);
-        this.addComment(line, message);
+        if (message) {
+            this.addComment(line, message);
+        }
     };
     ReviewManager.prototype.addActions = function () {
         var _this = this;

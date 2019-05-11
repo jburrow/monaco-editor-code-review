@@ -29,10 +29,11 @@ class ReviewComment {
     }
 }
 
-function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[]) {
-    return new ReviewManager(editor, currentUser, comments);
+function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[], onChange: OnCommentsChanged) {
+    const rm = new ReviewManager(editor, currentUser, onChange);
+    rm.load(comments);
+    return rm;
 }
-
 
 interface ReviewCommentIterItem {
     depth: number;
@@ -40,6 +41,9 @@ interface ReviewCommentIterItem {
     count: number
 }
 
+interface OnCommentsChanged {
+    (comments: ReviewComment[]): void
+}
 
 class ReviewManager {
     currentUser: string;
@@ -47,22 +51,34 @@ class ReviewManager {
     comments: ReviewComment[];
     activeComment?: ReviewComment;
     controlsWidget: any;
+    onChange: OnCommentsChanged;
 
-    constructor(editor: any, currentUser: string, comments: ReviewComment[]) {
+    constructor(editor: any, currentUser: string, onChange: OnCommentsChanged) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
-        this.comments = comments || [];
+        this.comments = [];
         this.controlsWidget = null;
+        this.onChange = onChange;
 
         this.addActions();
         this.createControlPanel();
 
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
+    }
 
-        if (this.comments.length) {
+    load(comments: ReviewComment[]) {
+        this.editor.changeViewZones((changeAccessor) => {
+            for (const item of this.iterateComments()) {
+                if (item.comment.viewZoneId) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                }
+            }
+
+            // Should this be inside this callback?
+            this.comments = comments;
             this.refreshComments();
-        }
+        })
     }
 
     createControlPanel() {
@@ -98,7 +114,6 @@ class ReviewManager {
                         preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
                     }
                 }
-
             }
         };
 
@@ -126,8 +141,6 @@ class ReviewManager {
         }
 
         this.refreshComments();
-
-
     }
 
     markLineNumberDirty(lineNumbers: number[]) {
@@ -148,6 +161,7 @@ class ReviewManager {
             }
 
             this.configureControlsWidget(null);
+
         } else if (ev.target.detail) {
             let activeComment: ReviewComment = null;
             for (const item of this.iterateComments()) {
@@ -171,6 +185,10 @@ class ReviewManager {
         }
 
         this.refreshComments()
+
+        if(this.onChange){
+            this.onChange(this.comments);
+        }
     }
 
     iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
@@ -193,6 +211,9 @@ class ReviewManager {
             item.comment.deleted = true;
         }
         this.refreshComments();
+        if (this.onChange) {
+            this.onChange(this.comments);
+        }
     }
 
     refreshComments() {
@@ -259,7 +280,9 @@ class ReviewManager {
         const line = this.editor.getPosition().lineNumber;
         const message = prompt(promptMessage);
 
-        this.addComment(line, message);
+        if (message) {
+            this.addComment(line, message);
+        }
     }
 
     addActions() {
