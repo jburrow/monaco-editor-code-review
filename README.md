@@ -3,7 +3,7 @@ Lightweight extension for monaco-editor to allow commenting off code. This modul
 
 Try it out: https://jburrow.github.io/monaco-editor-code-review/docs/index.html
 
-Simply add the monaco-eidtor-code-review/index.js to your .html page.
+Simply add the monaco-editor-code-review/index.js to your .html page.
 
 ```html
 <script src="../index.js"></script>
