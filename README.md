@@ -1,7 +1,7 @@
 # monaco-editor-code-review
 Lightweight extension for monaco-editor to allow commenting off code. This module has no explicit run-time dependencies. There is an implicit dependency on monaco-editor.
 
-Try it out: https://jburrow.github.io/monaco-editor-code-review/docs/example.html
+Try it out: https://jburrow.github.io/monaco-editor-code-review/docs/index.html
 
 Simply add the monaco-eidtor-code-review/index.js to your .html page.
 
