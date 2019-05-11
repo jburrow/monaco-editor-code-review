@@ -4,7 +4,7 @@ interface MonacoWindow {
 
 const monacoWindow = (window as any) as MonacoWindow;
 
-class ReviewComment {
+export class ReviewComment {
     author: string;
     dt: Date;
     lineNumber: number;
@@ -29,7 +29,7 @@ class ReviewComment {
     }
 }
 
-function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[], onChange: OnCommentsChanged) {
+export function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[], onChange: OnCommentsChanged) {
     const rm = new ReviewManager(editor, currentUser, onChange);
     rm.load(comments);
     return rm;
