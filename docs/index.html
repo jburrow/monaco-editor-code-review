@@ -1,6 +1,5 @@
 <html>
-  <head>
-    <script>window.exports = {};</script>
+  <head>    
     <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
     <script src="../dist/index.js"></script>
 
@@ -109,14 +108,14 @@
   }
 
   function initReviewManager(editor) {
-    var rm = window.exports.createReviewManager(editor, "mr reviewer", [
-      new window.exports.ReviewComment(
+    var rm = MonacoEditorCodeReview.createReviewManager(editor, "mr reviewer", [
+      new MonacoEditorCodeReview.ReviewComment(
         24,
         "another reviewer",
         new Date("2019-01-01"),
         "this code isn't very good",
         [
-          new window.exports.ReviewComment(
+          new MonacoEditorCodeReview.ReviewComment(
             24,
             "original author",
             new Date("2019-01-01"),
