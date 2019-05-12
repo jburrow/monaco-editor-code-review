@@ -25,7 +25,7 @@ test('can attach createReviewManager to editor', () => {
             addZone: (zone) => {
                 const zoneId = editor._zoneId++;
                 editor._zones[zoneId] = zone;
-                console.log('created', zoneId);
+                console.log('created', zoneId, zone.domNode.className);
                 return zoneId;
             }
         }),
@@ -33,11 +33,16 @@ test('can attach createReviewManager to editor', () => {
         getPosition: () => { return { lineNumber: 1 } }
     };
 
+    
     const rm = createReviewManager(editor, 'current.user');
-    rm.load([new ReviewComment(1, "", new Date("2019-01-01"), "Comment")]);
-    rm.setActiveComment(rm.comments[0]);
-
+    const comment = new ReviewComment(1, "", new Date("2019-01-01"), "Comment");    
+    rm.load([comment]);    
     expect(Object.keys(editor._zones).length).toBe(1);
+    expect(rm.activeComment).toBe(null);
+
+    rm.handleMouseDown({ target: { element: { tagName: 'X', }, detail: { viewZoneId: 0 } } })
+    expect(rm.activeComment).toBe(comment);
+    
     //check active comment
     //check the widget moved
     //check the contentview has active classes on it.
