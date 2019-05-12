@@ -29,9 +29,9 @@ export class ReviewComment {
     }
 }
 
-export function createReviewManager(editor: any, currentUser: string, comments: ReviewComment[], onChange: OnCommentsChanged) {
+export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged) {
     const rm = new ReviewManager(editor, currentUser, onChange);
-    rm.load(comments);
+    rm.load(comments||[]);
     return rm;
 }
 

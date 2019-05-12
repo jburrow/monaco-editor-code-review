@@ -3,17 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "test":"jest",
   "scripts": {
     "dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
-    "compile": "node node_modules/webpack/bin/webpack.js",    
+    "compile": "node node_modules/webpack/bin/webpack.js",
+    "jest": "node node_modules/jest/bin/jest.js",
     "watch": "node node_modules/webpack/bin/webpack.js --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^24.0.12",
     "jest": "^24.8.0",
     "monaco-editor": "^0.17.0",
+    "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "typescript": "^3.4.5",
     "webpack": "^4.31.0",
