@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
-  "test":"jest",
+  "test": "jest",
   "scripts": {
     "dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
     "compile": "node node_modules/webpack/bin/webpack.js",

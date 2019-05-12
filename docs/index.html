@@ -1,5 +1,5 @@
 <html>
-  <head>    
+  <head>
     <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
     <script src="../dist/index.js"></script>
 
@@ -12,13 +12,13 @@
         /* margin-bottom: 1px; */
       }
 
-      .reviewComment-selection-active {        
-         background-color: pink;      
+      .reviewComment-selection-active {
+        background-color: pink;
         margin-right: 7px;
       }
 
       .reviewComment-selection-inactive {
-         background-color: cadetblue;         
+        background-color: cadetblue;
         margin-right: 10px;
       }
 
@@ -35,16 +35,26 @@
       .reviewComment-text {
         /* background-color: lightcoral; */
       }
-      
+
+      body {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .editor {
+        flex: 0.5;
+        overflow: hidden;
+      }
     </style>
   </head>
 
   <body>
-    <h5>Press CTRL+F10 to add comment or ContextMenu</h5>
-    <h6>Regular Editor</h6>
-    <div id="containerEditor" style="height:40%;"></div>
-    <h6>Diff Editor</h6>
-    <div id="containerDiff" style="height:40%;"></div>
+    <h5>Regular Editor - Press CTRL+F10 to add comment or ContextMenu</h5>
+    <div class="editor" id="containerEditor"></div>
+
+    <h5>Diff Editor - Press CTRL+F10 to add comment or ContextMenu</h5>
+    <div class="editor" id="containerDiff"></div>
   </body>
 </html>
 
@@ -85,15 +95,17 @@
           value: text,
           language: "typescript",
           glyphMargin: true,
-          contextmenu: true
+          contextmenu: true,
+          automaticLayout: true
         }
       );
 
       initReviewManager(editor);
 
-      var originalModel = monaco.editor.createModel(text, "typescript");
+      var modifiedText = text.slice(0, 100) + "\nMODIFIED\n" + text.slice(100);
 
-      var modifiedModel = monaco.editor.createModel(text, "typescript");
+      var originalModel = monaco.editor.createModel(text, "typescript");
+      var modifiedModel = monaco.editor.createModel(modifiedText, "typescript");
 
       var diffEditor = monaco.editor.createDiffEditor(
         document.getElementById("containerDiff")
@@ -108,24 +120,29 @@
   }
 
   function initReviewManager(editor) {
-    var rm = MonacoEditorCodeReview.createReviewManager(editor, "mr reviewer", [
-      new MonacoEditorCodeReview.ReviewComment(
-        24,
-        "another reviewer",
-        new Date("2019-01-01"),
-        "this code isn't very good",
-        [
-          new MonacoEditorCodeReview.ReviewComment(
-            24,
-            "original author",
-            new Date("2019-01-01"),
-            "I think you will find it is good enough"
-          )
-        ]
-      )
-    ],(comments)=>{
-      console.log('comments changed:', comments);
-    });
+    var rm = MonacoEditorCodeReview.createReviewManager(
+      editor,
+      "mr reviewer",
+      [
+        new MonacoEditorCodeReview.ReviewComment(
+          24,
+          "another reviewer",
+          new Date("2019-01-01"),
+          "this code isn't very good",
+          [
+            new MonacoEditorCodeReview.ReviewComment(
+              24,
+              "original author",
+              new Date("2019-01-01"),
+              "I think you will find it is good enough"
+            )
+          ]
+        )
+      ],
+      comments => {
+        console.log("comments changed:", comments);
+      }
+    );
   }
 
   init();
