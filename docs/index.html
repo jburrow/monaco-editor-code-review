@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
-    <script src="../dist/index.js"></script>
+    <script src="../index.js"></script>
 
     <style>
       .reviewComment-active {
@@ -126,14 +126,29 @@
   function initReviewManager(editor, summaryDiv) {
     var comments = [
       new MonacoEditorCodeReview.ReviewComment(
-        'id-1',
+        "id-0",
+        1,
+        "another reviewer",
+        new Date("2019-01-01"),
+        "at start"
+      ),
+
+      new MonacoEditorCodeReview.ReviewComment(
+        "id-2",
+        50,
+        "another reviewer",
+        new Date("2019-01-01"),
+        "at start"
+      ),
+      new MonacoEditorCodeReview.ReviewComment(
+        "id-1",
         24,
         "another reviewer",
         new Date("2019-01-01"),
         "this code isn't very good",
         [
           new MonacoEditorCodeReview.ReviewComment(
-            'id-2',
+            "id-2",
             24,
             "original author",
             new Date("2019-01-01"),
@@ -142,7 +157,7 @@
         ]
       )
     ];
-    
+
     var rm = MonacoEditorCodeReview.createReviewManager(
       editor,
       "mr reviewer",
@@ -153,9 +168,26 @@
     renderComments(summaryDiv, comments);
   }
 
-  function renderComments(element, comments) {    
-    element.innerHTML =  comments.map((comment)=>`<div>${comment.id} ${comment.lineNumber} ${comment.author} ${comment.text} ${comment.deleted?'DELETED':''}</div>`).join('');
-    console.log("Comments Changed:",  comments.map((comment)=>`${comment.id} ${comment.lineNumber} ${comment.author} ${comment.text} ${comment.deleted}`).join('\n') );
+  function renderComments(element, comments) {
+    element.innerHTML = comments
+      .map(
+        comment =>
+          `<div>${comment.id} ${comment.lineNumber} ${comment.author} ${
+            comment.text
+          } ${comment.deleted ? "DELETED" : ""}</div>`
+      )
+      .join("");
+    console.log(
+      "Comments Changed:",
+      comments
+        .map(
+          comment =>
+            `${comment.id} ${comment.lineNumber} ${comment.author} ${
+              comment.text
+            } ${comment.deleted}`
+        )
+        .join("\n")
+    );
   }
 
   init();

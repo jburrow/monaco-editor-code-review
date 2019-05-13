@@ -5,7 +5,7 @@ interface MonacoWindow {
 const monacoWindow = (window as any) as MonacoWindow;
 
 export class ReviewComment {
-    id:string;
+    id: string;
     author: string;
     dt: Date;
     lineNumber: number;
@@ -16,7 +16,7 @@ export class ReviewComment {
     viewZoneId: number;
     isDirty: boolean;
 
-    constructor(id:string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
+    constructor(id: string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
         this.id = id;
         this.author = author;
         this.dt = dt;
@@ -33,7 +33,7 @@ export class ReviewComment {
 
 export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged) {
     const rm = new ReviewManager(editor, currentUser, onChange);
-    rm.load(comments||[]);
+    rm.load(comments || []);
     return rm;
 }
 
@@ -122,12 +122,6 @@ class ReviewManager {
         this.editor.addContentWidget(this.controlsWidget);
     }
 
-    configureControlsWidget(comment: ReviewComment) {
-        this.setActiveComment(comment);
-
-        this.editor.layoutContentWidget(this.controlsWidget);
-    }
-
     setActiveComment(comment: ReviewComment) {
         const lineNumbersToMakeDirty = [];
         if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
@@ -143,6 +137,8 @@ class ReviewManager {
         }
 
         this.refreshComments();
+
+        this.editor.layoutContentWidget(this.controlsWidget);
     }
 
     markLineNumberDirty(lineNumbers: number[]) {
@@ -162,7 +158,7 @@ class ReviewManager {
                 this.removeComment(this.activeComment);
             }
 
-            this.configureControlsWidget(null);
+            this.setActiveComment(null);
 
         } else if (ev.target.detail) {
             let activeComment: ReviewComment = null;
@@ -173,12 +169,12 @@ class ReviewManager {
                 }
             }
 
-            this.configureControlsWidget(activeComment);
+            this.setActiveComment(activeComment);
         }
     }
 
-    nextCommentId(){
-        return `${new Date().toString()}-${this.currentUser}`;  
+    nextCommentId() {
+        return `${new Date().toString()}-${this.currentUser}`;
     }
 
     addComment(lineNumber: number, text: string) {
@@ -192,7 +188,7 @@ class ReviewManager {
 
         this.refreshComments()
 
-        if(this.onChange){
+        if (this.onChange) {
             this.onChange(this.comments);
         }
     }
@@ -309,6 +305,75 @@ class ReviewManager {
             }
         });
 
-        
+        this.editor.addAction({
+            id: 'my-unique-id-next',
+            label: 'Next Comment',
+            keybindings: [
+                monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F12,
+            ],
+            precondition: null,
+            keybindingContext: null,
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 0.1,
+
+            run: () => {
+                this.navigateToComment(NaviationDirection.next);
+                return null;
+            }
+        });
+
+        this.editor.addAction({
+            id: 'my-unique-id-prev',
+            label: 'Prev Comment',
+            keybindings: [
+                monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F11,
+            ],
+            precondition: null,
+            keybindingContext: null,
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 0.1,
+
+            run: () => {
+                this.navigateToComment(NaviationDirection.prev);
+                return null;
+            }
+        });
     }
+
+    navigateToComment(direction: NaviationDirection) {
+        let currentLine =0;
+        if(this.activeComment){
+            currentLine = this.activeComment.lineNumber;
+        }else{
+            currentLine = this.editor.getPosition().lineNumber;
+        }
+         
+        console.log(currentLine);
+        const comments = this.comments.filter((c) => {
+            if (direction === NaviationDirection.next) {
+                return c.lineNumber > currentLine;
+            } else if (direction === NaviationDirection.prev) {
+                return c.lineNumber < currentLine;
+            }
+        });
+
+        if (comments.length) {
+            comments.sort((a, b) => {
+                if (direction === NaviationDirection.next) {
+                    return a.lineNumber - b.lineNumber;
+                } else if (direction === NaviationDirection.prev) {
+                    return b.lineNumber - a.lineNumber;
+                }
+            });
+
+            const comment = comments[0];
+            this.setActiveComment(comment)
+            this.editor.revealLine(comment.lineNumber);            
+        }
+    }
+}
+
+enum NaviationDirection {
+    next,
+    prev
 }
