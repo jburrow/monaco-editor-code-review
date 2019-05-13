@@ -1,14 +1,12 @@
 {
   "name": "monaco-review",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
-  "test": "jest",
   "scripts": {
-    "dev": "node node_modules/webpack-dev-server/bin/webpack-dev-server.js --open",
-    "compile": "node node_modules/webpack/bin/webpack.js",
-    "jest": "node node_modules/jest/bin/jest.js",
-    "watch": "node node_modules/webpack/bin/webpack.js --watch"
+    "dev": "webpack-dev-server",
+    "compile": "webpack",
+    "test": "jest"    
   },
   "author": "",
   "license": "ISC",
