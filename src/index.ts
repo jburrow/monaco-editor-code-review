@@ -5,6 +5,7 @@ interface MonacoWindow {
 const monacoWindow = (window as any) as MonacoWindow;
 
 export class ReviewComment {
+    id:string;
     author: string;
     dt: Date;
     lineNumber: number;
@@ -15,7 +16,8 @@ export class ReviewComment {
     viewZoneId: number;
     isDirty: boolean;
 
-    constructor(lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
+    constructor(id:string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
+        this.id = id;
         this.author = author;
         this.dt = dt;
         this.lineNumber = lineNumber;
@@ -175,12 +177,16 @@ class ReviewManager {
         }
     }
 
+    nextCommentId(){
+        return `${new Date().toString()}-${this.currentUser}`;  
+    }
+
     addComment(lineNumber: number, text: string) {
         if (this.activeComment) {
-            const comment = new ReviewComment(this.activeComment.lineNumber, this.currentUser, new Date(), text)
+            const comment = new ReviewComment(this.nextCommentId(), this.activeComment.lineNumber, this.currentUser, new Date(), text)
             this.activeComment.comments.push(comment);
         } else {
-            const comment = new ReviewComment(lineNumber, this.currentUser, new Date(), text)
+            const comment = new ReviewComment(this.nextCommentId(), lineNumber, this.currentUser, new Date(), text)
             this.comments.push(comment);
         }
 
@@ -302,5 +308,7 @@ class ReviewManager {
                 return null;
             }
         });
+
+        
     }
 }

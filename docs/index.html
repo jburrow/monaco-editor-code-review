@@ -52,9 +52,10 @@
   <body>
     <h5>Regular Editor - Press CTRL+F10 to add comment or ContextMenu</h5>
     <div class="editor" id="containerEditor"></div>
-
+    <div id="summaryEditor"></div>
     <h5>Diff Editor - Press CTRL+F10 to add comment or ContextMenu</h5>
     <div class="editor" id="containerDiff"></div>
+    <div id="summaryDiff"></div>
   </body>
 </html>
 
@@ -100,7 +101,7 @@
         }
       );
 
-      initReviewManager(editor);
+      initReviewManager(editor, document.getElementById("summaryEditor"));
 
       var modifiedText = text.slice(0, 100) + "\nMODIFIED\n" + text.slice(100);
 
@@ -115,34 +116,46 @@
         modified: modifiedModel
       });
 
-      initReviewManager(diffEditor.modifiedEditor);
+      initReviewManager(
+        diffEditor.modifiedEditor,
+        document.getElementById("summaryDiff")
+      );
     });
   }
 
-  function initReviewManager(editor) {
+  function initReviewManager(editor, summaryDiv) {
+    var comments = [
+      new MonacoEditorCodeReview.ReviewComment(
+        'id-1',
+        24,
+        "another reviewer",
+        new Date("2019-01-01"),
+        "this code isn't very good",
+        [
+          new MonacoEditorCodeReview.ReviewComment(
+            'id-2',
+            24,
+            "original author",
+            new Date("2019-01-01"),
+            "I think you will find it is good enough"
+          )
+        ]
+      )
+    ];
+    
     var rm = MonacoEditorCodeReview.createReviewManager(
       editor,
       "mr reviewer",
-      [
-        new MonacoEditorCodeReview.ReviewComment(
-          24,
-          "another reviewer",
-          new Date("2019-01-01"),
-          "this code isn't very good",
-          [
-            new MonacoEditorCodeReview.ReviewComment(
-              24,
-              "original author",
-              new Date("2019-01-01"),
-              "I think you will find it is good enough"
-            )
-          ]
-        )
-      ],
-      comments => {
-        console.log("comments changed:", comments);
-      }
+      comments,
+      updatedComments => renderComments(summaryDiv, updatedComments)
     );
+
+    renderComments(summaryDiv, comments);
+  }
+
+  function renderComments(element, comments) {    
+    element.innerHTML =  comments.map((comment)=>`<div>${comment.id} ${comment.lineNumber} ${comment.author} ${comment.text} ${comment.deleted?'DELETED':''}</div>`).join('');
+    console.log("Comments Changed:",  comments.map((comment)=>`${comment.id} ${comment.lineNumber} ${comment.author} ${comment.text} ${comment.deleted}`).join('\n') );
   }
 
   init();
