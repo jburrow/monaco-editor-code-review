@@ -14,7 +14,8 @@ export class ReviewComment {
 
     deleted: boolean;
     viewZoneId: number;
-    isDirty: boolean;
+    renderStatus: ReviewCommentStatus;
+
 
     constructor(id: string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
         this.id = id;
@@ -26,7 +27,7 @@ export class ReviewComment {
 
         //HACK - this is runtime state - and should be moved
         this.deleted = false;
-        this.isDirty = false;
+        this.renderStatus = ReviewCommentStatus.normal;
         this.viewZoneId = null;
     }
 }
@@ -52,19 +53,24 @@ class ReviewManager {
     editor: any;
     comments: ReviewComment[];
     activeComment?: ReviewComment;
-    controlsWidget: any;
+    widgetInlineToolbar: any;
+    widgetInlineCommentEditor: any;
     onChange: OnCommentsChanged;
+    editorMode: EditorMode;
 
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
         this.comments = [];
-        this.controlsWidget = null;
+        this.widgetInlineToolbar = null;
+        this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
+        this.editorMode = EditorMode.toolbar;
 
         this.addActions();
-        this.createControlPanel();
+        this.createInlineToolbarWidget();
+        this.createInlineEditorWidget();
 
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
     }
@@ -83,32 +89,61 @@ class ReviewManager {
         })
     }
 
-    createControlPanel() {
-        this.controlsWidget = {
-            domNode: null,
+    createInlineEditButtonsElement() {
+        const add = document.createElement('button');
+        add.innerText = '+';
+        add.name = 'add';
+
+        const remove = document.createElement('button');
+        remove.innerText = '-';
+        remove.name = 'remove';
+
+        var root = document.createElement('span');
+        root.appendChild(add);
+        root.appendChild(remove);
+        root.style.width = "50px";
+
+        return root;
+    }
+
+    createInlineEditorElement() {
+        var root = document.createElement('span');
+        root.className = "reviewCommentEdit"
+
+        const textarea = document.createElement('textarea');
+        textarea.className = "reviewCommentText";
+        textarea.innerText = '-';
+        textarea.name = 'text';
+
+        const save = document.createElement('button');
+        save.className = "reviewCommentSave";
+        save.innerText = 'Save';
+        save.name = 'save';
+
+        const cancel = document.createElement('button');
+        save.className = "reviewCommentCancel";
+        cancel.innerText = 'Cancel';
+        cancel.name = 'Cancel';
+
+        root.appendChild(textarea);
+        root.appendChild(save);
+        root.appendChild(cancel);
+
+        return root
+    }
+
+    createInlineToolbarWidget() {
+        const buttonsElement = this.createInlineEditButtonsElement();
+        this.widgetInlineToolbar = {
             allowEditorOverflow: true,
-            getId: function () {
-                return 'controlsWidget';
+            getId: () => {
+                return 'widgetInlineToolbar';
             },
-            getDomNode: function () {
-                if (!this.domNode) {
-                    const add = document.createElement('button');
-                    add.innerText = '+';
-                    add.name = 'add';
-
-                    const remove = document.createElement('button');
-                    remove.innerText = '-';
-                    remove.name = 'remove';
-
-                    this.domNode = document.createElement('span');
-                    this.domNode.appendChild(add);
-                    this.domNode.appendChild(remove);
-                    this.domNode.style.width = 50;
-                }
-                return this.domNode;
+            getDomNode: () => {
+                return buttonsElement;
             },
             getPosition: () => {
-                if (this.activeComment) {
+                if (this.activeComment && this.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
                             lineNumber: this.activeComment.lineNumber,
@@ -119,7 +154,32 @@ class ReviewManager {
             }
         };
 
-        this.editor.addContentWidget(this.controlsWidget);
+        this.editor.addContentWidget(this.widgetInlineToolbar);
+    }
+
+    createInlineEditorWidget() {
+        const editorElement = this.createInlineEditorElement();
+        this.widgetInlineCommentEditor = {
+            allowEditorOverflow: true,
+            getId: () => {
+                return 'widgetInlineEditor';
+            },
+            getDomNode: () => {
+                return editorElement;
+            },
+            getPosition: () => {
+                if (this.activeComment && this.editorMode == EditorMode.editor) {
+                    return {
+                        position: {
+                            lineNumber: this.activeComment.lineNumber,
+                        },
+                        preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
+                    }
+                }
+            }
+        };
+
+        this.editor.addContentWidget(this.widgetInlineCommentEditor);
     }
 
     setActiveComment(comment: ReviewComment) {
@@ -133,32 +193,56 @@ class ReviewManager {
 
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
-            this.markLineNumberDirty(lineNumbersToMakeDirty);
+            this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => { comment.renderStatus = ReviewCommentStatus.dirty });
         }
 
         this.refreshComments();
 
-        this.editor.layoutContentWidget(this.controlsWidget);
+        this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
-    markLineNumberDirty(lineNumbers: number[]) {
+    filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
         const comments = this.iterateComments();
         for (const c of comments) {
             if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
-                c.comment.isDirty = true;
+                fn(c.comment);
             }
         }
     }
 
     handleMouseDown(ev: any) {
-        if (ev.target.element.tagName === 'BUTTON') {
+        console.log(ev.target.element);
+
+        if (ev.target.element.tagName === 'TEXTAREA') {
+
+        } else if (ev.target.element.tagName === 'BUTTON') {
             if (ev.target.element.name === 'add') {
-                this.captureComment()
+                this.editorMode = EditorMode.editor;
+
+                this.filterAndMapComments([this.editor.getPosition().lineNumber], (comment) => { comment.renderStatus = ReviewCommentStatus.hidden });
+                this.refreshComments();
+
+                this.editor.layoutContentWidget(this.widgetInlineToolbar);
+                this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
+                // this.captureComment()
             } else if (ev.target.element.name === 'remove' && this.activeComment) {
                 this.removeComment(this.activeComment);
+                this.setActiveComment(null);
+            } else if (ev.target.element.name === 'save') {
+                const lineNumber = this.editor.getPosition().lineNumber;
+                this.editorMode = EditorMode.toolbar;
+                const element = this.widgetInlineCommentEditor.getDomNode();
+                const text = element.querySelector("TEXTAREA[name='text']").value;
+
+                this.filterAndMapComments([lineNumber], (comment) => { comment.renderStatus = ReviewCommentStatus.normal });
+
+                this.editor.layoutContentWidget(this.widgetInlineToolbar);
+                this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
+
+                this.addComment(lineNumber,text);
             }
 
-            this.setActiveComment(null);
+
 
         } else if (ev.target.detail) {
             let activeComment: ReviewComment = null;
@@ -226,10 +310,17 @@ class ReviewManager {
                     continue;
                 }
 
-                if (item.comment.isDirty) {
+                if (item.comment.renderStatus === ReviewCommentStatus.hidden) {
                     changeAccessor.removeZone(item.comment.viewZoneId);
                     item.comment.viewZoneId = null;
-                    item.comment.isDirty = false;
+
+                    continue;
+                }
+
+                if (item.comment.renderStatus === ReviewCommentStatus.dirty) {
+                    changeAccessor.removeZone(item.comment.viewZoneId);
+                    item.comment.viewZoneId = null;
+                    item.comment.renderStatus = ReviewCommentStatus.normal;
                 }
 
                 if (!item.comment.viewZoneId) {
@@ -258,7 +349,6 @@ class ReviewManager {
                     text.innerText = item.comment.text;
 
                     domNode.appendChild(status);
-
                     domNode.appendChild(dt);
                     domNode.appendChild(author);
                     domNode.appendChild(text);
@@ -341,14 +431,13 @@ class ReviewManager {
     }
 
     navigateToComment(direction: NaviationDirection) {
-        let currentLine =0;
-        if(this.activeComment){
+        let currentLine = 0;
+        if (this.activeComment) {
             currentLine = this.activeComment.lineNumber;
-        }else{
+        } else {
             currentLine = this.editor.getPosition().lineNumber;
         }
-         
-        console.log(currentLine);
+
         const comments = this.comments.filter((c) => {
             if (direction === NaviationDirection.next) {
                 return c.lineNumber > currentLine;
@@ -368,7 +457,7 @@ class ReviewManager {
 
             const comment = comments[0];
             this.setActiveComment(comment)
-            this.editor.revealLine(comment.lineNumber);            
+            this.editor.revealLine(comment.lineNumber);
         }
     }
 }
@@ -376,4 +465,15 @@ class ReviewManager {
 enum NaviationDirection {
     next,
     prev
+}
+
+enum EditorMode {
+    editor,
+    toolbar
+}
+
+enum ReviewCommentStatus {
+    dirty,
+    hidden,
+    normal
 }
