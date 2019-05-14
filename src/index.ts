@@ -113,6 +113,12 @@ class ReviewManager {
         textarea.className = "reviewCommentText";
         textarea.innerText = '-';
         textarea.name = 'text';
+        textarea.onkeypress = (e: KeyboardEvent) => {
+            if (e.code === "Enter" && e.ctrlKey) {
+                const r = this.setEditorMode(EditorMode.toolbar);
+                this.addComment(r.lineNumber, r.text);
+            }
+        };
 
         const save = document.createElement('button');
         save.className = "reviewCommentSave";
@@ -154,8 +160,7 @@ class ReviewManager {
             }
         };
 
-        this.editor.addContentWidget(this.widgetInlineToolbar);
-        this.widgetInlineCommentEditor
+        this.editor.addContentWidget(this.widgetInlineToolbar);        
     }
 
     createInlineEditorWidget() {
@@ -169,10 +174,11 @@ class ReviewManager {
                 return editorElement;
             },
             getPosition: () => {
+                console.log('asdf')
                 if (this.editorMode == EditorMode.editor) {
                     return {
                         position: {
-                            lineNumber: this.editor.getPosition().lineNumber,
+                            lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber
                         },
                         preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
                     }
@@ -212,7 +218,7 @@ class ReviewManager {
     }
 
     handleMouseDown(ev: any) {
-        console.log(ev.target.element);
+        console.log(ev.target.element, ev.target.detail);
 
         if (ev.target.element.tagName === 'TEXTAREA') {
 
@@ -226,23 +232,27 @@ class ReviewManager {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
             }
-        } else if (ev.target.detail) {
-            let activeComment: ReviewComment = null;
-            for (const item of this.iterateComments()) {
-                if (item.comment.viewZoneId == ev.target.detail.viewZoneId) {
-                    activeComment = item.comment;
-                    break;
+            return;
+        } else {
+            if (ev.target.detail) {
+                let activeComment: ReviewComment = null;
+                for (const item of this.iterateComments()) {
+                    if (item.comment.viewZoneId == ev.target.detail.viewZoneId) {
+                        activeComment = item.comment;
+                        break;
+                    }
                 }
-            }
 
-            this.setActiveComment(activeComment);
-        } else if (this.editorMode === EditorMode.editor) {
-            const r = this.setEditorMode(EditorMode.toolbar);
+                this.setActiveComment(activeComment);
+            }
+            if (this.editorMode === EditorMode.editor) {
+                this.setEditorMode(EditorMode.toolbar);
+            }
         }
     }
 
     private setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
-        const lineNumber = this.editor.getPosition().lineNumber;
+        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
         this.editorMode = mode;
 
         this.filterAndMapComments([lineNumber], (comment) => {
@@ -259,9 +269,9 @@ class ReviewManager {
 
         if (mode == EditorMode.editor) {
             textarea.value = "";
-            console.log('focccccccccccus');
-            textarea.focus();
-            (window as any).xxxx = textarea;
+
+            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...
+            setTimeout(() => textarea.focus(), 100);
         }
 
         return {
@@ -384,20 +394,6 @@ class ReviewManager {
         });
     }
 
-    // captureComment() {
-    //     let promptMessage = 'Mesage';
-    //     if (this.activeComment) {
-    //         promptMessage += '- ' + this.activeComment.text;
-    //     }
-
-    //     const line = this.editor.getPosition().lineNumber;
-    //     const message = prompt(promptMessage);
-
-    //     if (message) {
-    //         this.addComment(line, message);
-    //     }
-    // }
-
     addActions() {
         this.editor.addAction({
             id: 'my-unique-id-add',
@@ -405,16 +401,14 @@ class ReviewManager {
             keybindings: [
                 monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10,
             ],
-            precondition: null,
-            keybindingContext: null,
-            contextMenuGroupId: 'navigation',
-            contextMenuOrder: 0,
+            // precondition: null,
+            // keybindingContext: null,
+            // contextMenuGroupId: 'navigation',
+            // contextMenuOrder: 0,
 
             run: () => {
-                //this.captureComment()
-                console.warn('asfd');
+                console.log('run')
                 this.setEditorMode(EditorMode.editor);
-                return null;
             }
         });
 
@@ -448,7 +442,6 @@ class ReviewManager {
 
             run: () => {
                 this.navigateToComment(NaviationDirection.prev);
-                return null;
             }
         });
     }
