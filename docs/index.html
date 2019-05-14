@@ -81,10 +81,10 @@
 
       initReviewManager(editor, document.getElementById("summaryEditor"));
 
-      var modifiedText = text.slice(0, 100) + "\nMODIFIED\n" + text.slice(100);
+      // var modifiedText = text.slice(0, 100) + "\nMODIFIED\n" + text.slice(100);
 
-      var originalModel = monaco.editor.createModel(text, "typescript");
-      var modifiedModel = monaco.editor.createModel(modifiedText, "typescript");
+      // var originalModel = monaco.editor.createModel(text, "typescript");
+      // var modifiedModel = monaco.editor.createModel(modifiedText, "typescript");
 
       // var diffEditor = monaco.editor.createDiffEditor(
       //   document.getElementById("containerDiff")
@@ -94,10 +94,10 @@
       //   modified: modifiedModel
       // });
 
-      initReviewManager(
-        diffEditor.modifiedEditor,
-        document.getElementById("summaryDiff")
-      );
+      // initReviewManager(
+      //   diffEditor.modifiedEditor,
+      //   document.getElementById("summaryDiff")
+      // );
     });
   }
 
