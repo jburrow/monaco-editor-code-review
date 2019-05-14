@@ -1,0 +1,50 @@
+.reviewCommentEdit {
+  border: 1px solid yellow;
+  width: 200px;
+  height: 50px;
+  margin-left:80px;
+}
+
+.reviewCommentText{
+    width:100%
+}
+
+.reviewCommentSave {
+  background-color: blue;
+}
+
+.reviewCommentCancel {
+  background-color: rebeccapurple;
+}
+
+.reviewComment-active {
+  border-bottom: 1px dashed grey;
+}
+
+.reviewComment-inactive {
+  margin-bottom: 1px;
+}
+
+.reviewComment-selection-active {
+  background-color: pink;
+  margin-right: 7px;
+}
+
+.reviewComment-selection-inactive {
+  background-color: cadetblue;
+  margin-right: 10px;
+}
+
+.reviewComment-author {
+  background-color: yellow;
+  margin-right: 10px;
+}
+
+.reviewComment-dt {
+  background-color: orange;
+  margin-right: 10px;
+}
+
+.reviewComment-text {
+  background-color: lightcoral;
+}
