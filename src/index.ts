@@ -37,6 +37,10 @@ export function createReviewManager(editor: any, currentUser: string, comments?:
     return rm;
 }
 
+const ReviewCommentIconSelect = '---';
+const ReviewCommentIconActive = '>>';
+
+
 interface ReviewCommentIterItem {
     depth: number;
     comment: ReviewComment,
@@ -71,7 +75,7 @@ class ReviewManager {
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
 
-        this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        this.editor.onMouseDown(this.handleMouseDown.bind(this));        
     }
 
     load(comments: ReviewComment[]) {
@@ -118,6 +122,7 @@ class ReviewManager {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
             }
+            console.log(e);
         };
 
         const save = document.createElement('button');
@@ -126,9 +131,9 @@ class ReviewManager {
         save.name = 'save';
 
         const cancel = document.createElement('button');
-        save.className = "reviewCommentCancel";
+        cancel.className = "reviewCommentCancel";
         cancel.innerText = 'Cancel';
-        cancel.name = 'Cancel';
+        cancel.name = 'cancel';
 
         root.appendChild(textarea);
         root.appendChild(save);
@@ -160,7 +165,7 @@ class ReviewManager {
             }
         };
 
-        this.editor.addContentWidget(this.widgetInlineToolbar);        
+        this.editor.addContentWidget(this.widgetInlineToolbar);
     }
 
     createInlineEditorWidget() {
@@ -173,8 +178,7 @@ class ReviewManager {
             getDomNode: () => {
                 return editorElement;
             },
-            getPosition: () => {
-                console.log('asdf')
+            getPosition: () => {                
                 if (this.editorMode == EditorMode.editor) {
                     return {
                         position: {
@@ -190,6 +194,8 @@ class ReviewManager {
     }
 
     setActiveComment(comment: ReviewComment) {
+        console.debug('setActiveComment', comment);
+
         const lineNumbersToMakeDirty = [];
         if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
             lineNumbersToMakeDirty.push(this.activeComment.lineNumber);
@@ -204,7 +210,6 @@ class ReviewManager {
         }
 
         this.refreshComments();
-
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
@@ -218,7 +223,7 @@ class ReviewManager {
     }
 
     handleMouseDown(ev: any) {
-        console.log(ev.target.element, ev.target.detail);
+        console.debug('handleMouseDown', this.activeComment, ev.target.element, ev.target.detail);
 
         if (ev.target.element.tagName === 'TEXTAREA') {
 
@@ -231,20 +236,23 @@ class ReviewManager {
             } else if (ev.target.element.name === 'save') {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
+            }else if(ev.target.element.name === 'cancel'){
+                this.setEditorMode(EditorMode.toolbar);
             }
             return;
         } else {
-            if (ev.target.detail) {
-                let activeComment: ReviewComment = null;
+            let activeComment: ReviewComment = null;
+
+            if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
                 for (const item of this.iterateComments()) {
                     if (item.comment.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = item.comment;
                         break;
                     }
                 }
-
-                this.setActiveComment(activeComment);
             }
+            this.setActiveComment(activeComment);
+
             if (this.editorMode === EditorMode.editor) {
                 this.setEditorMode(EditorMode.toolbar);
             }
@@ -253,11 +261,12 @@ class ReviewManager {
 
     private setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
+        console.debug('setEditorMode', this.activeComment, lineNumber, this.editor.getPosition().lineNumber);
         this.editorMode = mode;
 
         this.filterAndMapComments([lineNumber], (comment) => {
             comment.renderStatus = mode == EditorMode.editor ? ReviewCommentStatus.hidden : ReviewCommentStatus.normal;
-            console.warn(comment.text, mode);
+            console.debug(comment.text, mode);
         });
         this.refreshComments();
 
@@ -365,7 +374,7 @@ class ReviewManager {
 
                     const status = document.createElement('span');
                     status.className = isActive ? 'reviewComment-selection-active' : 'reviewComment-selection-inactive'
-                    status.innerText = isActive ? '>>' : '---';
+                    status.innerText = isActive ? ReviewCommentIconActive : ReviewCommentIconSelect;
 
                     const author = document.createElement('span');
                     author.className = 'reviewComment-author'

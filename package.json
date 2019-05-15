@@ -4,17 +4,19 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "webpack-dev-server",
+    "start": "webpack-dev-server",
     "compile": "webpack",
-    "test": "jest"    
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    
+  },
   "devDependencies": {
-    "@types/jest": "^24.0.12",
-    "jest": "^24.8.0",
     "monaco-editor": "^0.17.0",
+    "@types/jest": "^24.0.13",
+    "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "typescript": "^3.4.5",

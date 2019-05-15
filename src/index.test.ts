@@ -40,7 +40,7 @@ test('can attach createReviewManager to editor', () => {
     expect(Object.keys(editor._zones).length).toBe(1);
     expect(rm.activeComment).toBe(null);
 
-    rm.handleMouseDown({ target: { element: { tagName: 'X', }, detail: { viewZoneId: 0 } } })
+    rm.handleMouseDown({ target: { element: { tagName: 'DIV', }, detail: { viewZoneId: 0 } } })
     expect(rm.activeComment).toBe(comment);
 
     //check active comment
@@ -51,7 +51,13 @@ test('can attach createReviewManager to editor', () => {
     expect(rm.comments.length).toBe(1); //TODO marked deleted ;)
     expect(Object.keys(editor._zones).length).toBe(0);
 
-    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'add' } } })
+    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'add' } } });
+    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'save' } } });
+    expect(rm.comments.length).toBe(2);
+    expect(Object.keys(editor._zones).length).toBe(1);
+
+    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'add' } } });
+    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'cancel' } } });
     expect(rm.comments.length).toBe(2);
     expect(Object.keys(editor._zones).length).toBe(1);
 });
