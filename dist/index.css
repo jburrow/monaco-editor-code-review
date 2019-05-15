@@ -1,8 +1,10 @@
 .reviewCommentEdit {
-  border: 1px solid yellow;
-  width: 200px;
-  height: 50px;
-  margin-left:80px;
+  border: 1px solid black;
+  width: 50%;
+  height: 60px;
+  margin-left:100px;
+  padding:5px;
+  background-color: white;
 }
 
 .reviewCommentText{
@@ -10,11 +12,13 @@
 }
 
 .reviewCommentSave {
-  background-color: blue;
+  /* background-color: blue; */
+  margin:0px 5px 5px 0px;
 }
 
 .reviewCommentCancel {
-  background-color: rebeccapurple;
+  /* background-color: rebeccapurple; */
+  margin:5px 5px 5px 0px;
 }
 
 .reviewComment-active {
@@ -27,24 +31,24 @@
 
 .reviewComment-selection-active {
   background-color: pink;
-  margin-right: 7px;
+  margin-right: 7px;  
 }
 
 .reviewComment-selection-inactive {
   background-color: cadetblue;
-  margin-right: 10px;
+  margin-right: 10px;  
 }
 
 .reviewComment-author {
   background-color: yellow;
-  margin-right: 10px;
+  margin-right: 10px;  
 }
 
 .reviewComment-dt {
   background-color: orange;
-  margin-right: 10px;
+  margin-right: 10px;  
 }
 
 .reviewComment-text {
-  background-color: lightcoral;
+  background-color: lightcoral;  
 }
