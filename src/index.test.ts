@@ -19,13 +19,13 @@ test('can attach createReviewManager to editor', () => {
         onMouseDown: () => null,
         changeViewZones: (cb) => cb({
             removeZone: (zoneId) => {
-                console.log('deleted zone', zoneId);
+                console.debug('deleted zone', zoneId);
                 delete editor._zones[zoneId]
             },
             addZone: (zone) => {
                 const zoneId = editor._zoneId++;
                 editor._zones[zoneId] = zone;
-                console.log('created', zoneId, zone.domNode.className);
+                console.debug('created', zoneId, zone.domNode.className);
                 return zoneId;
             }
         }),

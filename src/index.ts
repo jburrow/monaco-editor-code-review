@@ -122,7 +122,6 @@ class ReviewManager {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
             }
-            console.log(e);
         };
 
         const save = document.createElement('button');
