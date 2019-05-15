@@ -75,7 +75,7 @@ class ReviewManager {
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
 
-        this.editor.onMouseDown(this.handleMouseDown.bind(this));        
+        this.editor.onMouseDown(this.handleMouseDown.bind(this));
     }
 
     load(comments: ReviewComment[]) {
@@ -115,7 +115,7 @@ class ReviewManager {
 
         const textarea = document.createElement('textarea');
         textarea.className = "reviewCommentText";
-        textarea.innerText = '-';
+        textarea.innerText = '';
         textarea.name = 'text';
         textarea.onkeypress = (e: KeyboardEvent) => {
             if (e.code === "Enter" && e.ctrlKey) {
@@ -177,11 +177,12 @@ class ReviewManager {
             getDomNode: () => {
                 return editorElement;
             },
-            getPosition: () => {                
+            getPosition: () => {
                 if (this.editorMode == EditorMode.editor) {
                     return {
                         position: {
-                            lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber
+                            // We are using negative marginTop to shift it above the line to the previous
+                            lineNumber: this.activeComment ? this.activeComment.lineNumber + 1 : this.editor.getPosition().lineNumber
                         },
                         preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
                     }
@@ -235,7 +236,7 @@ class ReviewManager {
             } else if (ev.target.element.name === 'save') {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
-            }else if(ev.target.element.name === 'cancel'){
+            } else if (ev.target.element.name === 'cancel') {
                 this.setEditorMode(EditorMode.toolbar);
             }
             return;
@@ -263,11 +264,31 @@ class ReviewManager {
         console.debug('setEditorMode', this.activeComment, lineNumber, this.editor.getPosition().lineNumber);
         this.editorMode = mode;
 
-        this.filterAndMapComments([lineNumber], (comment) => {
-            comment.renderStatus = mode == EditorMode.editor ? ReviewCommentStatus.hidden : ReviewCommentStatus.normal;
-            console.debug(comment.text, mode);
-        });
-        this.refreshComments();
+        // this.filterAndMapComments([lineNumber], (comment) => {
+        //     comment.renderStatus = mode == EditorMode.editor ? ReviewCommentStatus.hidden : ReviewCommentStatus.normal;
+        //     console.debug(comment.text, mode);
+        // });
+        // this.refreshComments();
+
+        let idx = 0;
+        let count = 0;
+        let marginTop: number = 0;
+
+        if (this.activeComment) {
+            for (var item of this.iterateComments()) {
+                if (item.comment.lineNumber == this.activeComment.lineNumber) {
+                    count++;
+                }
+
+                if (item.comment == this.activeComment) {
+                    idx = count + 0;
+                }
+            }
+            marginTop = ((++count - idx) * 19) - 2; //FIXME - Magic number for line height            
+        }
+
+        let node = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
+        node.style.marginTop = `-${marginTop}px`;
 
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
@@ -296,6 +317,10 @@ class ReviewManager {
         if (this.activeComment) {
             const comment = new ReviewComment(this.nextCommentId(), this.activeComment.lineNumber, this.currentUser, new Date(), text)
             this.activeComment.comments.push(comment);
+
+            this.filterAndMapComments([lineNumber], (comment) => {
+                comment.renderStatus = ReviewCommentStatus.dirty;
+            });
         } else {
             const comment = new ReviewComment(this.nextCommentId(), lineNumber, this.currentUser, new Date(), text)
             this.comments.push(comment);
@@ -394,7 +419,7 @@ class ReviewManager {
 
                     item.comment.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.comment.lineNumber,
-                        heightInLines: 1,
+                        heightInLines: 1, //TODO - Figure out if multi-line?
                         domNode: domNode
                     });
                 }
@@ -409,10 +434,10 @@ class ReviewManager {
             keybindings: [
                 monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10,
             ],
-            // precondition: null,
-            // keybindingContext: null,
-            // contextMenuGroupId: 'navigation',
-            // contextMenuOrder: 0,
+            precondition: null,
+            keybindingContext: null,
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 0,
 
             run: () => {
                 console.log('run')
