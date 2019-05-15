@@ -10,13 +10,12 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    
-  },
+  "dependencies": {},
   "devDependencies": {
-    "monaco-editor": "^0.17.0",
     "@types/jest": "^24.0.13",
     "jest": "^24.8.0",
+    "monaco-editor": "^0.17.0",
+    "timestamp-webpack-plugin": "^0.2.3",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.0",
     "typescript": "^3.4.5",

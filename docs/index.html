@@ -16,19 +16,21 @@
         flex: auto;
         overflow: hidden;
       }
-      h5{
-        height:20px
+      h5 {
+        height: 20px;
       }
-      .summary{
-        height:100px;
-        padding:10px;
-        overflow:auto;
+      .summary {
+        height: 100px;
+        padding: 10px;
+        overflow: auto;
       }
     </style>
   </head>
 
   <body>
-    <h5>Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment</h5>
+    <h5>
+      Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
+    </h5>
     <div class="editor" id="containerEditor"></div>
     <div class="summary" id="summaryEditor"></div>
     <!-- <h5>Diff Editor - Press CTRL+F10 to add comment or ContextMenu</h5>
@@ -62,6 +64,10 @@
     var prefix = await ensureMonacoIsAvailable();
     var response = await fetch("../src/index.ts");
     var text = await response.text();
+
+    response = await fetch("../dist/timestamp.json");
+    tsobj = await response.json();
+    console.log("Compiled at:", tsobj.date);
 
     require.config({
       paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
