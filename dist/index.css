@@ -3,22 +3,22 @@
   width: 50%;
   height: 60px;
   /* margin-left:100px; */
-  padding:5px;
-  background-color: white;  
+  padding: 5px;
+  background-color: white;
 }
 
-.reviewCommentText{
-    width:100%
+.reviewCommentText {
+  width: 100%;
 }
 
 .reviewCommentSave {
   /* background-color: blue; */
-  margin:0px 5px 5px 0px;
+  margin: 0px 5px 5px 0px;
 }
 
 .reviewCommentCancel {
   /* background-color: rebeccapurple; */
-  margin:5px 5px 5px 0px;
+  margin: 5px 5px 5px 0px;
 }
 
 .reviewComment-active {
@@ -31,32 +31,32 @@
 
 .reviewComment-selection-active {
   background-color: pink;
-  margin-right: 7px;  
+  margin-right: 7px;
 }
 
 .reviewComment-selection-inactive {
   background-color: cadetblue;
-  margin-right: 10px;  
+  margin-right: 10px;
 }
 
 .reviewComment-author {
   background-color: yellow;
-  margin-right: 10px;  
+  margin-right: 10px;
 }
 
 .reviewComment-dt {
   background-color: orange;
-  margin-right: 10px;  
+  margin-right: 10px;
 }
 
 .reviewComment-text {
-  background-color: lightcoral;  
+  background-color: lightcoral;
 }
 
-.editButtonsContainer{
-font-size:12px
+.editButtonsContainer {
+  font-size: 12px;
 }
 
-.editButtonRemove{
-  margin-left:5px;
+.editButtonRemove {
+  margin-left: 5px;
 }

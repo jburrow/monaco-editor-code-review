@@ -31,8 +31,8 @@ export class ReviewComment {
     }
 }
 
-export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged) {
-    const rm = new ReviewManager(editor, currentUser, onChange);
+export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig) {
+    const rm = new ReviewManager(editor, currentUser, onChange, config);
     rm.load(comments || []);
     return rm;
 }
@@ -48,7 +48,19 @@ interface OnCommentsChanged {
     (comments: ReviewComment[]): void
 }
 
-interface ReviewManagerConfig {
+export interface ReviewManagerConfig {
+    editButtonEnableRemove?: boolean;
+    lineHeight?: number;
+    commentIndent?: number;
+    commentIndentOffset?: number;
+    editButtonAddText?: string;
+    editButtonRemoveText?: string;
+    editButtonOffset?: string;
+    reviewCommentIconSelect?: string;
+    reviewCommentIconActive?: string;
+}
+
+interface ReviewManagerConfigPrivate {
     editButtonEnableRemove: boolean;
     lineHeight: number;
     commentIndent: number;
@@ -56,11 +68,12 @@ interface ReviewManagerConfig {
     editButtonAddText: string;
     editButtonRemoveText: string;
     editButtonOffset: string;
-    reviewCommentIconSelect:string;
-    reviewCommentIconActive:string;
+    reviewCommentIconSelect: string;
+    reviewCommentIconActive: string;
 }
 
-const defaultReviewManagerConfig: ReviewManagerConfig = {
+
+const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     editButtonOffset: '-75px',
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
@@ -68,8 +81,8 @@ const defaultReviewManagerConfig: ReviewManagerConfig = {
     lineHeight: 19,
     commentIndent: 20,
     commentIndentOffset: 0,
-    reviewCommentIconSelect : '---',
-    reviewCommentIconActive : '>>'
+    reviewCommentIconSelect: '---',
+    reviewCommentIconActive: '>>'
 };
 
 
@@ -82,9 +95,9 @@ class ReviewManager {
     widgetInlineCommentEditor: any;
     onChange: OnCommentsChanged;
     editorMode: EditorMode;
-    config: ReviewManagerConfig;
+    config: ReviewManagerConfigPrivate;
 
-    constructor(editor: any, currentUser: string, onChange: OnCommentsChanged) {
+    constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
@@ -93,7 +106,7 @@ class ReviewManager {
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
-        this.config = defaultReviewManagerConfig;
+        this.config = { ...defaultReviewManagerConfig, ...(config || {}) };
 
         this.addActions();
         this.createInlineToolbarWidget();
@@ -152,6 +165,7 @@ class ReviewManager {
             if (e.code === "Enter" && e.ctrlKey) {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
+                
             }
         };
 
@@ -187,7 +201,7 @@ class ReviewManager {
                 if (this.activeComment && this.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
-                            lineNumber: this.activeComment.lineNumber,
+                            lineNumber: this.activeComment.lineNumber + 1,
                         },
                         preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
                     }
@@ -241,6 +255,15 @@ class ReviewManager {
         }
 
         this.refreshComments();
+        this.layoutInlineToolbar();
+        
+    }
+
+    layoutInlineToolbar(){
+        if(this.activeComment){
+        const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
+        toolbarRoot.style.marginTop = `-${this.calculateMarginTopOffset(2)}px`;
+        }
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
@@ -255,7 +278,7 @@ class ReviewManager {
 
     handleMouseDown(ev: any) {
         console.debug('handleMouseDown', this.activeComment, ev.target.element, ev.target.detail);
-        
+
         if (ev.target.element.tagName === 'TEXTAREA') {
 
         } else if (ev.target.element.tagName === 'BUTTON' || ev.target.element.tagName === 'A') {
@@ -290,11 +313,7 @@ class ReviewManager {
         }
     }
 
-    private setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
-        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
-        console.debug('setEditorMode', this.activeComment, lineNumber, this.editor.getPosition().lineNumber);
-        this.editorMode = mode;
-
+    private calculateMarginTopOffset(extraOffset: number = 1): number {
         let idx = 0;
         let count = 0;
         let marginTop: number = 0;
@@ -310,13 +329,21 @@ class ReviewManager {
                     idx = count + 0;
                 }
             }
-            marginTop = ((++count - idx) * lineHeight) - 2;
+            marginTop = ((extraOffset + count - idx) * lineHeight) - 2;
         }
 
-        let node = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
-        node.style.marginTop = `-${marginTop}px`;
+        return marginTop;
+    }
 
-        this.editor.layoutContentWidget(this.widgetInlineToolbar);
+    private setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
+        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
+        console.debug('setEditorMode', this.activeComment, lineNumber, this.editor.getPosition().lineNumber);
+        this.editorMode = mode;
+
+        const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
+        editorRoot.style.marginTop = `-${this.calculateMarginTopOffset()}px`;
+
+        this.layoutInlineToolbar();
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
 
         const element = this.widgetInlineCommentEditor.getDomNode();
@@ -353,6 +380,7 @@ class ReviewManager {
         }
 
         this.refreshComments()
+        this.layoutInlineToolbar();
 
         if (this.onChange) {
             this.onChange(this.comments);
