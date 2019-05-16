@@ -2,7 +2,7 @@
   border: 1px solid black;
   width: 50%;
   height: 60px;
-  margin-left:100px;
+  /* margin-left:100px; */
   padding:5px;
   background-color: white;  
 }
@@ -51,4 +51,12 @@
 
 .reviewComment-text {
   background-color: lightcoral;  
+}
+
+.editButtonsContainer{
+font-size:12px
+}
+
+.editButtonRemove{
+  margin-left:5px;
 }

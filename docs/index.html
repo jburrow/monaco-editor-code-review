@@ -28,14 +28,20 @@
   </head>
 
   <body>
+    <div>
+      <div>Choose Monaco Mode</div>
+      <button onclick="setView('standard')">Editor</button>
+      <button onclick="setView('standard-readonly')">Editor - Readonly</button>
+      <button onclick="setView('inline')">Diff - Inline</button>
+      <button onclick="setView('side-by-side')">Diff - Side-by-Side</button>
+    </div>
     <h5>
       Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
     </h5>
     <div class="editor" id="containerEditor"></div>
     <div class="summary" id="summaryEditor"></div>
     <!-- <h5>Diff Editor - Press CTRL+F10 to add comment or ContextMenu</h5>
-    <div class="editor" id="containerDiff"></div>
-    <div id="summaryDiff"></div> -->
+    <div class="editor" id="containerDiff"></div>//-->
   </body>
 </html>
 
@@ -60,10 +66,53 @@
     });
   }
 
+  function setView(mode) {
+    document.getElementById("containerEditor").innerHTML = "";
+    if (mode.startsWith("standard")) {
+      var editor = monaco.editor.create(
+        document.getElementById("containerEditor"),
+        {
+          value: window.exampleText,
+          language: "typescript",
+          glyphMargin: true,
+          contextmenu: true,
+          automaticLayout: true,
+          readOnly: mode === 'standard-readonly'
+        }
+      );
+
+      initReviewManager(editor, document.getElementById("summaryEditor"));
+    } else {
+      var originalModel = monaco.editor.createModel(
+        window.exampleText,
+        "typescript"
+      );
+      var modifiedModel = monaco.editor.createModel(
+        window.modifiedText,
+        "typescript"
+      );
+
+      var diffEditor = monaco.editor.createDiffEditor(
+        document.getElementById("containerEditor"),
+        { renderSideBySide: mode !== "inline" }
+      );
+      diffEditor.setModel({
+        original: originalModel,
+        modified: modifiedModel
+      });
+
+      initReviewManager(diffEditor.modifiedEditor);
+    }
+  }
+
   async function init() {
     var prefix = await ensureMonacoIsAvailable();
     var response = await fetch("../src/index.ts");
-    var text = await response.text();
+    window.exampleText = await response.text();
+    window.modifiedText = window.exampleText.replace(
+      new RegExp("string", "g"),
+      "string /* String!*/"
+    );
 
     response = await fetch("../dist/timestamp.json");
     tsobj = await response.json();
@@ -74,40 +123,11 @@
     });
 
     require(["vs/editor/editor.main"], function() {
-      var editor = monaco.editor.create(
-        document.getElementById("containerEditor"),
-        {
-          value: text,
-          language: "typescript",
-          glyphMargin: true,
-          contextmenu: true,
-          automaticLayout: true
-        }
-      );
-
-      initReviewManager(editor, document.getElementById("summaryEditor"));
-
-      // var modifiedText = text.slice(0, 100) + "\nMODIFIED\n" + text.slice(100);
-
-      // var originalModel = monaco.editor.createModel(text, "typescript");
-      // var modifiedModel = monaco.editor.createModel(modifiedText, "typescript");
-
-      // var diffEditor = monaco.editor.createDiffEditor(
-      //   document.getElementById("containerDiff")
-      // );
-      // diffEditor.setModel({
-      //   original: originalModel,
-      //   modified: modifiedModel
-      // });
-
-      // initReviewManager(
-      //   diffEditor.modifiedEditor,
-      //   document.getElementById("summaryDiff")
-      // );
+      setView("standard");
     });
   }
 
-  function initReviewManager(editor, summaryDiv) {
+  function initReviewManager(editor) {
     var comments = [
       new MonacoEditorCodeReview.ReviewComment(
         "id-0",
@@ -142,6 +162,7 @@
       )
     ];
 
+    var summaryDiv = document.getElementById("summaryEditor");
     var rm = MonacoEditorCodeReview.createReviewManager(
       editor,
       "mr reviewer",
@@ -153,6 +174,7 @@
   }
 
   function renderComments(element, comments) {
+    comments = comments || [];
     element.innerHTML = comments
       .map(
         comment =>

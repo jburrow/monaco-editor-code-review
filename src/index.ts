@@ -51,6 +51,27 @@ interface OnCommentsChanged {
     (comments: ReviewComment[]): void
 }
 
+interface ReviewManagerConfig {
+    editButtonEnableRemove: boolean;
+    lineHeight: number;
+    commentIndent: number;
+    commentIndentOffset: number;
+    editButtonAddText: string;
+    editButtonRemoveText: string;
+    editButtonOffset: string;
+}
+
+const defaultReviewManagerConfig: ReviewManagerConfig = {
+    editButtonOffset: '-75px',
+    editButtonAddText: 'Reply',
+    editButtonRemoveText: 'Remove',
+    editButtonEnableRemove: true,
+    lineHeight: 19,
+    commentIndent: 20,
+    commentIndentOffset: 0
+};
+
+
 class ReviewManager {
     currentUser: string;
     editor: any;
@@ -60,6 +81,7 @@ class ReviewManager {
     widgetInlineCommentEditor: any;
     onChange: OnCommentsChanged;
     editorMode: EditorMode;
+    config: ReviewManagerConfig;
 
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged) {
         this.currentUser = currentUser;
@@ -70,6 +92,7 @@ class ReviewManager {
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
+        this.config = defaultReviewManagerConfig;
 
         this.addActions();
         this.createInlineToolbarWidget();
@@ -93,19 +116,26 @@ class ReviewManager {
     }
 
     createInlineEditButtonsElement() {
-        const add = document.createElement('button');
-        add.innerText = '+';
-        add.name = 'add';
-
-        const remove = document.createElement('button');
-        remove.innerText = '-';
-        remove.name = 'remove';
-
         var root = document.createElement('span');
-        root.appendChild(add);
-        root.appendChild(remove);
-        root.style.width = "50px";
+        root.className = 'editButtonsContainer'
 
+        const add = document.createElement('a');
+        add.href = '#'
+        add.innerText = this.config.editButtonAddText;
+        add.name = 'add';
+        add.className = 'editButtonAdd'
+        root.appendChild(add);
+
+        if (this.config.editButtonEnableRemove) {
+            const remove = document.createElement('a');
+            remove.href = '#'
+            remove.innerText = this.config.editButtonRemoveText;
+            remove.name = 'remove';
+            remove.className = 'editButtonRemove'
+            root.appendChild(remove);
+        }
+        
+        root.style.marginLeft = this.config.editButtonOffset;
         return root;
     }
 
@@ -224,10 +254,10 @@ class ReviewManager {
 
     handleMouseDown(ev: any) {
         console.debug('handleMouseDown', this.activeComment, ev.target.element, ev.target.detail);
-
+        
         if (ev.target.element.tagName === 'TEXTAREA') {
 
-        } else if (ev.target.element.tagName === 'BUTTON') {
+        } else if (ev.target.element.tagName === 'BUTTON' || ev.target.element.tagName === 'A') {
             if (ev.target.element.name === 'add') {
                 this.setEditorMode(EditorMode.editor);
             } else if (ev.target.element.name === 'remove' && this.activeComment) {
@@ -264,15 +294,10 @@ class ReviewManager {
         console.debug('setEditorMode', this.activeComment, lineNumber, this.editor.getPosition().lineNumber);
         this.editorMode = mode;
 
-        // this.filterAndMapComments([lineNumber], (comment) => {
-        //     comment.renderStatus = mode == EditorMode.editor ? ReviewCommentStatus.hidden : ReviewCommentStatus.normal;
-        //     console.debug(comment.text, mode);
-        // });
-        // this.refreshComments();
-
         let idx = 0;
         let count = 0;
         let marginTop: number = 0;
+        const lineHeight = this.config.lineHeight;//FIXME - Magic number for line height            
 
         if (this.activeComment) {
             for (var item of this.iterateComments()) {
@@ -284,7 +309,7 @@ class ReviewManager {
                     idx = count + 0;
                 }
             }
-            marginTop = ((++count - idx) * 19) - 2; //FIXME - Magic number for line height            
+            marginTop = ((++count - idx) * lineHeight) - 2;
         }
 
         let node = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
@@ -299,7 +324,7 @@ class ReviewManager {
         if (mode == EditorMode.editor) {
             textarea.value = "";
 
-            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...
+            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...            
             setTimeout(() => textarea.focus(), 100);
         }
 
@@ -391,8 +416,7 @@ class ReviewManager {
                     const domNode = document.createElement('div');
                     const isActive = this.activeComment == item.comment;
 
-                    domNode.style.marginLeft = (25 * (item.depth + 1)) + 50 + "";
-                    domNode.style.width = "100";
+                    domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "";
                     domNode.style.display = 'inline';
                     domNode.className = isActive ? 'reviewComment-active' : 'reviewComment-inactive';
 
