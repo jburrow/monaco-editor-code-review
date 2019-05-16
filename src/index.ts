@@ -164,6 +164,12 @@ class ReviewManager {
         this.editor.focus();
     }
 
+    handleSave() {
+        const r = this.setEditorMode(EditorMode.toolbar);
+        this.addComment(r.lineNumber, r.text);
+        this.editor.focus();
+    }
+
     createInlineEditorElement() {
         var root = document.createElement('span');
         root.className = "reviewCommentEdit"
@@ -174,8 +180,7 @@ class ReviewManager {
         textarea.name = 'text';
         textarea.onkeypress = (e: KeyboardEvent) => {
             if (e.code === "Enter" && e.ctrlKey) {
-                const r = this.setEditorMode(EditorMode.toolbar);
-                this.addComment(r.lineNumber, r.text);
+                this.handleSave();
             }
         };
         textarea.onkeydown = (e: KeyboardEvent) => {
@@ -189,8 +194,7 @@ class ReviewManager {
         save.innerText = 'Save';
         save.name = 'save';
         save.onclick = () => {
-            const r = this.setEditorMode(EditorMode.toolbar);
-            this.addComment(r.lineNumber, r.text);
+            this.handleSave();
         };
 
         const cancel = document.createElement('button') as HTMLButtonElement;
@@ -509,7 +513,6 @@ class ReviewManager {
             contextMenuOrder: 0,
 
             run: () => {
-                console.log('run')
                 this.setEditorMode(EditorMode.editor);
             }
         });
@@ -527,7 +530,6 @@ class ReviewManager {
 
             run: () => {
                 this.navigateToComment(NavigationDirection.next);
-                return null;
             }
         });
 
@@ -576,7 +578,7 @@ class ReviewManager {
             const comment = comments[0];
             this.setActiveComment(comment)
             this.refreshComments();
-            this.layoutInlineToolbar(); //HERE
+            this.layoutInlineToolbar();
             this.editor.revealLineInCenter(comment.lineNumber);
         }
     }
