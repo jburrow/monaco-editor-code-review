@@ -133,11 +133,12 @@ class ReviewManager {
         var root = document.createElement('span');
         root.className = 'editButtonsContainer'
 
-        const add = document.createElement('a');
+        const add = document.createElement('a') as HTMLAnchorElement;
         add.href = '#'
         add.innerText = this.config.editButtonAddText;
         add.name = 'add';
         add.className = 'editButtonAdd'
+        add.onclick = () => this.setEditorMode(EditorMode.editor);
         root.appendChild(add);
 
         if (this.config.editButtonEnableRemove) {
@@ -146,6 +147,10 @@ class ReviewManager {
             remove.innerText = this.config.editButtonRemoveText;
             remove.name = 'remove';
             remove.className = 'editButtonRemove'
+            remove.onclick = () => {
+                this.removeComment(this.activeComment);
+
+            }
             root.appendChild(remove);
         }
 
@@ -165,19 +170,26 @@ class ReviewManager {
             if (e.code === "Enter" && e.ctrlKey) {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
-                
+
             }
         };
 
-        const save = document.createElement('button');
+        const save = document.createElement('button') as HTMLButtonElement;
         save.className = "reviewCommentSave";
         save.innerText = 'Save';
         save.name = 'save';
+        save.onclick = () => {
+            const r = this.setEditorMode(EditorMode.toolbar);
+            this.addComment(r.lineNumber, r.text);
+        };
 
-        const cancel = document.createElement('button');
+        const cancel = document.createElement('button') as HTMLButtonElement;
         cancel.className = "reviewCommentCancel";
         cancel.innerText = 'Cancel';
         cancel.name = 'cancel';
+        save.onclick = () => {
+            this.setEditorMode(EditorMode.toolbar);
+        }
 
         root.appendChild(textarea);
         root.appendChild(save);
@@ -253,16 +265,12 @@ class ReviewManager {
         if (lineNumbersToMakeDirty.length > 0) {
             this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => { comment.renderStatus = ReviewCommentStatus.dirty });
         }
-
-        this.refreshComments();
-        this.layoutInlineToolbar();
-        
     }
 
-    layoutInlineToolbar(){
-        if(this.activeComment){
-        const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
-        toolbarRoot.style.marginTop = `-${this.calculateMarginTopOffset(2)}px`;
+    layoutInlineToolbar() {
+        if (this.activeComment) {
+            const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
+            toolbarRoot.style.marginTop = `-${this.calculateMarginTopOffset(2)}px`;
         }
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
@@ -276,23 +284,12 @@ class ReviewManager {
         }
     }
 
+
+
     handleMouseDown(ev: any) {
         console.debug('handleMouseDown', this.activeComment, ev.target.element, ev.target.detail);
 
-        if (ev.target.element.tagName === 'TEXTAREA') {
-
-        } else if (ev.target.element.tagName === 'BUTTON' || ev.target.element.tagName === 'A') {
-            if (ev.target.element.name === 'add') {
-                this.setEditorMode(EditorMode.editor);
-            } else if (ev.target.element.name === 'remove' && this.activeComment) {
-                this.removeComment(this.activeComment);
-                this.setActiveComment(null);
-            } else if (ev.target.element.name === 'save') {
-                const r = this.setEditorMode(EditorMode.toolbar);
-                this.addComment(r.lineNumber, r.text);
-            } else if (ev.target.element.name === 'cancel') {
-                this.setEditorMode(EditorMode.toolbar);
-            }
+        if (ev.target.element.tagName === 'TEXTAREA' || ev.target.element.tagName === 'BUTTON' || ev.target.element.tagName === 'A') {
             return;
         } else {
             let activeComment: ReviewComment = null;
@@ -306,10 +303,9 @@ class ReviewManager {
                 }
             }
             this.setActiveComment(activeComment);
-
-            if (this.editorMode === EditorMode.editor) {
-                this.setEditorMode(EditorMode.toolbar);
-            }
+            this.refreshComments();
+            this.setEditorMode(EditorMode.toolbar);
+            
         }
     }
 
@@ -406,6 +402,10 @@ class ReviewManager {
         for (const item of this.iterateComments([comment])) {
             item.comment.deleted = true;
         }
+        if (this.activeComment == comment) {
+            this.setActiveComment(null);
+        }
+
         this.refreshComments();
         if (this.onChange) {
             this.onChange(this.comments);
@@ -559,7 +559,9 @@ class ReviewManager {
 
             const comment = comments[0];
             this.setActiveComment(comment)
-            this.editor.revealLine(comment.lineNumber);
+            this.refreshComments();
+            this.layoutInlineToolbar(); //HERE
+            this.editor.revealLineInCenter(comment.lineNumber);
         }
     }
 }

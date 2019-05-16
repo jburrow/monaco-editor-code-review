@@ -2,7 +2,6 @@
   border: 1px solid black;
   width: 50%;
   height: 60px;
-  /* margin-left:100px; */
   padding: 5px;
   background-color: white;
 }
@@ -40,13 +39,17 @@
 }
 
 .reviewComment-author {
-  background-color: yellow;
+  background-color: pink;
+  width: 200px;
   margin-right: 10px;
 }
 
 .reviewComment-dt {
-  background-color: orange;
+  background-color: green;
   margin-right: 10px;
+  width:200px;
+  display:inline-block;
+  text-align:center;
 }
 
 .reviewComment-text {
