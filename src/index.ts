@@ -37,9 +37,6 @@ export function createReviewManager(editor: any, currentUser: string, comments?:
     return rm;
 }
 
-const ReviewCommentIconSelect = '---';
-const ReviewCommentIconActive = '>>';
-
 
 interface ReviewCommentIterItem {
     depth: number;
@@ -59,6 +56,8 @@ interface ReviewManagerConfig {
     editButtonAddText: string;
     editButtonRemoveText: string;
     editButtonOffset: string;
+    reviewCommentIconSelect:string;
+    reviewCommentIconActive:string;
 }
 
 const defaultReviewManagerConfig: ReviewManagerConfig = {
@@ -68,7 +67,9 @@ const defaultReviewManagerConfig: ReviewManagerConfig = {
     editButtonEnableRemove: true,
     lineHeight: 19,
     commentIndent: 20,
-    commentIndentOffset: 0
+    commentIndentOffset: 0,
+    reviewCommentIconSelect : '---',
+    reviewCommentIconActive : '>>'
 };
 
 
@@ -134,7 +135,7 @@ class ReviewManager {
             remove.className = 'editButtonRemove'
             root.appendChild(remove);
         }
-        
+
         root.style.marginLeft = this.config.editButtonOffset;
         return root;
     }
@@ -422,7 +423,7 @@ class ReviewManager {
 
                     const status = document.createElement('span');
                     status.className = isActive ? 'reviewComment-selection-active' : 'reviewComment-selection-inactive'
-                    status.innerText = isActive ? ReviewCommentIconActive : ReviewCommentIconSelect;
+                    status.innerText = isActive ? this.config.reviewCommentIconActive : this.config.reviewCommentIconSelect;
 
                     const author = document.createElement('span');
                     author.className = 'reviewComment-author'
