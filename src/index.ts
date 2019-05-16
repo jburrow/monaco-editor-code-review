@@ -584,7 +584,7 @@ class ReviewManager {
     }
 }
 
-export enum NavigationDirection {
+enum NavigationDirection {
     next = 1,
     prev = 2
 }
