@@ -21,7 +21,7 @@
 }
 
 .reviewComment-active {
-  border-bottom: 1px dashed grey;
+  /*   border-bottom: 1px dashed grey; */
 }
 
 .reviewComment-inactive {
@@ -39,21 +39,28 @@
 }
 
 .reviewComment-author {
-  background-color: pink;
-  width: 200px;
+  /* background-color: pink; */
+
   margin-right: 10px;
+  /* display: inline-block; */
 }
 
 .reviewComment-dt {
-  background-color: green;
+  /*   background-color: green; */
   margin-right: 10px;
-  width:200px;
-  display:inline-block;
-  text-align:center;
+  width: 200px;
+  /* display: inline-block; */
+  text-align: center;
 }
 
 .reviewComment-text {
-  background-color: lightcoral;
+  /* background-color: lightcoral; */
+  /* font-size:12px; */
+  width: 200px;
+
+  /* display: inline-block; */
+  overflow: hidden;
+  height: 20px;
 }
 
 .editButtonsContainer {

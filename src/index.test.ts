@@ -17,6 +17,7 @@ test('can attach createReviewManager to editor', () => {
         addAction: () => null,
         addContentWidget: () => null,
         onMouseDown: () => null,
+        revealLineInCenter: () => null,
         changeViewZones: (cb) => cb({
             removeZone: (zoneId) => {
                 console.debug('deleted zone', zoneId);
@@ -33,9 +34,9 @@ test('can attach createReviewManager to editor', () => {
         getPosition: () => { return { lineNumber: 1 } }
     };
 
+    const comment = new ReviewComment('id-1', 1, "", new Date("2019-01-01"), "#1");
 
-    const rm = createReviewManager(editor, 'current.user');
-    const comment = new ReviewComment('id-1', 1, "", new Date("2019-01-01"), "Comment");
+    const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
     rm.load([comment]);
     expect(Object.keys(editor._zones).length).toBe(1);
     expect(rm.activeComment).toBe(null);
@@ -47,17 +48,33 @@ test('can attach createReviewManager to editor', () => {
     //check the widget moved
     //check the contentview has active classes on it.
 
-    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'remove' } } })
+    rm.removeComment(comment);
+    expect(rm.activeComment).toBe(null);
+
     expect(rm.comments.length).toBe(1); //TODO marked deleted ;)
     expect(Object.keys(editor._zones).length).toBe(0);
 
-    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'add' } } });
-    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'save' } } });
+    const num2 = rm.addComment(2, "#2");
     expect(rm.comments.length).toBe(2);
     expect(Object.keys(editor._zones).length).toBe(1);
 
-    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'add' } } });
-    rm.handleMouseDown({ target: { element: { tagName: 'BUTTON', name: 'cancel' } } });
+    rm.setActiveComment(num2);
+    const num3 = rm.addComment(null, "#2.2");
     expect(rm.comments.length).toBe(2);
-    expect(Object.keys(editor._zones).length).toBe(1);
+    expect(Object.keys(editor._zones).length).toBe(2);
+
+    rm.setActiveComment(null);
+    const num4 = rm.addComment(4, "#4");
+    expect(Object.keys(editor._zones).length).toBe(3);
+
+    rm.setActiveComment(num4);
+
+    rm.navigateToComment(2);
+    expect(rm.activeComment.text).toBe('#2');
+
+    rm.navigateToComment(2);
+    expect(rm.activeComment.text).toBe('#1');
+
+    rm.navigateToComment(1);
+    expect(rm.activeComment.text).toBe('#2');
 });

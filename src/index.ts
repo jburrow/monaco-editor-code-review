@@ -32,6 +32,7 @@ export class ReviewComment {
 }
 
 export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig) {
+    //(window as any).editor = editor;    
     const rm = new ReviewManager(editor, currentUser, onChange, config);
     rm.load(comments || []);
     return rm;
@@ -158,6 +159,11 @@ class ReviewManager {
         return root;
     }
 
+    handleCancel() {
+        this.setEditorMode(EditorMode.toolbar);
+        this.editor.focus();
+    }
+
     createInlineEditorElement() {
         var root = document.createElement('span');
         root.className = "reviewCommentEdit"
@@ -170,9 +176,13 @@ class ReviewManager {
             if (e.code === "Enter" && e.ctrlKey) {
                 const r = this.setEditorMode(EditorMode.toolbar);
                 this.addComment(r.lineNumber, r.text);
-
             }
         };
+        textarea.onkeydown = (e: KeyboardEvent) => {
+            if (e.code === "Escape") {
+                this.handleCancel();
+            }
+        }
 
         const save = document.createElement('button') as HTMLButtonElement;
         save.className = "reviewCommentSave";
@@ -187,8 +197,8 @@ class ReviewManager {
         cancel.className = "reviewCommentCancel";
         cancel.innerText = 'Cancel';
         cancel.name = 'cancel';
-        save.onclick = () => {
-            this.setEditorMode(EditorMode.toolbar);
+        cancel.onclick = () => {
+            this.handleCancel();
         }
 
         root.appendChild(textarea);
@@ -305,7 +315,7 @@ class ReviewManager {
             this.setActiveComment(activeComment);
             this.refreshComments();
             this.setEditorMode(EditorMode.toolbar);
-            
+
         }
     }
 
@@ -332,8 +342,9 @@ class ReviewManager {
     }
 
     private setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
+        console.debug('setEditorMode', this.activeComment);
+
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
-        console.debug('setEditorMode', this.activeComment, lineNumber, this.editor.getPosition().lineNumber);
         this.editorMode = mode;
 
         const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
@@ -362,16 +373,17 @@ class ReviewManager {
         return `${new Date().toString()}-${this.currentUser}`;
     }
 
-    addComment(lineNumber: number, text: string) {
+    addComment(lineNumber: number, text: string): ReviewComment {
+        let comment: ReviewComment = null;
         if (this.activeComment) {
-            const comment = new ReviewComment(this.nextCommentId(), this.activeComment.lineNumber, this.currentUser, new Date(), text)
+            comment = new ReviewComment(this.nextCommentId(), this.activeComment.lineNumber, this.currentUser, new Date(), text)
             this.activeComment.comments.push(comment);
 
             this.filterAndMapComments([lineNumber], (comment) => {
                 comment.renderStatus = ReviewCommentStatus.dirty;
             });
         } else {
-            const comment = new ReviewComment(this.nextCommentId(), lineNumber, this.currentUser, new Date(), text)
+            comment = new ReviewComment(this.nextCommentId(), lineNumber, this.currentUser, new Date(), text)
             this.comments.push(comment);
         }
 
@@ -381,6 +393,8 @@ class ReviewManager {
         if (this.onChange) {
             this.onChange(this.comments);
         }
+
+        return comment;
     }
 
     iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
@@ -392,6 +406,7 @@ class ReviewManager {
         for (const comment of comments) {
             countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
             results.push({ depth, comment, count: countByLineNumber[comment.lineNumber] })
+
             this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
         }
 
@@ -473,7 +488,8 @@ class ReviewManager {
                     item.comment.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.comment.lineNumber,
                         heightInLines: 1, //TODO - Figure out if multi-line?
-                        domNode: domNode
+                        domNode: domNode,
+                        suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
                 }
             }
@@ -510,7 +526,7 @@ class ReviewManager {
             contextMenuOrder: 0.1,
 
             run: () => {
-                this.navigateToComment(NaviationDirection.next);
+                this.navigateToComment(NavigationDirection.next);
                 return null;
             }
         });
@@ -527,12 +543,12 @@ class ReviewManager {
             contextMenuOrder: 0.1,
 
             run: () => {
-                this.navigateToComment(NaviationDirection.prev);
+                this.navigateToComment(NavigationDirection.prev);
             }
         });
     }
 
-    navigateToComment(direction: NaviationDirection) {
+    navigateToComment(direction: NavigationDirection) {
         let currentLine = 0;
         if (this.activeComment) {
             currentLine = this.activeComment.lineNumber;
@@ -541,18 +557,18 @@ class ReviewManager {
         }
 
         const comments = this.comments.filter((c) => {
-            if (direction === NaviationDirection.next) {
+            if (direction === NavigationDirection.next) {
                 return c.lineNumber > currentLine;
-            } else if (direction === NaviationDirection.prev) {
+            } else if (direction === NavigationDirection.prev) {
                 return c.lineNumber < currentLine;
             }
         });
 
         if (comments.length) {
             comments.sort((a, b) => {
-                if (direction === NaviationDirection.next) {
+                if (direction === NavigationDirection.next) {
                     return a.lineNumber - b.lineNumber;
-                } else if (direction === NaviationDirection.prev) {
+                } else if (direction === NavigationDirection.prev) {
                     return b.lineNumber - a.lineNumber;
                 }
             });
@@ -566,9 +582,9 @@ class ReviewManager {
     }
 }
 
-enum NaviationDirection {
-    next,
-    prev
+export enum NavigationDirection {
+    next = 1,
+    prev = 2
 }
 
 enum EditorMode {
