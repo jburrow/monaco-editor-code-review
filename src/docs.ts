@@ -5,12 +5,13 @@ interface WindowDoc {
     monaco: any;
     setView: any;
     generateDifferentComments: any;
+    generateDifferentContents: any;
 }
 
 const win = (window as any) as WindowDoc;
-let exampleText: string = '';
-let modifiedText: string = '';
 let reviewManager: any = null;
+let currentMode: string = '';
+let currentEditor: any = null;
 
 function ensureMonacoIsAvailable() {
     return new Promise(resolve => {
@@ -32,13 +33,20 @@ function ensureMonacoIsAvailable() {
     });
 }
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
 function setView(mode) {
+    const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
+
+    currentMode = mode;
     document.getElementById("containerEditor").innerHTML = "";
     if (mode.startsWith("standard")) {
-        var editor = win.monaco.editor.create(
+        currentEditor = win.monaco.editor.create(
             document.getElementById("containerEditor"),
             {
-                value: exampleText,
+                value: exampleSourceCode[idx],
                 language: "typescript",
                 glyphMargin: true,
                 contextmenu: true,
@@ -47,40 +55,63 @@ function setView(mode) {
             }
         );
 
-        initReviewManager(editor);
+        initReviewManager(currentEditor);
     } else {
         var originalModel = win.monaco.editor.createModel(
-            exampleText,
+            exampleSourceCode[idx],
             "typescript"
         );
         var modifiedModel = win.monaco.editor.createModel(
-            modifiedText,
+            exampleSourceCode[idx + 1],
             "typescript"
         );
 
-        var diffEditor = win.monaco.editor.createDiffEditor(
+        currentEditor = win.monaco.editor.createDiffEditor(
             document.getElementById("containerEditor"),
             { renderSideBySide: mode !== "inline" }
         );
-        diffEditor.setModel({
+        currentEditor.setModel({
             original: originalModel,
             modified: modifiedModel
         });
 
-        initReviewManager(diffEditor.modifiedEditor);
+        initReviewManager(currentEditor.modifiedEditor);
     }
 }
 
-async function init() {
-    var prefix = await ensureMonacoIsAvailable();
-    var response = await fetch("../src/index.ts");
-    exampleText = await response.text();
-    modifiedText = exampleText.replace(
+function generateDifferentContents() {
+    const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
+
+    if (currentMode.startsWith("standard")) {
+        currentEditor.setValue(exampleSourceCode[idx]);
+    } else {
+        currentEditor.getModel().modified.setValue(exampleSourceCode[idx]);
+        currentEditor.getModel().modified.setValue(exampleSourceCode[idx+1]);
+    }
+}
+
+const exampleSourceCode = [];
+
+async function fetchSourceCode(url: string) {
+    const response = await fetch(url);
+    const exampleText = await response.text();
+
+    const modifiedText = exampleText.replace(
         new RegExp("string", "g"),
         "string /* String!*/"
     );
 
-    response = await fetch("../dist/timestamp.json");
+    exampleSourceCode.push(url + '\n' + exampleText);
+    exampleSourceCode.push(url + '\n' + modifiedText);
+}
+
+async function init() {
+    var prefix = await ensureMonacoIsAvailable();
+    await fetchSourceCode("../src/index.ts");
+    await fetchSourceCode("../src/docs.ts");
+    await fetchSourceCode("../src/index.test.ts");
+
+    const response = await fetch("../dist/timestamp.json");
     const tsobj = await response.json();
     console.log("Compiled at:", tsobj.date);
 
@@ -94,7 +125,6 @@ async function init() {
 }
 
 function initReviewManager(editor: any) {
-
     var summaryDiv = document.getElementById("summaryEditor");
     reviewManager = createReviewManager(
         editor,
@@ -112,10 +142,7 @@ function generateDifferentComments() {
 }
 
 function createRandomComments() {
-
-    const firstLine = Math.floor(Math.random() * 25);
-
-
+    const firstLine = Math.floor(Math.random() * 10);
 
     return [
         new ReviewComment(
@@ -198,6 +225,7 @@ function renderComments(element, comments) {
 
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
+win.generateDifferentContents = generateDifferentContents;
 
 init();
 
