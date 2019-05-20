@@ -421,7 +421,7 @@ class ReviewManager {
         for (const item of this.iterateComments([comment])) {
             item.comment.deleted = true;
         }
-        if (this.activeComment == comment) {s            
+        if (this.activeComment == comment) {
             this.setActiveComment(null);
             this.layoutInlineToolbar();
         }
