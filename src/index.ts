@@ -137,7 +137,7 @@ class ReviewManager {
         add.className = 'editButtonAdd'
         add.onclick = () => {
             this.setEditorMode(EditorMode.editor)
-            return true;// Suppress navigation
+            return false;// Suppress navigation
         };
         root.appendChild(add);
 
@@ -153,7 +153,7 @@ class ReviewManager {
             remove.className = 'editButtonRemove'
             remove.onclick = () => {
                 this.removeComment(this.activeComment);
-                return true; // Suppress navigation
+                return false; // Suppress navigation
             }
             root.appendChild(remove);
         }
@@ -465,7 +465,7 @@ class ReviewManager {
                     const domNode = document.createElement('div');
                     const isActive = this.activeComment == item.comment;
 
-                    domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "";
+                    domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "px";
                     domNode.style.display = 'inline';
                     domNode.className = isActive ? 'reviewComment-active' : 'reviewComment-inactive';
 
