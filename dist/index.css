@@ -22,6 +22,7 @@
 
 .reviewComment-active, .reviewComment-inactive{
   font-size: 12px;
+  background-color:lightcoral;
 }
 
 .reviewComment-active {

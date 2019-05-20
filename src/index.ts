@@ -1,3 +1,5 @@
+import { isTemplateElement } from "@babel/types";
+
 interface MonacoWindow {
     monaco: any;
 }
@@ -13,8 +15,8 @@ export class ReviewComment {
     comments: ReviewComment[];
 
     deleted: boolean;
-    viewZoneId: number;
-    renderStatus: ReviewCommentStatus;
+    // viewZoneId: number;
+    // renderStatus: ReviewCommentStatus;
 
     constructor(id: string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
         this.id = id;
@@ -26,12 +28,21 @@ export class ReviewComment {
 
         //HACK - this is runtime state - and should be moved
         this.deleted = false;
+
+    }
+}
+
+class ReviewCommentState {
+    viewZoneId: number;
+    renderStatus: ReviewCommentStatus;
+
+    constructor() {
         this.renderStatus = ReviewCommentStatus.normal;
         this.viewZoneId = null;
     }
 }
 
-export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig) {
+export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig): IReviewManager {
     //(window as any).editor = editor;    
     const rm = new ReviewManager(editor, currentUser, onChange, config);
     rm.load(comments || []);
@@ -42,7 +53,8 @@ export function createReviewManager(editor: any, currentUser: string, comments?:
 interface ReviewCommentIterItem {
     depth: number;
     comment: ReviewComment,
-    count: number
+    count: number,
+    viewState: ReviewCommentState
 }
 
 interface OnCommentsChanged {
@@ -82,11 +94,19 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     commentIndentOffset: 20,
 };
 
+export interface IReviewManager {
+    load: { (comments: ReviewComment[]): void },
+    editor: any;
+    config: ReviewManagerConfig;
+    comments: ReviewComment[];
+}
 
-class ReviewManager {
+class ReviewManager implements IReviewManager {
     currentUser: string;
     editor: any;
     comments: ReviewComment[];
+    commentState: { [reviewCommentId: string]: ReviewCommentState };
+
     activeComment?: ReviewComment;
     widgetInlineToolbar: any;
     widgetInlineCommentEditor: any;
@@ -94,11 +114,13 @@ class ReviewManager {
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
 
+
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
         this.comments = [];
+        this.commentState = {};
         this.widgetInlineToolbar = null;
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
@@ -112,16 +134,36 @@ class ReviewManager {
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
     }
 
-    load(comments: ReviewComment[]) {
+    load(comments: ReviewComment[]): void {
         this.editor.changeViewZones((changeAccessor) => {
             for (const item of this.iterateComments()) {
-                if (item.comment.viewZoneId) {
-                    changeAccessor.removeZone(item.comment.viewZoneId);
+                this.comments = [];
+
+                if (item.viewState.viewZoneId) {
+                    changeAccessor.removeZone(item.viewState.viewZoneId);
                 }
             }
 
             // Should this be inside this callback?
             this.comments = comments;
+            this.commentState = {};
+
+            for (const item of this.iterateComments(comments)) {
+                const originalId = item.comment.id;
+                let changedId = false;
+
+                while (!item.comment.id || this.commentState[item.comment.id]) {
+                    item.comment.id = 'autoid-' + Math.random();
+                    changedId = true;
+                }
+
+                if (changedId) {
+                    console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', item.comment.id, ' due to collision');
+                }
+
+                this.commentState[item.comment.id] = new ReviewCommentState();
+            }
+
             this.refreshComments();
         })
     }
@@ -280,7 +322,9 @@ class ReviewManager {
 
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
-            this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => { comment.renderStatus = ReviewCommentStatus.dirty });
+            this.filterAndMapComments(lineNumbersToMakeDirty, (item) => {
+                item.viewState.renderStatus = ReviewCommentStatus.dirty
+            });
         }
     }
 
@@ -292,11 +336,11 @@ class ReviewManager {
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
-    filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
+    filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewCommentIterItem): void }) {
         const comments = this.iterateComments();
         for (const c of comments) {
             if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
-                fn(c.comment);
+                fn(c);
             }
         }
     }
@@ -311,7 +355,7 @@ class ReviewManager {
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
                 for (const item of this.iterateComments()) {
-                    if (item.comment.viewZoneId == ev.target.detail.viewZoneId) {
+                    if (item.viewState.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = item.comment;
                         break;
                     }
@@ -378,18 +422,20 @@ class ReviewManager {
     }
 
     addComment(lineNumber: number, text: string): ReviewComment {
-        let comment: ReviewComment = null;
-        if (this.activeComment) {
-            comment = new ReviewComment(this.nextCommentId(), this.activeComment.lineNumber, this.currentUser, new Date(), text)
-            this.activeComment.comments.push(comment);
 
-            this.filterAndMapComments([lineNumber], (comment) => {
-                comment.renderStatus = ReviewCommentStatus.dirty;
-            });
+        const ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
+        const comment = new ReviewComment(this.nextCommentId(), ln, this.currentUser, new Date(), text);
+        this.commentState[comment.id] = new ReviewCommentState();
+
+        if (this.activeComment) {
+            this.activeComment.comments.push(comment);
         } else {
-            comment = new ReviewComment(this.nextCommentId(), lineNumber, this.currentUser, new Date(), text)
             this.comments.push(comment);
         }
+
+        this.filterAndMapComments([ln], (item) => {
+            item.viewState.renderStatus = ReviewCommentStatus.dirty;
+        });
 
         this.refreshComments()
         this.layoutInlineToolbar();
@@ -409,7 +455,12 @@ class ReviewManager {
 
         for (const comment of comments) {
             countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
-            results.push({ depth, comment, count: countByLineNumber[comment.lineNumber] })
+            results.push({
+                depth,
+                comment,
+                count: countByLineNumber[comment.lineNumber],
+                viewState: this.commentState[comment.id]
+            })
 
             this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
         }
@@ -436,38 +487,38 @@ class ReviewManager {
         this.editor.changeViewZones((changeAccessor) => {
             for (const item of this.iterateComments(this.comments, 0)) {
                 if (item.comment.deleted) {
-                    console.debug('Delete', item.comment.id);
+                    console.debug('Zone.Delete', item.comment.id);
 
-                    changeAccessor.removeZone(item.comment.viewZoneId);
+                    changeAccessor.removeZone(item.viewState.viewZoneId);
                     continue;
                 }
 
-                if (item.comment.renderStatus === ReviewCommentStatus.hidden) {
-                    console.debug('Hidden', item.comment.id);
+                if (item.viewState.renderStatus === ReviewCommentStatus.hidden) {
+                    console.debug('Zone.Hidden', item.comment.id);
 
-                    changeAccessor.removeZone(item.comment.viewZoneId);
-                    item.comment.viewZoneId = null;
+                    changeAccessor.removeZone(item.viewState.viewZoneId);
+                    item.viewState.viewZoneId = null;
 
                     continue;
                 }
 
-                if (item.comment.renderStatus === ReviewCommentStatus.dirty) {
-                    console.debug('Dirty', item.comment.id);
+                if (item.viewState.renderStatus === ReviewCommentStatus.dirty) {
+                    console.debug('Zone.Dirty', item.comment.id);
 
-                    changeAccessor.removeZone(item.comment.viewZoneId);
-                    item.comment.viewZoneId = null;
-                    item.comment.renderStatus = ReviewCommentStatus.normal;
+                    changeAccessor.removeZone(item.viewState.viewZoneId);
+                    item.viewState.viewZoneId = null;
+                    item.viewState.renderStatus = ReviewCommentStatus.normal;
                 }
 
-                if (!item.comment.viewZoneId) {
-                    console.debug('Create', item.comment.id);
+                if (!item.viewState.viewZoneId) {
+                    console.debug('Zone.Create', item.comment.id);
 
                     const domNode = document.createElement('div');
                     const isActive = this.activeComment == item.comment;
 
                     domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "px";
                     domNode.style.display = 'inline';
-                    domNode.className = isActive ? 'reviewComment-active' : 'reviewComment-inactive';
+                    domNode.className = isActive ? 'reviewComment reviewComment-active' : 'reviewComment reviewComment-inactive';
 
                     const author = document.createElement('span');
                     author.className = 'reviewComment-author'
@@ -485,7 +536,7 @@ class ReviewManager {
                     domNode.appendChild(author);
                     domNode.appendChild(text);
 
-                    item.comment.viewZoneId = changeAccessor.addZone({
+                    item.viewState.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.comment.lineNumber,
                         heightInLines: 1, //TODO - Figure out if multi-line?
                         domNode: domNode,
