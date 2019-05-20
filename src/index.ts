@@ -6,30 +6,29 @@ interface MonacoWindow {
 
 const monacoWindow = (window as any) as MonacoWindow;
 
-export class ReviewComment {
-    id: string;
+export interface ReviewComment {
+    id?: string;
     author: string;
     dt: Date;
     lineNumber: number;
     text: string;
-    comments: ReviewComment[];
-
-    deleted: boolean;
+    comments?: ReviewComment[];
+    deleted?: boolean;
     // viewZoneId: number;
     // renderStatus: ReviewCommentStatus;
 
-    constructor(id: string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
-        this.id = id;
-        this.author = author;
-        this.dt = dt;
-        this.lineNumber = lineNumber;
-        this.text = text;
-        this.comments = comments || [];
+    // constructor(id: string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
+    //     this.id = id;
+    //     this.author = author;
+    //     this.dt = dt;
+    //     this.lineNumber = lineNumber;
+    //     this.text = text;
+    //     this.comments = comments || [];
 
-        //HACK - this is runtime state - and should be moved
-        this.deleted = false;
+    //     //HACK - this is runtime state - and should be moved
+    //     this.deleted = false;
 
-    }
+    // }
 }
 
 class ReviewCommentState {
@@ -130,7 +129,7 @@ class ReviewManager {
 
     load(comments: ReviewComment[]): void {
         this.editor.changeViewZones((changeAccessor) => {
-            for (const item of this.iterateComments()) {
+            for (const item of this.iterateComments(this.comments)) {
                 this.comments = [];
 
                 if (item.viewState.viewZoneId) {
@@ -331,7 +330,7 @@ class ReviewManager {
     }
 
     filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewCommentIterItem): void }) {
-        const comments = this.iterateComments();
+        const comments = this.iterateComments(this.comments);
         for (const c of comments) {
             if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
                 fn(c);
@@ -348,7 +347,7 @@ class ReviewManager {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
-                for (const item of this.iterateComments()) {
+                for (const item of this.iterateComments(this.comments)) {
                     if (item.viewState.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = item.comment;
                         break;
@@ -368,7 +367,7 @@ class ReviewManager {
         const lineHeight = this.config.lineHeight;//FIXME - Magic number for line height            
 
         if (this.activeComment) {
-            for (var item of this.iterateComments()) {
+            for (var item of this.iterateComments(this.comments)) {
                 if (item.comment.lineNumber == this.activeComment.lineNumber) {
                     count++;
                 }
@@ -416,12 +415,20 @@ class ReviewManager {
     }
 
     addComment(lineNumber: number, text: string): ReviewComment {
-
         const ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
-        const comment = new ReviewComment(this.nextCommentId(), ln, this.currentUser, new Date(), text);
+        const comment: ReviewComment = {
+            id: this.nextCommentId(),
+            lineNumber: ln,
+            author: this.currentUser,
+            dt: new Date(),
+            text: text
+        };
         this.commentState[comment.id] = new ReviewCommentState();
 
         if (this.activeComment) {
+            if(!this.activeComment.comments){
+                this.activeComment.comments = [];
+            }
             this.activeComment.comments.push(comment);
         } else {
             this.comments.push(comment);
@@ -441,22 +448,22 @@ class ReviewManager {
         return comment;
     }
 
-    iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
+    iterateComments(comments: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
         results = results || [];
         depth = depth || 0;
-        comments = comments || this.comments;
         countByLineNumber = countByLineNumber || {};
+        if (comments) {
+            for (const comment of comments) {
+                countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
+                results.push({
+                    depth,
+                    comment,
+                    count: countByLineNumber[comment.lineNumber],
+                    viewState: this.commentState[comment.id]
+                })
 
-        for (const comment of comments) {
-            countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
-            results.push({
-                depth,
-                comment,
-                count: countByLineNumber[comment.lineNumber],
-                viewState: this.commentState[comment.id]
-            })
-
-            this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
+                this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
+            }
         }
 
         return results;

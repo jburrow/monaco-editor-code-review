@@ -34,7 +34,7 @@ test('can attach createReviewManager to editor', () => {
         getPosition: () => { return { lineNumber: 1 } }
     };
 
-    const comment = new ReviewComment('id-1', 1, "", new Date("2019-01-01"), "#1");
+    const comment: ReviewComment = { id: 'id-1', lineNumber: 1, author: "author", dt: new Date("2019-01-01"), text: "#1" };
 
     const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
     rm.load([comment]);

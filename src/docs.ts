@@ -86,7 +86,7 @@ function generateDifferentContents() {
         currentEditor.setValue(exampleSourceCode[idx]);
     } else {
         currentEditor.getModel().modified.setValue(exampleSourceCode[idx]);
-        currentEditor.getModel().modified.setValue(exampleSourceCode[idx+1]);
+        currentEditor.getModel().modified.setValue(exampleSourceCode[idx + 1]);
     }
 }
 
@@ -141,61 +141,51 @@ function generateDifferentComments() {
     reviewManager.load(createRandomComments());
 }
 
-function createRandomComments() {
+function createRandomComments(): ReviewComment[] {
     const firstLine = Math.floor(Math.random() * 10);
 
     return [
-        new ReviewComment(
-            "id-0",
-            firstLine + 1,
-            "another reviewer",
-            new Date(),
-            "at start"
-        ),
-        new ReviewComment(
-            "id-2",
-            firstLine + 50,
-            "another reviewer",
-            new Date(),
-            "at start"
-        ),
-        new ReviewComment(
-            undefined,
-            firstLine + 5,
-            "another reviewer",
-            new Date(),
-            "this code isn't very good",
-            [
-                new ReviewComment(
-                    undefined,
-                    firstLine + 5,
-                    "original author",
-                    new Date(),
-                    "I think you will find it is good enough"
-                ),
-                new ReviewComment(
-                    undefined,
-                    firstLine + 5,
-                    "original author",
-                    new Date(),
-                    "I think you will find it is good enough",
-                    [new ReviewComment(
-                        undefined,
-                        firstLine + 5,
-                        "original author",
-                        new Date(),
-                        "I think you will find it is good enough"
-                    )]
-                )
-                , new ReviewComment(
-                    undefined,
-                    firstLine + 5,
-                    "original author",
-                    new Date(),
-                    "I think you will find it is good enough"
-                )
+        {
+            id: "id-0",
+            lineNumber: firstLine + 1,
+            author: "another reviewer",
+            dt: new Date(),
+            text: "at start"
+        },
+        {
+            id: "id-2",
+            lineNumber: firstLine + 50,
+            author: "another reviewer",
+            dt: new Date(),
+            text: "at start"
+        },
+        {
+            lineNumber: firstLine + 5,
+            author: "another reviewer",
+            dt: new Date(),
+            text: "this code isn't very good",
+            comments: [
+                {
+                    lineNumber: firstLine + 5,
+                    author: "original author",
+                    dt: new Date(),
+                    text: "I think you will find it is good enough"
+                },
+                {
+                    lineNumber: firstLine + 5,
+                    author: "original author",
+                    dt: new Date(),
+                    text: "I think you will find it is good enough",
+                    comments: [{
+                        lineNumber: firstLine + 5,
+                        author: "original author",
+                        dt: new Date(),
+                        text: "I think you will find it is good enough",
+                    }]
+                }
+                ,
             ]
-        )
+        }
     ];
 
 }
