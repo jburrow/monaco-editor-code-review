@@ -42,7 +42,7 @@ class ReviewCommentState {
     }
 }
 
-export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig): IReviewManager {
+export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig): ReviewManager {
     //(window as any).editor = editor;    
     const rm = new ReviewManager(editor, currentUser, onChange, config);
     rm.load(comments || []);
@@ -94,14 +94,8 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     commentIndentOffset: 20,
 };
 
-export interface IReviewManager {
-    load: { (comments: ReviewComment[]): void },
-    editor: any;
-    config: ReviewManagerConfig;
-    comments: ReviewComment[];
-}
 
-class ReviewManager implements IReviewManager {
+class ReviewManager {
     currentUser: string;
     editor: any;
     comments: ReviewComment[];

@@ -1,4 +1,4 @@
-import { ReviewComment, createReviewManager, IReviewManager } from "./index";
+import { ReviewComment, createReviewManager } from "./index";
 
 interface WindowDoc {
     require: any;
@@ -10,7 +10,7 @@ interface WindowDoc {
 const win = (window as any) as WindowDoc;
 let exampleText: string = '';
 let modifiedText: string = '';
-let reviewManager: IReviewManager = null;
+let reviewManager: any = null;
 
 function ensureMonacoIsAvailable() {
     return new Promise(resolve => {
