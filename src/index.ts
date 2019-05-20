@@ -69,21 +69,17 @@ interface ReviewManagerConfigPrivate {
     editButtonAddText: string;
     editButtonRemoveText: string;
     editButtonOffset: string;
-    reviewCommentIconSelect: string;
-    reviewCommentIconActive: string;
 }
 
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
-    editButtonOffset: '-75px',
+    editButtonOffset: '-10px',
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
     editButtonEnableRemove: true,
     lineHeight: 19,
     commentIndent: 20,
-    commentIndentOffset: 0,
-    reviewCommentIconSelect: '---',
-    reviewCommentIconActive: '>>'
+    commentIndentOffset: 20,
 };
 
 
@@ -131,7 +127,7 @@ class ReviewManager {
     }
 
     createInlineEditButtonsElement() {
-        var root = document.createElement('span');
+        var root = document.createElement('div');
         root.className = 'editButtonsContainer'
 
         const add = document.createElement('a') as HTMLAnchorElement;
@@ -139,18 +135,25 @@ class ReviewManager {
         add.innerText = this.config.editButtonAddText;
         add.name = 'add';
         add.className = 'editButtonAdd'
-        add.onclick = () => this.setEditorMode(EditorMode.editor);
+        add.onclick = () => {
+            this.setEditorMode(EditorMode.editor)
+            return true;// Suppress navigation
+        };
         root.appendChild(add);
 
         if (this.config.editButtonEnableRemove) {
-            const remove = document.createElement('a');
+            const spacer = document.createElement('div');
+            spacer.innerText = ' '
+            root.appendChild(spacer);
+
+            const remove = document.createElement('a') as HTMLAnchorElement;
             remove.href = '#'
             remove.innerText = this.config.editButtonRemoveText;
             remove.name = 'remove';
             remove.className = 'editButtonRemove'
             remove.onclick = () => {
                 this.removeComment(this.activeComment);
-
+                return true; // Suppress navigation
             }
             root.appendChild(remove);
         }
@@ -298,8 +301,6 @@ class ReviewManager {
         }
     }
 
-
-
     handleMouseDown(ev: any) {
         console.debug('handleMouseDown', this.activeComment, ev.target.element, ev.target.detail);
 
@@ -319,11 +320,10 @@ class ReviewManager {
             this.setActiveComment(activeComment);
             this.refreshComments();
             this.setEditorMode(EditorMode.toolbar);
-
         }
     }
 
-    private calculateMarginTopOffset(extraOffset: number = 1): number {
+    private calculateMarginTopOffset(extraOffsetLines: number = 1): number {
         let idx = 0;
         let count = 0;
         let marginTop: number = 0;
@@ -339,7 +339,7 @@ class ReviewManager {
                     idx = count + 0;
                 }
             }
-            marginTop = ((extraOffset + count - idx) * lineHeight) - 2;
+            marginTop = ((extraOffsetLines + count - idx) * lineHeight);
         }
 
         return marginTop;
@@ -421,8 +421,9 @@ class ReviewManager {
         for (const item of this.iterateComments([comment])) {
             item.comment.deleted = true;
         }
-        if (this.activeComment == comment) {
+        if (this.activeComment == comment) {s            
             this.setActiveComment(null);
+            this.layoutInlineToolbar();
         }
 
         this.refreshComments();
@@ -468,10 +469,6 @@ class ReviewManager {
                     domNode.style.display = 'inline';
                     domNode.className = isActive ? 'reviewComment-active' : 'reviewComment-inactive';
 
-                    const status = document.createElement('span');
-                    status.className = isActive ? 'reviewComment-selection-active' : 'reviewComment-selection-inactive'
-                    status.innerText = isActive ? this.config.reviewCommentIconActive : this.config.reviewCommentIconSelect;
-
                     const author = document.createElement('span');
                     author.className = 'reviewComment-author'
                     author.innerText = item.comment.author || ' ';
@@ -484,7 +481,6 @@ class ReviewManager {
                     text.className = 'reviewComment-text'
                     text.innerText = item.comment.text;
 
-                    domNode.appendChild(status);
                     domNode.appendChild(dt);
                     domNode.appendChild(author);
                     domNode.appendChild(text);

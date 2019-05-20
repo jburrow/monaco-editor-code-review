@@ -20,22 +20,28 @@
   margin: 5px 5px 5px 0px;
 }
 
+.reviewComment-active, .reviewComment-inactive{
+  font-size: 12px;
+}
+
 .reviewComment-active {
   /*   border-bottom: 1px dashed grey; */
 }
 
 .reviewComment-inactive {
-  margin-bottom: 1px;
+  /* margin-bottom: 1px; */
 }
 
 .reviewComment-selection-active {
-  background-color: pink;
-  margin-right: 7px;
+  /* background-color: pink; */
+  /* margin-right: 7px;
+  font-size: 12px; */
 }
 
 .reviewComment-selection-inactive {
-  background-color: cadetblue;
+  /* background-color: cadetblue; */
   margin-right: 10px;
+  font-size: 12px;
 }
 
 .reviewComment-author {
@@ -63,10 +69,21 @@
   height: 20px;
 }
 
-.editButtonsContainer {
+.editButtonsContainer{
   font-size: 12px;
+  height: 50px;
+
+  width:45px;
+  background-color:white;/* FIXME - this needs to editor background color  */
+  padding-right:2px;
+  text-align: right;
+}
+.editButtonAdd{
+
 }
 
-.editButtonRemove {
-  margin-left: 5px;
+.editButtonRemove{
+
 }
+
+
