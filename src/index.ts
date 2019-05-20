@@ -129,7 +129,7 @@ class ReviewManager {
 
     load(comments: ReviewComment[]): void {
         this.editor.changeViewZones((changeAccessor) => {
-            for (const item of this.iterateComments(this.comments)) {
+            for (const item of this.iterateComments()) {
                 this.comments = [];
 
                 if (item.viewState.viewZoneId) {
@@ -330,7 +330,7 @@ class ReviewManager {
     }
 
     filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewCommentIterItem): void }) {
-        const comments = this.iterateComments(this.comments);
+        const comments = this.iterateComments();
         for (const c of comments) {
             if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
                 fn(c);
@@ -347,7 +347,7 @@ class ReviewManager {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
-                for (const item of this.iterateComments(this.comments)) {
+                for (const item of this.iterateComments()) {
                     if (item.viewState.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = item.comment;
                         break;
@@ -367,7 +367,7 @@ class ReviewManager {
         const lineHeight = this.config.lineHeight;//FIXME - Magic number for line height            
 
         if (this.activeComment) {
-            for (var item of this.iterateComments(this.comments)) {
+            for (var item of this.iterateComments()) {
                 if (item.comment.lineNumber == this.activeComment.lineNumber) {
                     count++;
                 }
@@ -426,7 +426,7 @@ class ReviewManager {
         this.commentState[comment.id] = new ReviewCommentState();
 
         if (this.activeComment) {
-            if(!this.activeComment.comments){
+            if (!this.activeComment.comments) {
                 this.activeComment.comments = [];
             }
             this.activeComment.comments.push(comment);
@@ -448,9 +448,10 @@ class ReviewManager {
         return comment;
     }
 
-    iterateComments(comments: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
+    iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
         results = results || [];
         depth = depth || 0;
+        comments = comments || this.comments;
         countByLineNumber = countByLineNumber || {};
         if (comments) {
             for (const comment of comments) {
@@ -462,7 +463,9 @@ class ReviewManager {
                     viewState: this.commentState[comment.id]
                 })
 
-                this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
+                if (comment.comments) {
+                    this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
+                }
             }
         }
 
@@ -486,7 +489,7 @@ class ReviewManager {
 
     refreshComments() {
         this.editor.changeViewZones((changeAccessor) => {
-            for (const item of this.iterateComments(this.comments, 0)) {
+            for (const item of this.iterateComments()) {
                 if (item.comment.deleted) {
                     console.debug('Zone.Delete', item.comment.id);
 
