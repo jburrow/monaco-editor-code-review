@@ -70,6 +70,7 @@ export interface ReviewManagerConfig {
     editButtonOffset?: string;
     reviewCommentIconSelect?: string;
     reviewCommentIconActive?: string;
+    showInRuler?: boolean
 }
 
 interface ReviewManagerConfigPrivate {
@@ -80,6 +81,7 @@ interface ReviewManagerConfigPrivate {
     editButtonAddText: string;
     editButtonRemoveText: string;
     editButtonOffset: string;
+    showInRuler: boolean;
 }
 
 
@@ -91,6 +93,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     lineHeight: 19,
     commentIndent: 20,
     commentIndentOffset: 20,
+    showInRuler: true,
 };
 
 
@@ -128,20 +131,19 @@ class ReviewManager {
     }
 
     load(comments: ReviewComment[]): void {
-        this.editor.changeViewZones((changeAccessor) => {
+        this.editor.changeViewZones((changeAccessor) => {       
+            // Remove all the existing comments     
             for (const item of this.iterateComments()) {
-                this.comments = [];
-
                 if (item.viewState.viewZoneId) {
                     changeAccessor.removeZone(item.viewState.viewZoneId);
-                }
-            }
+                }            
+            }            
 
-            // Should this be inside this callback?
-            this.comments = comments;
+            this.comments = comments || [];
             this.commentState = {};
 
-            for (const item of this.iterateComments(comments)) {
+            // Check all comments that they have unique and present id's
+            for (const item of this.iterateComments()) {
                 const originalId = item.comment.id;
                 let changedId = false;
 
@@ -158,6 +160,8 @@ class ReviewManager {
             }
 
             this.refreshComments();
+
+            console.debug('Comments Loaded: ', this.comments.length);
         })
     }
 
@@ -489,6 +493,8 @@ class ReviewManager {
 
     refreshComments() {
         this.editor.changeViewZones((changeAccessor) => {
+            const lineNumbers: { [key: number]: number } = {};
+
             for (const item of this.iterateComments()) {
                 if (item.comment.deleted) {
                     console.debug('Zone.Delete', item.comment.id);
@@ -516,6 +522,8 @@ class ReviewManager {
 
                 if (!item.viewState.viewZoneId) {
                     console.debug('Zone.Create', item.comment.id);
+
+                    lineNumbers[item.comment.lineNumber] = 0;
 
                     const domNode = document.createElement('div');
                     const isActive = this.activeComment == item.comment;
@@ -547,6 +555,25 @@ class ReviewManager {
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
                 }
+            }
+
+            if (this.config.showInRuler) {
+                const decorators = [];
+                for (const ln in lineNumbers) {
+                    decorators.push({
+                        range: new monacoWindow.monaco.Range(ln, 0, ln, 0),
+                        options: {
+                            isWholeLine: true,
+                            overviewRuler: {
+                                color: "red",
+                                darkColor: "green",
+                                position: 7
+                            }
+                        }
+                    })
+                }
+
+                this.editor.deltaDecorations([], decorators);
             }
         });
     }

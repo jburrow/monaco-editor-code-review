@@ -87,4 +87,8 @@
 
 }
 
-
+.myLineDecoration {
+	background: lightblue;
+	width: 10px !important;
+	margin-left: 3px;
+}

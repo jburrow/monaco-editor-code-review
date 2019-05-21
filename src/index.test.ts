@@ -7,7 +7,10 @@ interface MonacoWindow {
 }
 
 const monacoWindow = (window as any) as MonacoWindow;
-monacoWindow.monaco = { KeyMod: { CtrlCmd: 0 }, KeyCode: { F10: 1 } };
+monacoWindow.monaco = {
+    KeyMod: { CtrlCmd: 0 }, KeyCode: { F10: 1 },
+    Range: () => { }
+};
 monacoWindow.prompt = () => 'comment';
 
 test('can attach createReviewManager to editor', () => {
@@ -18,6 +21,7 @@ test('can attach createReviewManager to editor', () => {
         addContentWidget: () => null,
         onMouseDown: () => null,
         revealLineInCenter: () => null,
+        deltaDecorations: () => null,
         changeViewZones: (cb) => cb({
             removeZone: (zoneId) => {
                 console.debug('deleted zone', zoneId);
