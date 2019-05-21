@@ -133,9 +133,9 @@ class ReviewManager {
     load(comments: ReviewComment[]): void {
         this.editor.changeViewZones((changeAccessor) => {       
             // Remove all the existing comments     
-            for (const item of this.iterateComments()) {
-                if (item.viewState.viewZoneId) {
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
+            for (const oldItem of this.iterateComments()) {
+                if (oldItem.viewState.viewZoneId) {
+                    changeAccessor.removeZone(oldItem.viewState.viewZoneId);
                 }            
             }            
 
