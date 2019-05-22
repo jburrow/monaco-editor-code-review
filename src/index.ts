@@ -29,7 +29,7 @@ class ReviewCommentState {
 }
 
 export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig): ReviewManager {
-    //(window as any).editor = editor;    
+    //For Debug: (window as any).editor = editor;    
     const rm = new ReviewManager(editor, currentUser, onChange, config);
     rm.load(comments || []);
     return rm;
@@ -39,7 +39,6 @@ export function createReviewManager(editor: any, currentUser: string, comments?:
 interface ReviewCommentIterItem {
     depth: number;
     comment: ReviewComment,
-    //count: number,
     viewState: ReviewCommentState
 }
 
@@ -538,7 +537,7 @@ class ReviewManager {
 
                     item.viewState.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.comment.lineNumber,
-                        heightInLines: item.viewState.numberOfLines, //TODO - Figure out if multi-line?
+                        heightInLines: item.viewState.numberOfLines,
                         domNode: domNode,
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
