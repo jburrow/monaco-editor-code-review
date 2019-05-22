@@ -60,6 +60,8 @@ export interface ReviewManagerConfig {
 }
 
 interface ReviewManagerConfigPrivate {
+    rulerMarkerColor: any;
+    rulerMarkerDarkColor: any;
     editButtonEnableRemove: boolean;
     lineHeight: number;
     commentIndent: number;
@@ -80,6 +82,8 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     commentIndent: 20,
     commentIndentOffset: 20,
     showInRuler: true,
+    rulerMarkerColor: 'darkorange',
+    rulerMarkerDarkColor: 'darkorange'
 };
 
 
@@ -95,6 +99,8 @@ class ReviewManager {
     onChange: OnCommentsChanged;
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
+
+    textarea: HTMLTextAreaElement;
 
 
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
@@ -134,7 +140,7 @@ class ReviewManager {
                 let changedId = false;
 
                 while (!item.comment.id || this.commentState[item.comment.id]) {
-                    item.comment.id = 'autoid-' + Math.random();
+                    item.comment.id = uuid();
                     changedId = true;
                 }
 
@@ -166,7 +172,7 @@ class ReviewManager {
         add.name = 'add';
         add.className = 'editButtonAdd'
         add.onclick = () => {
-            this.setEditorMode(EditorMode.editor)
+            this.setEditorMode(EditorMode.editComment)
             return false;// Suppress navigation
         };
         root.appendChild(add);
@@ -203,46 +209,39 @@ class ReviewManager {
         this.editor.focus();
     }
 
+    handleTextAreaKeyDown(e: KeyboardEvent) {
+        if (e.code === "Escape") {
+            this.handleCancel();
+        } else if (e.code === "Enter" && e.ctrlKey) {
+            this.handleSave();
+        }
+    }
+
     createInlineEditorElement() {
         var root = document.createElement('span');
         root.className = "reviewCommentEdit"
 
-        const textarea = document.createElement('textarea');
+        const textarea = document.createElement('textarea') as HTMLTextAreaElement;
         textarea.className = "reviewCommentText";
         textarea.innerText = '';
         textarea.name = 'text';
-        textarea.style.lineHeight = '1';
-        textarea.onkeypress = (e: KeyboardEvent) => {
-            if (e.code === "Enter" && e.ctrlKey) {
-                this.handleSave();
-            }
-        };
-        textarea.onkeydown = (e: KeyboardEvent) => {
-            if (e.code === "Escape") {
-                this.handleCancel();
-            }
-        }
+        textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
         const save = document.createElement('button') as HTMLButtonElement;
         save.className = "reviewCommentSave";
         save.innerText = 'Save';
-        save.name = 'save';
-        save.onclick = () => {
-            this.handleSave();
-        };
+        save.onclick = this.handleSave.bind(this);
 
         const cancel = document.createElement('button') as HTMLButtonElement;
         cancel.className = "reviewCommentCancel";
         cancel.innerText = 'Cancel';
-        cancel.name = 'cancel';
-        cancel.onclick = () => {
-            this.handleCancel();
-        }
+        cancel.onclick = this.handleCancel.bind(this);
 
         root.appendChild(textarea);
         root.appendChild(save);
         root.appendChild(cancel);
 
+        this.textarea = textarea;
         return root
     }
 
@@ -283,7 +282,7 @@ class ReviewManager {
                 return editorElement;
             },
             getPosition: () => {
-                if (this.editorMode == EditorMode.editor) {
+                if (this.editorMode == EditorMode.editComment) {
                     return {
                         position: {
                             // We are using negative marginTop to shift it above the line to the previous
@@ -335,8 +334,6 @@ class ReviewManager {
     }
 
     handleMouseDown(ev: any) {
-        console.debug('handleMouseDown', this.activeComment, ev.target.element, ev.target.detail);
-
         if (ev.target.element.tagName === 'TEXTAREA' || ev.target.element.tagName === 'BUTTON' || ev.target.element.tagName === 'A') {
             return;
         } else {
@@ -378,7 +375,9 @@ class ReviewManager {
         return marginTop;
     }
 
-    private setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
+
+
+    setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
         console.debug('setEditorMode', this.activeComment);
 
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
@@ -390,22 +389,19 @@ class ReviewManager {
         this.layoutInlineToolbar();
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
 
-        const element = this.widgetInlineCommentEditor.getDomNode();
-        const textarea = element.querySelector("TEXTAREA[name='text']");
+        const text = this.textarea.value;
+        this.textarea.value = "";
 
-        if (mode == EditorMode.editor) {
-            textarea.value = "";
-
+        if (mode == EditorMode.editComment) {
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...            
-            setTimeout(() => textarea.focus(), 100);
+            setTimeout(() => this.textarea.focus(), 100);
         }
 
         return {
-            text: textarea.value,            
+            text: text,
             lineNumber: lineNumber
         };
     }
-
 
     addComment(lineNumber: number, text: string): ReviewComment {
         const ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
@@ -521,7 +517,7 @@ class ReviewManager {
 
                     const author = document.createElement('span');
                     author.className = 'reviewComment-author'
-                    author.innerText =`${item.comment.author || ' '} at `;
+                    author.innerText = `${item.comment.author || ' '} at `;
 
                     const dt = document.createElement('span');
                     dt.className = 'reviewComment-dt'
@@ -531,7 +527,7 @@ class ReviewManager {
                     text.className = 'reviewComment-text'
                     text.innerText = `${item.comment.text} by `;
 
-                    domNode.appendChild(text);                    
+                    domNode.appendChild(text);
                     domNode.appendChild(author);
                     domNode.appendChild(dt);
 
@@ -552,8 +548,8 @@ class ReviewManager {
                         options: {
                             isWholeLine: true,
                             overviewRuler: {
-                                color: "darkorange",
-                                darkColor: "darkorange",
+                                color: this.config.rulerMarkerColor,
+                                darkColor: this.config.rulerMarkerDarkColor,
                                 position: 1
                             }
                         }
@@ -578,7 +574,7 @@ class ReviewManager {
             contextMenuOrder: 0,
 
             run: () => {
-                this.setEditorMode(EditorMode.editor);
+                this.setEditorMode(EditorMode.editComment);
             }
         });
 
@@ -656,12 +652,12 @@ enum NavigationDirection {
 }
 
 enum EditorMode {
-    editor,
-    toolbar
+    editComment = 1,
+    toolbar = 2
 }
 
 enum ReviewCommentStatus {
-    dirty,
-    hidden,
-    normal
+    dirty = 1,
+    hidden = 2,
+    normal = 3
 }

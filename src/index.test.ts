@@ -9,14 +9,16 @@ interface MonacoWindow {
 const monacoWindow = (window as any) as MonacoWindow;
 monacoWindow.monaco = {
     KeyMod: { CtrlCmd: 0 }, KeyCode: { F10: 1 },
-    Range: () => { }
+    Range: () => { },
+    editor: { ContentWidgetPositionPreference: { BELOW: 'BELOW' } }
 };
 monacoWindow.prompt = () => 'comment';
 
-test('can attach createReviewManager to editor', () => {
+function getMockEditor() {
     const editor = {
         _zoneId: 0,
         _zones: {},
+        focus: () => null,
         addAction: () => null,
         addContentWidget: () => null,
         onMouseDown: () => null,
@@ -24,13 +26,13 @@ test('can attach createReviewManager to editor', () => {
         deltaDecorations: () => null,
         changeViewZones: (cb) => cb({
             removeZone: (zoneId) => {
-                console.debug('deleted zone', zoneId);
+                // console.debug('deleted zone', zoneId);
                 delete editor._zones[zoneId]
             },
             addZone: (zone) => {
                 const zoneId = editor._zoneId++;
                 editor._zones[zoneId] = zone;
-                console.debug('created', zoneId, zone.domNode.className);
+                // console.debug('created', zoneId, zone.domNode.className);
                 return zoneId;
             }
         }),
@@ -38,7 +40,24 @@ test('can attach createReviewManager to editor', () => {
         getPosition: () => { return { lineNumber: 1 } }
     };
 
-    const comment: ReviewComment = { id: 'id-1', lineNumber: 1, author: "author", dt: new Date("2019-01-01"), text: "#1" };
+    return editor;
+
+}
+
+test('Widget Coverage', () => {
+    const editor = getMockEditor();
+    const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
+    rm.widgetInlineToolbar.getId();
+    rm.widgetInlineToolbar.getPosition();
+
+    rm.setEditorMode(1);
+    rm.widgetInlineCommentEditor.getId();
+    rm.widgetInlineCommentEditor.getPosition();
+})
+
+test('can attach createReviewManager to editor', () => {
+    const editor = getMockEditor();
+    const comment: ReviewComment = { lineNumber: 1, author: "author", dt: new Date("2019-01-01"), text: "#1" };
 
     const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
     rm.load([comment]);
@@ -81,4 +100,21 @@ test('can attach createReviewManager to editor', () => {
 
     rm.navigateToComment(1);
     expect(rm.activeComment.text).toBe('#2');
+
+    console.debug('COMMENTS', rm.comments.length, rm.comments);
+
+    rm.setActiveComment(null);
+
+    rm.setEditorMode(1); // Edit Mode
+    rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false } as any) as KeyboardEvent);
+    expect(rm.editorMode).toBe(2); //Toolbar
+
+    rm.setEditorMode(1);
+    rm.textarea.value = '#5';
+
+    rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true } as any) as KeyboardEvent);
+    expect(rm.editorMode).toBe(2); //Toolbar
+    expect(rm.textarea.value).toBe("");
+    expect(Object.keys(editor._zones).length).toBe(4);
+    expect(rm.comments[3].text).toBe('#5');
 });
