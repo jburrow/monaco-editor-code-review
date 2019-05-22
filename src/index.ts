@@ -1,4 +1,4 @@
-import { isTemplateElement } from "@babel/types";
+import * as uuid from "uuid/v4";
 
 interface MonacoWindow {
     monaco: any;
@@ -9,35 +9,22 @@ const monacoWindow = (window as any) as MonacoWindow;
 export interface ReviewComment {
     id?: string;
     author: string;
-    dt: Date;
+    dt: Date | string;
     lineNumber: number;
     text: string;
     comments?: ReviewComment[];
     deleted?: boolean;
-    // viewZoneId: number;
-    // renderStatus: ReviewCommentStatus;
-
-    // constructor(id: string, lineNumber: number, author: string, dt: Date, text: string, comments?: ReviewComment[]) {
-    //     this.id = id;
-    //     this.author = author;
-    //     this.dt = dt;
-    //     this.lineNumber = lineNumber;
-    //     this.text = text;
-    //     this.comments = comments || [];
-
-    //     //HACK - this is runtime state - and should be moved
-    //     this.deleted = false;
-
-    // }
 }
 
 class ReviewCommentState {
     viewZoneId: number;
     renderStatus: ReviewCommentStatus;
+    numberOfLines: number;
 
-    constructor() {
+    constructor(numberOfLines: number) {
         this.renderStatus = ReviewCommentStatus.normal;
         this.viewZoneId = null;
+        this.numberOfLines = numberOfLines;
     }
 }
 
@@ -52,7 +39,7 @@ export function createReviewManager(editor: any, currentUser: string, comments?:
 interface ReviewCommentIterItem {
     depth: number;
     comment: ReviewComment,
-    count: number,
+    //count: number,
     viewState: ReviewCommentState
 }
 
@@ -131,13 +118,13 @@ class ReviewManager {
     }
 
     load(comments: ReviewComment[]): void {
-        this.editor.changeViewZones((changeAccessor) => {       
+        this.editor.changeViewZones((changeAccessor) => {
             // Remove all the existing comments     
             for (const oldItem of this.iterateComments()) {
                 if (oldItem.viewState.viewZoneId) {
                     changeAccessor.removeZone(oldItem.viewState.viewZoneId);
-                }            
-            }            
+                }
+            }
 
             this.comments = comments || [];
             this.commentState = {};
@@ -156,13 +143,18 @@ class ReviewManager {
                     console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', item.comment.id, ' due to collision');
                 }
 
-                this.commentState[item.comment.id] = new ReviewCommentState();
+                this.commentState[item.comment.id] = new ReviewCommentState(this.calculateNumberOfLines(item.comment.text));
             }
 
             this.refreshComments();
 
             console.debug('Comments Loaded: ', this.comments.length);
         })
+    }
+
+
+    calculateNumberOfLines(text: string): number {
+        return text.split(/\r*\n/).length;
     }
 
     createInlineEditButtonsElement() {
@@ -220,6 +212,7 @@ class ReviewManager {
         textarea.className = "reviewCommentText";
         textarea.innerText = '';
         textarea.name = 'text';
+        textarea.style.lineHeight = '1';
         textarea.onkeypress = (e: KeyboardEvent) => {
             if (e.code === "Enter" && e.ctrlKey) {
                 this.handleSave();
@@ -409,25 +402,22 @@ class ReviewManager {
         }
 
         return {
-            text: textarea.value,
+            text: textarea.value,            
             lineNumber: lineNumber
         };
     }
 
-    nextCommentId() {
-        return `${new Date().toString()}-${this.currentUser}`;
-    }
 
     addComment(lineNumber: number, text: string): ReviewComment {
         const ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
         const comment: ReviewComment = {
-            id: this.nextCommentId(),
+            id: uuid(),
             lineNumber: ln,
             author: this.currentUser,
             dt: new Date(),
             text: text
         };
-        this.commentState[comment.id] = new ReviewCommentState();
+        this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(text));
 
         if (this.activeComment) {
             if (!this.activeComment.comments) {
@@ -452,23 +442,21 @@ class ReviewManager {
         return comment;
     }
 
-    iterateComments(comments?: ReviewComment[], depth?: number, countByLineNumber?: any, results?: ReviewCommentIterItem[]) {
+    iterateComments(comments?: ReviewComment[], depth?: number, results?: ReviewCommentIterItem[]) {
         results = results || [];
         depth = depth || 0;
         comments = comments || this.comments;
-        countByLineNumber = countByLineNumber || {};
+
         if (comments) {
             for (const comment of comments) {
-                countByLineNumber[comment.lineNumber] = (countByLineNumber[comment.lineNumber] || 0) + 1
                 results.push({
                     depth,
                     comment,
-                    count: countByLineNumber[comment.lineNumber],
                     viewState: this.commentState[comment.id]
                 })
 
                 if (comment.comments) {
-                    this.iterateComments(comment.comments, depth + 1, countByLineNumber, results);
+                    this.iterateComments(comment.comments, depth + 1, results);
                 }
             }
         }
@@ -534,7 +522,7 @@ class ReviewManager {
 
                     const author = document.createElement('span');
                     author.className = 'reviewComment-author'
-                    author.innerText = item.comment.author || ' ';
+                    author.innerText =`${item.comment.author || ' '} at `;
 
                     const dt = document.createElement('span');
                     dt.className = 'reviewComment-dt'
@@ -542,15 +530,15 @@ class ReviewManager {
 
                     const text = document.createElement('span');
                     text.className = 'reviewComment-text'
-                    text.innerText = item.comment.text;
+                    text.innerText = `${item.comment.text} by `;
 
-                    domNode.appendChild(dt);
+                    domNode.appendChild(text);                    
                     domNode.appendChild(author);
-                    domNode.appendChild(text);
+                    domNode.appendChild(dt);
 
                     item.viewState.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.comment.lineNumber,
-                        heightInLines: 1, //TODO - Figure out if multi-line?
+                        heightInLines: item.viewState.numberOfLines, //TODO - Figure out if multi-line?
                         domNode: domNode,
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
@@ -565,9 +553,9 @@ class ReviewManager {
                         options: {
                             isWholeLine: true,
                             overviewRuler: {
-                                color: "red",
-                                darkColor: "green",
-                                position: 7
+                                color: "darkorange",
+                                darkColor: "darkorange",
+                                position: 1
                             }
                         }
                     })
@@ -661,6 +649,7 @@ class ReviewManager {
         }
     }
 }
+
 
 enum NavigationDirection {
     next = 1,

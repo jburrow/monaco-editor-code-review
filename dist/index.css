@@ -1,94 +1,53 @@
 .reviewCommentEdit {
   border: 1px solid black;
-  width: 50%;
-  height: 60px;
+  width: 80%;
   padding: 5px;
   background-color: white;
 }
 
 .reviewCommentText {
+  /* background-color: lightseagreen; */
   width: 100%;
+  height: 60px;
 }
 
 .reviewCommentSave {
   /* background-color: blue; */
-  margin: 0px 5px 5px 0px;
+  margin: 0 5px 5px 0;
 }
 
 .reviewCommentCancel {
   /* background-color: rebeccapurple; */
-  margin: 5px 5px 5px 0px;
+  margin: 5px 5px 5px 0;
 }
 
-.reviewComment-active, .reviewComment-inactive{
-  font-size: 12px;
-  background-color:lightcoral;
-}
-
-.reviewComment-active {
-  /*   border-bottom: 1px dashed grey; */
-}
-
+.reviewComment-active,
 .reviewComment-inactive {
-  /* margin-bottom: 1px; */
-}
-
-.reviewComment-selection-active {
-  /* background-color: pink; */
-  /* margin-right: 7px;
-  font-size: 12px; */
-}
-
-.reviewComment-selection-inactive {
-  /* background-color: cadetblue; */
-  margin-right: 10px;
   font-size: 12px;
+  background-color: lightcoral;
 }
 
 .reviewComment-author {
   /* background-color: pink; */
-
-  margin-right: 10px;
-  /* display: inline-block; */
 }
 
 .reviewComment-dt {
-  /*   background-color: green; */
-  margin-right: 10px;
-  width: 200px;
-  /* display: inline-block; */
-  text-align: center;
+  /* background-color: green; */
 }
 
 .reviewComment-text {
-  /* background-color: lightcoral; */
-  /* font-size:12px; */
-  width: 200px;
-
-  /* display: inline-block; */
-  overflow: hidden;
-  height: 20px;
+  /* background-color: yellow; */
 }
 
-.editButtonsContainer{
+.editButtonsContainer {
   font-size: 12px;
-  height: 50px;
-
-  width:45px;
-  background-color:white;/* FIXME - this needs to editor background color  */
-  padding-right:2px;
+  width: 45px;
+  background-color: white; /* FIXME - this needs to editor background color  */
+  padding-right: 2px;
   text-align: right;
 }
-.editButtonAdd{
-
+.editButtonAdd {
 }
 
-.editButtonRemove{
-
-}
-
-.myLineDecoration {
-	background: lightblue;
-	width: 10px !important;
-	margin-left: 3px;
+.editButtonRemove {
 }

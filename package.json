@@ -11,9 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    
+    "@types/uuid": "^3.4.4",
+    "uuid": "^3.3.2"
   },
-  "devDependencies": {    
+  "devDependencies": {
     "@types/jest": "^24.0.13",
     "jest": "^24.8.0",
     "monaco-editor": "^0.17.0",

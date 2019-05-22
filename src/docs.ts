@@ -131,7 +131,7 @@ function initReviewManager(editor: any) {
         "mr reviewer",
         createRandomComments(),
         updatedComments => renderComments(summaryDiv, updatedComments),
-        { editButtonEnableRemove: false }
+        { editButtonEnableRemove: true }
     );
 
     renderComments(summaryDiv, reviewManager.comments);
@@ -162,7 +162,7 @@ function createRandomComments(): ReviewComment[] {
         {
             lineNumber: firstLine + 5,
             author: "another reviewer",
-            dt: new Date(),
+            dt: '2019-01-01 12:22:33',
             text: "this code isn't very good",
             comments: [
                 {
