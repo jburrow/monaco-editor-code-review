@@ -7,6 +7,7 @@ interface WindowDoc {
     generateDifferentComments: any;
     generateDifferentContents: any;
     toggleTheme: any;
+    clearComments: any;
 }
 
 const win = (window as any) as WindowDoc;
@@ -128,16 +129,16 @@ async function init() {
 }
 
 function initReviewManager(editor: any) {
-    var summaryDiv = document.getElementById("summaryEditor");
+    
     reviewManager = createReviewManager(
         editor,
         "mr reviewer",
         createRandomComments(),
-        updatedComments => renderComments(summaryDiv, updatedComments),
+        updatedComments => renderComments(updatedComments),
         { editButtonEnableRemove: true }
     );
 
-    renderComments(summaryDiv, reviewManager.comments);
+    renderComments( reviewManager.comments);
 }
 
 function toggleTheme() {
@@ -147,6 +148,7 @@ function toggleTheme() {
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
+    renderComments(reviewManager.comments);
 }
 
 function createRandomComments(): ReviewComment[] {
@@ -198,32 +200,33 @@ function createRandomComments(): ReviewComment[] {
 
 }
 
-function renderComments(element, comments) {
+function renderComments( comments) {
     comments = comments || [];
-    element.innerHTML = comments
+    document.getElementById("summaryEditor").innerHTML = reviewManager.iterateComments(comments)
         .map(
-            comment =>
-                `<div>${comment.id} ${comment.lineNumber} ${comment.author} ${
-                comment.text
-                } ${comment.deleted ? "DELETED" : ""}</div>`
+            item =>
+
+                `<div style="display:flex;height:16px;text-decoration:${item.comment.deleted ? 'line-through' : 'normal'}">
+                    <div style="width:100px;overflow:hidden;">${item.comment.id}</div>
+                    <div style="width:50px;overflow:hidden;">${item.comment.lineNumber}</div>
+                    <div style="width:100px;overflow:hidden;">${item.comment.author}</div> 
+                    <div style="width:100px;overflow:hidden;">${item.comment.dt}</div> 
+                    <div style="width:300px;overflow:hidden;">${item.comment.text}</div>                    
+                </div>`
         )
         .join("");
-    console.log(
-        "Comments Changed:",
-        comments
-            .map(
-                comment =>
-                    `${comment.id} ${comment.lineNumber} ${comment.author} ${
-                    comment.text
-                    } ${comment.deleted}`
-            )
-            .join("\n")
-    );
+
+}
+
+function clearComments() {
+    reviewManager.load([]);
+    renderComments([]);
 }
 
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.toggleTheme = toggleTheme;
+win.clearComments = clearComments;
 init();
 
