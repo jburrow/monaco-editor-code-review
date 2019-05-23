@@ -7,7 +7,7 @@ For a working examplple of all the features and the behaviours
 - See example source-code
   - [docs/index.html](examples/index.html) 
   - [src/docs.ts](src/docs.ts)
-
+- Read the Api-Docs: https://jburrow.github.io/monaco-editor-code-review/docs/
 
 Simply add the monaco-editor-code-review/index.js to your .html page. 
 
