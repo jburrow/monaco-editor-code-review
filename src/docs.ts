@@ -6,12 +6,14 @@ interface WindowDoc {
     setView: any;
     generateDifferentComments: any;
     generateDifferentContents: any;
+    toggleTheme: any;
 }
 
 const win = (window as any) as WindowDoc;
 let reviewManager: any = null;
 let currentMode: string = '';
 let currentEditor: any = null;
+let theme = 'vs-dark';
 
 function ensureMonacoIsAvailable() {
     return new Promise(resolve => {
@@ -51,7 +53,8 @@ function setView(mode) {
                 glyphMargin: true,
                 contextmenu: true,
                 automaticLayout: true,
-                readOnly: mode === "standard-readonly"
+                readOnly: mode === "standard-readonly",
+                theme: theme
             }
         );
 
@@ -137,6 +140,11 @@ function initReviewManager(editor: any) {
     renderComments(summaryDiv, reviewManager.comments);
 }
 
+function toggleTheme() {
+    theme = theme == 'vs' ? 'vs-dark' : 'vs';
+    win.monaco.editor.setTheme(theme)
+}
+
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
 }
@@ -216,6 +224,6 @@ function renderComments(element, comments) {
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
-
+win.toggleTheme = toggleTheme;
 init();
 

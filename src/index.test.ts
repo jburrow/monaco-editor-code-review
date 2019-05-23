@@ -1,9 +1,7 @@
 import { ReviewComment, createReviewManager } from "./index";
 
-
 interface MonacoWindow {
     monaco: any;
-    prompt: any;
 }
 
 const monacoWindow = (window as any) as MonacoWindow;
@@ -12,7 +10,6 @@ monacoWindow.monaco = {
     Range: () => { },
     editor: { ContentWidgetPositionPreference: { BELOW: 'BELOW' } }
 };
-monacoWindow.prompt = () => 'comment';
 
 function getMockEditor() {
     const editor = {
@@ -37,11 +34,17 @@ function getMockEditor() {
             }
         }),
         layoutContentWidget: () => null,
-        getPosition: () => { return { lineNumber: 1 } }
-    };
+        getPosition: () => { return { lineNumber: 1 } },
+        _themeService: {
+            getTheme: () => {
+                return {
+                    getColor: () => ''
+                }
+            }
+        }
+    }
 
     return editor;
-
 }
 
 test('Widget Coverage', () => {
@@ -64,7 +67,7 @@ test('can attach createReviewManager to editor', () => {
     expect(Object.keys(editor._zones).length).toBe(1);
     expect(rm.activeComment).toBe(null);
 
-    rm.handleMouseDown({ target: { element: { tagName: 'DIV', }, detail: { viewZoneId: 0 } } })
+    rm.handleMouseDown({ target: { element: { hasAttribute: () => false }, detail: { viewZoneId: 0 } } })
     expect(rm.activeComment).toBe(comment);
 
     //check active comment

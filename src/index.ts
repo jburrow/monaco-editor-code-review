@@ -29,7 +29,7 @@ class ReviewCommentState {
 }
 
 export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig): ReviewManager {
-    //For Debug: (window as any).editor = editor;    
+    //For Debug: (window as any).editor = editor;
     const rm = new ReviewManager(editor, currentUser, onChange, config);
     rm.load(comments || []);
     return rm;
@@ -86,6 +86,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     rulerMarkerDarkColor: 'darkorange'
 };
 
+const CONTROL_ATTR_NAME = 'ReviewManagerControl';
 
 class ReviewManager {
     currentUser: string;
@@ -157,44 +158,46 @@ class ReviewManager {
         })
     }
 
-
     calculateNumberOfLines(text: string): number {
         return text.split(/\r*\n/).length;
     }
 
-    createInlineEditButtonsElement() {
-        var root = document.createElement('div');
-        root.className = 'editButtonsContainer'
+    getThemedColor(name: string): string {
+        // editor.background: e {rgba: e}
+        // editor.foreground: e {rgba: e}
+        // editor.inactiveSelectionBackground: e {rgba: e}
+        // editor.selectionHighlightBackground: e {rgba: e}
+        // editorIndentGuide.activeBackground: e {rgba: e}
+        // editorIndentGuide.background: e {rgba: e}
+        return this.editor._themeService.getTheme().getColor(name);
+    }
 
-        const add = document.createElement('a') as HTMLAnchorElement;
-        add.href = '#'
+    createInlineEditButtonsElement() {
+        var root = document.createElement('div') as HTMLDivElement;
+        root.className = 'editButtonsContainer'
+        root.style.marginLeft = this.config.editButtonOffset;
+
+        const add = document.createElement('span') as HTMLSpanElement;
         add.innerText = this.config.editButtonAddText;
-        add.name = 'add';
-        add.className = 'editButtonAdd'
-        add.onclick = () => {
-            this.setEditorMode(EditorMode.editComment)
-            return false;// Suppress navigation
-        };
+        add.className = 'editButton add'
+        add.setAttribute(CONTROL_ATTR_NAME, '');
+        add.onclick = () => this.setEditorMode(EditorMode.editComment);
         root.appendChild(add);
 
         if (this.config.editButtonEnableRemove) {
-            const spacer = document.createElement('div');
+            const spacer = document.createElement('div') as HTMLDivElement;
             spacer.innerText = ' '
             root.appendChild(spacer);
 
-            const remove = document.createElement('a') as HTMLAnchorElement;
-            remove.href = '#'
+            const remove = document.createElement('span') as HTMLSpanElement;
+            remove.setAttribute(CONTROL_ATTR_NAME, '');
             remove.innerText = this.config.editButtonRemoveText;
-            remove.name = 'remove';
-            remove.className = 'editButtonRemove'
-            remove.onclick = () => {
-                this.removeComment(this.activeComment);
-                return false; // Suppress navigation
-            }
+            remove.className = 'editButton remove'
+            remove.onclick = () => this.removeComment(this.activeComment);
             root.appendChild(remove);
         }
 
-        root.style.marginLeft = this.config.editButtonOffset;
+
         return root;
     }
 
@@ -218,21 +221,24 @@ class ReviewManager {
     }
 
     createInlineEditorElement() {
-        var root = document.createElement('span');
+        var root = document.createElement('span') as HTMLSpanElement;
         root.className = "reviewCommentEdit"
 
         const textarea = document.createElement('textarea') as HTMLTextAreaElement;
+        textarea.setAttribute(CONTROL_ATTR_NAME, '');
         textarea.className = "reviewCommentText";
         textarea.innerText = '';
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
         const save = document.createElement('button') as HTMLButtonElement;
+        save.setAttribute(CONTROL_ATTR_NAME, '');
         save.className = "reviewCommentSave";
         save.innerText = 'Save';
         save.onclick = this.handleSave.bind(this);
 
         const cancel = document.createElement('button') as HTMLButtonElement;
+        cancel.setAttribute(CONTROL_ATTR_NAME, '');
         cancel.className = "reviewCommentCancel";
         cancel.innerText = 'Cancel';
         cancel.onclick = this.handleCancel.bind(this);
@@ -273,6 +279,7 @@ class ReviewManager {
 
     createInlineEditorWidget() {
         const editorElement = this.createInlineEditorElement();
+
         this.widgetInlineCommentEditor = {
             allowEditorOverflow: true,
             getId: () => {
@@ -317,10 +324,12 @@ class ReviewManager {
     }
 
     layoutInlineToolbar() {
+        const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
+
         if (this.activeComment) {
-            const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
             toolbarRoot.style.marginTop = `-${this.calculateMarginTopOffset(2)}px`;
         }
+        toolbarRoot.style.backgroundColor = this.getThemedColor("editor.background");
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
@@ -333,8 +342,8 @@ class ReviewManager {
         }
     }
 
-    handleMouseDown(ev: any) {
-        if (ev.target.element.tagName === 'TEXTAREA' || ev.target.element.tagName === 'BUTTON' || ev.target.element.tagName === 'A') {
+    handleMouseDown(ev: { target: { element: { hasAttribute: { (string): boolean } }, detail: any } }) {
+        if (ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             return;
         } else {
             let activeComment: ReviewComment = null;
@@ -385,6 +394,8 @@ class ReviewManager {
 
         const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
         editorRoot.style.marginTop = `-${this.calculateMarginTopOffset()}px`;
+
+
 
         this.layoutInlineToolbar();
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
@@ -507,24 +518,23 @@ class ReviewManager {
                     console.debug('Zone.Create', item.comment.id);
 
                     lineNumbers[item.comment.lineNumber] = 0;
-
-                    const domNode = document.createElement('div');
                     const isActive = this.activeComment == item.comment;
 
+                    const domNode = document.createElement('span') as HTMLSpanElement;
                     domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "px";
-                    domNode.style.display = 'inline';
-                    domNode.className = isActive ? 'reviewComment reviewComment-active' : 'reviewComment reviewComment-inactive';
+                    domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+                    domNode.className = `reviewComment ${isActive ? 'active' : ' inactive'}`;
 
-                    const author = document.createElement('span');
-                    author.className = 'reviewComment-author'
+                    const author = document.createElement('span') as HTMLSpanElement;
+                    author.className = 'reviewComment author'
                     author.innerText = `${item.comment.author || ' '} at `;
 
-                    const dt = document.createElement('span');
-                    dt.className = 'reviewComment-dt'
+                    const dt = document.createElement('span') as HTMLSpanElement;
+                    dt.className = 'reviewComment dt'
                     dt.innerText = item.comment.dt.toLocaleString();
 
-                    const text = document.createElement('span');
-                    text.className = 'reviewComment-text'
+                    const text = document.createElement('span') as HTMLSpanElement;
+                    text.className = 'reviewComment text'
                     text.innerText = `${item.comment.text} by `;
 
                     domNode.appendChild(text);
@@ -556,6 +566,7 @@ class ReviewManager {
                     })
                 }
 
+                //TODO - Preserver any other decorators
                 this.editor.deltaDecorations([], decorators);
             }
         });

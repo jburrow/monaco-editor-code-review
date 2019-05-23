@@ -21,33 +21,45 @@
   margin: 5px 5px 5px 0;
 }
 
-.reviewComment-active,
-.reviewComment-inactive {
+.reviewComment {
   font-size: 12px;
-  background-color: lightcoral;
+  /* background-color: red; */
 }
 
-.reviewComment-author {
+.reviewComment.active {
+  /* background-color: orangered; */
+}
+
+.reviewComment.inactive {
+  /* background-color: lightgreen; */
+}
+
+.reviewComment.author {
   /* background-color: pink; */
 }
 
-.reviewComment-dt {
+.reviewComment.dt {
   /* background-color: green; */
 }
 
-.reviewComment-text {
+.reviewComment.text {
   /* background-color: yellow; */
 }
 
 .editButtonsContainer {
   font-size: 12px;
   width: 45px;
-  background-color: white; /* FIXME - this needs to editor background color  */
   padding-right: 2px;
   text-align: right;
+  background-color: red;
 }
-.editButtonAdd {
+.editButton:hover {
+  text-decoration: underline;
+  cursor: pointer
 }
 
-.editButtonRemove {
+.editButton.add {
+}
+
+.editButton.remove {
 }
