@@ -3,17 +3,17 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>monaco-review</title>
+	<title>MonacoWindow | monaco-review</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="assets/css/main.css">
+	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
 <header>
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">monaco-review</a>
+					<a href="../index.html" class="title">monaco-review</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -53,80 +53,124 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="globals.html">Globals</a>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="../modules/_index_.html">&quot;index&quot;</a>
+				</li>
+				<li>
+					<a href="_index_.monacowindow.html">MonacoWindow</a>
 				</li>
 			</ul>
-			<h1> monaco-review</h1>
+			<h1>Interface MonacoWindow</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<div class="tsd-panel tsd-typography">
-				<h1 id="monaco-editor-code-review">monaco-editor-code-review</h1>
-				<p>Lightweight extension (24kb) for monaco-editor to allow commenting off code.
-				This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.</p>
-				<p>For a working examplple of all the features and the behaviours</p>
-				<ul>
-					<li>Try it out: <a href="https://jburrow.github.io/monaco-editor-code-review/docs/index.html">https://jburrow.github.io/monaco-editor-code-review/docs/index.html</a></li>
-					<li>See example source-code<ul>
-							<li><a href="docs/index.html">docs/index.html</a> </li>
-							<li><a href="src/docs.ts">src/docs.ts</a></li>
-						</ul>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">MonacoWindow</span>
 					</li>
 				</ul>
-				<p>Simply add the monaco-editor-code-review/index.js to your .html page. </p>
-				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"../index.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
-				<pre><code class="language-javascript"><span class="hljs-comment">//Type: ./src/types/index.ts#ReviewManagerConfig</span>
-<span class="hljs-keyword">var</span> overriddenConfig = {}; 
-
-<span class="hljs-comment">//Type: ./src/types/index.ts#ReviewComment</span>
-<span class="hljs-keyword">var</span> existingComments = [{<span class="hljs-attr">author</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">dt</span>:<span class="hljs-string">''</span>, 
-                          <span class="hljs-attr">text</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">lineNumber</span>:<span class="hljs-number">10</span>, 
-                         <span class="hljs-attr">comments</span>:[]}]; 
-
-<span class="hljs-keyword">var</span> editor = monaco.editor.create(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"container"</span>), {
-        <span class="hljs-attr">value</span>: <span class="hljs-string">'...some source code '</span><span class="hljs-string">''</span>,
-        <span class="hljs-attr">language</span>: <span class="hljs-string">"javascript"</span>,        
-        <span class="hljs-attr">contextmenu</span>: <span class="hljs-literal">true</span>
-    });
-<span class="hljs-keyword">var</span> rm = MonacoEditorCodeReview.createReviewManager(editor, 
-                                                    <span class="hljs-string">"name-of-current-user"</span>, 
-                                                    existingComments, 
-                                                    (newComments)=&gt;{<span class="hljs-built_in">console</span>.info(newComments);}, 
-                                                    overriddenConfig);</code></pre>
-				<p>Features</p>
-				<ul>
-					<li>Add comment</li>
-					<li>Reply to comment</li>
-					<li>Delete comment [optionally disabl]</li>
-					<li>Navigate between comments [ forward, back]</li>
-					<li>Displays comment marker in scrollbar</li>
-					<li>Supports Monaco Themes</li>
-				</ul>
-				<p><img src="https://github.com/jburrow/monaco-editor-code-review/blob/master/docs/screenshot.png?raw=true" alt="screenshot"></p>
-				<h2 id="motivation">Motivation</h2>
-				<p>Your first reaction might be there is no need for this because github or gitlab all have excellent code
-					review tools, and you are right! However - Monaco can be embedded in many types of applications, and this
-				library enables you integrate a light way of allowing users to annotate documents rendered in it. </p>
-			</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-not-exported">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_index_.monacowindow.html#monaco" class="tsd-kind-icon">monaco</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
+					<a name="monaco" class="tsd-anchor"></a>
+					<h3>monaco</h3>
+					<div class="tsd-signature tsd-kind-icon">monaco<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/7edfc52/src/index.ts#L4">index.ts:4</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
+						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_index_.html">"index"</a>
+					<li class="current tsd-kind-external-module">
+						<a href="../modules/_index_.html">"index"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../enums/_index_.editormode.html" class="tsd-kind-icon">Editor<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../enums/_index_.navigationdirection.html" class="tsd-kind-icon">Navigation<wbr>Direction</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../enums/_index_.reviewcommentstatus.html" class="tsd-kind-icon">Review<wbr>Comment<wbr>Status</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../classes/_index_.reviewcommentstate.html" class="tsd-kind-icon">Review<wbr>Comment<wbr>State</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../classes/_index_.reviewmanager.html" class="tsd-kind-icon">Review<wbr>Manager</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_index_.monacowindow.html" class="tsd-kind-icon">Monaco<wbr>Window</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
+								<a href="_index_.monacowindow.html#monaco" class="tsd-kind-icon">monaco</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_index_.oncommentschanged.html" class="tsd-kind-icon">On<wbr>Comments<wbr>Changed</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_index_.reviewcomment.html" class="tsd-kind-icon">Review<wbr>Comment</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_index_.reviewcommentiteritem.html" class="tsd-kind-icon">Review<wbr>Comment<wbr>Iter<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_index_.reviewmanagerconfig.html" class="tsd-kind-icon">Review<wbr>Manager<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_index_.reviewmanagerconfigprivate.html" class="tsd-kind-icon">Review<wbr>Manager<wbr>Config<wbr>Private</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_index_.html#control_attr_name" class="tsd-kind-icon">CONTROL_<wbr>ATTR_<wbr>NAME</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_index_.html#monacowindow-1" class="tsd-kind-icon">monaco<wbr>Window</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="../modules/_index_.html#createreviewmanager" class="tsd-kind-icon">create<wbr>Review<wbr>Manager</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_index_.html#defaultreviewmanagerconfig" class="tsd-kind-icon">default<wbr>Review<wbr>Manager<wbr>Config</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -195,7 +239,7 @@
 	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
-<script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

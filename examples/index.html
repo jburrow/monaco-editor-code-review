@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../dist/index.css" />
+
+    <style>
+      body {
+        height: calc(100% - 20px);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .editor {
+        flex: auto;
+        overflow: hidden;
+      }
+
+      h5 {
+        height: 20px;
+        margin: 1px;
+      }
+      .summary {
+        height: auto;
+        max-height: 200px;
+        min-height: 100px;
+        padding: 10px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="display:flex">      
+      <button onclick="setView('standard')">Editor</button>
+      <button onclick="setView('standard-readonly')">Editor - Readonly</button>
+      <button onclick="setView('inline')">Diff - Inline</button>
+      <button onclick="setView('side-by-side')">Diff - Side-by-Side</button>
+      <button onclick="generateDifferentComments()" style="background-color:lightgoldenrodyellow">Change Comments (in-place)</button>
+      <button onclick="generateDifferentContents()" style="background-color:lightgoldenrodyellow">Change Contents (in-place)</button>
+      <button onclick="toggleTheme()" style="background-color:lightgoldenrodyellow">Toggle Theme</button>  
+      <button onclick="clearComments()" style="background-color:lightgoldenrodyellow">Clear Comments</button>  
+          
+    </div>
+    <h5>
+      Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
+    </h5>
+    <div class="editor" id="containerEditor"></div>
+    <h5>Comments</h5>
+    <div class="summary" id="summaryEditor"></div>
+  </body>
+</html>
+
+<script src="../dist/index.js"></script>
+<script src="../dist/docs.js"></script>

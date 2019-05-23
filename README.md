@@ -3,9 +3,9 @@ Lightweight extension (24kb) for monaco-editor to allow commenting off code.
 This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.
 
 For a working examplple of all the features and the behaviours
-- Try it out: https://jburrow.github.io/monaco-editor-code-review/docs/index.html
+- Try it out: https://jburrow.github.io/monaco-editor-code-review/examples/index.html
 - See example source-code
-  - [docs/index.html](docs/index.html) 
+  - [docs/index.html](examples/index.html) 
   - [src/docs.ts](src/docs.ts)
 
 
@@ -49,7 +49,7 @@ Features
 - Supports Monaco Themes
 
 
-![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/docs/screenshot.png?raw=true)
+![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true)
 
 ## Motivation
 

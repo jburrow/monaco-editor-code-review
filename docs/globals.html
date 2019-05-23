@@ -63,61 +63,24 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<div class="tsd-panel tsd-typography">
-				<h1 id="monaco-editor-code-review">monaco-editor-code-review</h1>
-				<p>Lightweight extension (24kb) for monaco-editor to allow commenting off code.
-				This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.</p>
-				<p>For a working examplple of all the features and the behaviours</p>
-				<ul>
-					<li>Try it out: <a href="https://jburrow.github.io/monaco-editor-code-review/docs/index.html">https://jburrow.github.io/monaco-editor-code-review/docs/index.html</a></li>
-					<li>See example source-code<ul>
-							<li><a href="docs/index.html">docs/index.html</a> </li>
-							<li><a href="src/docs.ts">src/docs.ts</a></li>
-						</ul>
-					</li>
-				</ul>
-				<p>Simply add the monaco-editor-code-review/index.js to your .html page. </p>
-				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"../index.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
-				<pre><code class="language-javascript"><span class="hljs-comment">//Type: ./src/types/index.ts#ReviewManagerConfig</span>
-<span class="hljs-keyword">var</span> overriddenConfig = {}; 
-
-<span class="hljs-comment">//Type: ./src/types/index.ts#ReviewComment</span>
-<span class="hljs-keyword">var</span> existingComments = [{<span class="hljs-attr">author</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">dt</span>:<span class="hljs-string">''</span>, 
-                          <span class="hljs-attr">text</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">lineNumber</span>:<span class="hljs-number">10</span>, 
-                         <span class="hljs-attr">comments</span>:[]}]; 
-
-<span class="hljs-keyword">var</span> editor = monaco.editor.create(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"container"</span>), {
-        <span class="hljs-attr">value</span>: <span class="hljs-string">'...some source code '</span><span class="hljs-string">''</span>,
-        <span class="hljs-attr">language</span>: <span class="hljs-string">"javascript"</span>,        
-        <span class="hljs-attr">contextmenu</span>: <span class="hljs-literal">true</span>
-    });
-<span class="hljs-keyword">var</span> rm = MonacoEditorCodeReview.createReviewManager(editor, 
-                                                    <span class="hljs-string">"name-of-current-user"</span>, 
-                                                    existingComments, 
-                                                    (newComments)=&gt;{<span class="hljs-built_in">console</span>.info(newComments);}, 
-                                                    overriddenConfig);</code></pre>
-				<p>Features</p>
-				<ul>
-					<li>Add comment</li>
-					<li>Reply to comment</li>
-					<li>Delete comment [optionally disabl]</li>
-					<li>Navigate between comments [ forward, back]</li>
-					<li>Displays comment marker in scrollbar</li>
-					<li>Supports Monaco Themes</li>
-				</ul>
-				<p><img src="https://github.com/jburrow/monaco-editor-code-review/blob/master/docs/screenshot.png?raw=true" alt="screenshot"></p>
-				<h2 id="motivation">Motivation</h2>
-				<p>Your first reaction might be there is no need for this because github or gitlab all have excellent code
-					review tools, and you are right! However - Monaco can be embedded in many types of applications, and this
-				library enables you integrate a light way of allowing users to annotate documents rendered in it. </p>
-			</div>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>External modules</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-external-module"><a href="modules/_index_.html" class="tsd-kind-icon">"index"</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
+					<li class="globals current ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
