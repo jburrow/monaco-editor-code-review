@@ -5,8 +5,8 @@ This module has 1 explicit run-time dependencies (uuid). There is an implicit de
 For a working examplple of all the features and the behaviours
 - Try it out: https://jburrow.github.io/monaco-editor-code-review/docs/index.html
 - See example source-code
- - [docs/index.html](docs/index.html) 
- - [src/docs.ts](src/docs.ts)
+  - [docs/index.html](docs/index.html) 
+  - [src/docs.ts](src/docs.ts)
 
 
 Simply add the monaco-editor-code-review/index.js to your .html page. 
