@@ -55,5 +55,3 @@ Features
 Your first reaction might be there is no need for this because github or gitlab all have excellent code 
 review tools, and you are right! However - Monaco can be embedded in many types of applications, and this 
 library enables you integrate a light way of allowing users to annotate documents rendered in it. 
-
-![logo]("https://travis-ci.org/jburrow/monaco-editor-code-review.svg?branch=master")
