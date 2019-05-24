@@ -86,7 +86,7 @@ test('can attach createReviewManager to editor', () => {
 
     rm.setActiveComment(num2);
     const num3 = rm.addComment(null, "#2.2");
-    expect(rm.comments.length).toBe(2);
+    expect(rm.comments.length).toBe(3);
     expect(Object.keys(editor._zones).length).toBe(2);
 
     rm.setActiveComment(null);
@@ -119,5 +119,5 @@ test('can attach createReviewManager to editor', () => {
     expect(rm.editorMode).toBe(2); //Toolbar
     expect(rm.textarea.value).toBe("");
     expect(Object.keys(editor._zones).length).toBe(4);
-    expect(rm.comments[3].text).toBe('#5');
+    expect(rm.comments[4].text).toBe('#5');
 });

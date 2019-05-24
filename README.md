@@ -1,5 +1,5 @@
 # monaco-editor-code-review
-Lightweight extension (24kb) for monaco-editor to allow commenting off code. 
+Lightweight extension (31KiB) for monaco-editor to allow commenting off code. 
 This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.
 
 For a working examplple of all the features and the behaviours
@@ -24,9 +24,8 @@ var overriddenConfig = {};
 //Type: ./src/types/index.ts#ReviewComment
 var existingComments = [{author:'', 
                          dt:'', 
-                          text:'', 
-                         lineNumber:10, 
-                         comments:[]}]; 
+                         text:'', 
+                         lineNumber:10 }]; 
 
 var editor = monaco.editor.create(document.getElementById("container"), {
         value: '...some source code ''',

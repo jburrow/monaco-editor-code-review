@@ -129,7 +129,7 @@ async function init() {
 }
 
 function initReviewManager(editor: any) {
-    
+
     reviewManager = createReviewManager(
         editor,
         "mr reviewer",
@@ -138,7 +138,7 @@ function initReviewManager(editor: any) {
         { editButtonEnableRemove: true }
     );
 
-    renderComments( reviewManager.comments);
+    renderComments(reviewManager.comments);
 }
 
 function toggleTheme() {
@@ -163,55 +163,58 @@ function createRandomComments(): ReviewComment[] {
             text: "at start"
         },
         {
-            id: "id-2",
+            id: "id-1",
             lineNumber: firstLine + 50,
             author: "another reviewer",
             dt: new Date(),
             text: "at start"
         },
         {
+            id: "id-2",
+            parentId: "id-1",
             lineNumber: firstLine + 5,
             author: "another reviewer",
             dt: '2019-01-01 12:22:33',
             text: "this code isn't very good",
-            comments: [
-                {
-                    lineNumber: firstLine + 5,
-                    author: "original author",
-                    dt: new Date(),
-                    text: "I think you will find it is good enough"
-                },
-                {
-                    lineNumber: firstLine + 5,
-                    author: "original author",
-                    dt: new Date(),
-                    text: "I think you will find it is good enough",
-                    comments: [{
-                        lineNumber: firstLine + 5,
-                        author: "original author",
-                        dt: new Date(),
-                        text: "I think you will find it is good enough",
-                    }]
-                }
-                ,
-            ]
-        }
-    ];
+        },
+        {
+            id: "id-3",
+            parentId: "id-2",
+            lineNumber: firstLine + 5,
+            author: "original author",
+            dt: new Date(),
+            text: "I think you will find it is good enough"
+        },
+        {
+            parentId: "id-3",
+            lineNumber: firstLine + 5,
+            author: "original author",
+            dt: new Date(),
+            text: "I think you will find it is good enough",
+        },
+        {
+            parentId: "id-3",
+            lineNumber: firstLine + 5,
+            author: "original author",
+            dt: new Date(),
+            text: "I think you will find it is good enough",
 
+        }
+
+    ]
 }
 
-function renderComments( comments) {
+function renderComments(comments) {
     comments = comments || [];
-    document.getElementById("summaryEditor").innerHTML = reviewManager.iterateComments(comments)
+    document.getElementById("summaryEditor").innerHTML = reviewManager.comments
         .map(
-            item =>
-
-                `<div style="display:flex;height:16px;text-decoration:${item.comment.deleted ? 'line-through' : 'normal'}">
-                    <div style="width:100px;overflow:hidden;">${item.comment.id}</div>
-                    <div style="width:50px;overflow:hidden;">${item.comment.lineNumber}</div>
-                    <div style="width:100px;overflow:hidden;">${item.comment.author}</div> 
-                    <div style="width:100px;overflow:hidden;">${item.comment.dt}</div> 
-                    <div style="width:300px;overflow:hidden;">${item.comment.text}</div>                    
+            comment =>
+                `<div style="display:flex;height:16px;text-decoration:${comment.status && comment.status === 2 ? 'line-through' : 'normal'}">
+                    <div style="width:100px;overflow:hidden;">${comment.id}</div>
+                    <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
+                    <div style="width:100px;overflow:hidden;">${comment.author}</div> 
+                    <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
+                    <div style="width:300px;overflow:hidden;">${comment.text}</div>                    
                 </div>`
         )
         .join("");

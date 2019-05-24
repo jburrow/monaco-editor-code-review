@@ -4,7 +4,7 @@ const TimestampWebpackPlugin = require("timestamp-webpack-plugin");
 module.exports = {
   entry: { index: "./src/index.ts", docs: "./src/docs.ts" },
   mode: "development",
-  devtool: "inline-source-map",
+  devtool: "source-map",
   devServer: {
     publicPath: "/dist/"
   },

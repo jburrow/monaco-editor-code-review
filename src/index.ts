@@ -8,21 +8,26 @@ const monacoWindow = (window as any) as MonacoWindow;
 
 export interface ReviewComment {
     id?: string;
+    parentId?: string;
     author: string;
     dt: Date | string;
     lineNumber: number;
     text: string;
-    comments?: ReviewComment[];
-    deleted?: boolean;
+    status?: ReviewCommentStatus;
+}
+
+export enum ReviewCommentStatus {
+    active = 1,
+    deleted = 2
 }
 
 class ReviewCommentState {
     viewZoneId: number;
-    renderStatus: ReviewCommentStatus;
+    renderStatus: ReviewCommentRenderState;
     numberOfLines: number;
 
     constructor(numberOfLines: number) {
-        this.renderStatus = ReviewCommentStatus.normal;
+        this.renderStatus = ReviewCommentRenderState.normal;
         this.viewZoneId = null;
         this.numberOfLines = numberOfLines;
     }
@@ -126,9 +131,9 @@ class ReviewManager {
     load(comments: ReviewComment[]): void {
         this.editor.changeViewZones((changeAccessor) => {
             // Remove all the existing comments     
-            for (const oldItem of this.iterateComments()) {
-                if (oldItem.viewState.viewZoneId) {
-                    changeAccessor.removeZone(oldItem.viewState.viewZoneId);
+            for (const viewState of Object.values(this.commentState)) {
+                if (viewState.viewZoneId) {
+                    changeAccessor.removeZone(viewState.viewZoneId);
                 }
             }
 
@@ -136,20 +141,20 @@ class ReviewManager {
             this.commentState = {};
 
             // Check all comments that they have unique and present id's
-            for (const item of this.iterateComments()) {
-                const originalId = item.comment.id;
+            for (const comment of comments) {
+                const originalId = comment.id;
                 let changedId = false;
 
-                while (!item.comment.id || this.commentState[item.comment.id]) {
-                    item.comment.id = uuid();
+                while (!comment.id || this.commentState[comment.id]) {
+                    comment.id = uuid();
                     changedId = true;
                 }
 
                 if (changedId) {
-                    console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', item.comment.id, ' due to collision');
+                    console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', comment.id, ' due to collision');
                 }
 
-                this.commentState[item.comment.id] = new ReviewCommentState(this.calculateNumberOfLines(item.comment.text));
+                this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(comment.text));
             }
 
             this.refreshComments();
@@ -317,8 +322,8 @@ class ReviewManager {
 
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
-            this.filterAndMapComments(lineNumbersToMakeDirty, (item) => {
-                item.viewState.renderStatus = ReviewCommentStatus.dirty
+            this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
+                this.commentState[comment.id].renderStatus = ReviewCommentRenderState.dirty;
             });
         }
     }
@@ -333,11 +338,10 @@ class ReviewManager {
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
-    filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewCommentIterItem): void }) {
-        const comments = this.iterateComments();
-        for (const c of comments) {
-            if (lineNumbers.indexOf(c.comment.lineNumber) > -1) {
-                fn(c);
+    filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
+        for (const comment of this.comments) {
+            if (lineNumbers.indexOf(comment.lineNumber) > -1) {
+                fn(comment);
             }
         }
     }
@@ -349,9 +353,10 @@ class ReviewManager {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
-                for (const item of this.iterateComments()) {
-                    if (item.viewState.viewZoneId == ev.target.detail.viewZoneId) {
-                        activeComment = item.comment;
+                for (const comment of this.comments) {
+                    const viewState = this.commentState[comment.id];
+                    if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
+                        activeComment = comment;
                         break;
                     }
                 }
@@ -383,8 +388,6 @@ class ReviewManager {
 
         return marginTop;
     }
-
-
 
     setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
         console.debug('setEditorMode', this.activeComment);
@@ -421,21 +424,16 @@ class ReviewManager {
             lineNumber: ln,
             author: this.currentUser,
             dt: new Date(),
-            text: text
+            text: text,
+            status: ReviewCommentStatus.active,
+            parentId: this.activeComment ? this.activeComment.id : null
         };
+
         this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(text));
+        this.comments.push(comment);
 
-        if (this.activeComment) {
-            if (!this.activeComment.comments) {
-                this.activeComment.comments = [];
-            }
-            this.activeComment.comments.push(comment);
-        } else {
-            this.comments.push(comment);
-        }
-
-        this.filterAndMapComments([ln], (item) => {
-            item.viewState.renderStatus = ReviewCommentStatus.dirty;
+        this.filterAndMapComments([ln], (comment) => {
+            this.commentState[comment.id].renderStatus = ReviewCommentRenderState.dirty;
         });
 
         this.refreshComments()
@@ -448,31 +446,40 @@ class ReviewManager {
         return comment;
     }
 
-    iterateComments(comments?: ReviewComment[], depth?: number, results?: ReviewCommentIterItem[]) {
-        results = results || [];
-        depth = depth || 0;
-        comments = comments || this.comments;
+    _recurse(allComments: { [key: string]: ReviewComment }, filterFn: { (c: ReviewComment): boolean }, depth: number, results: ReviewCommentIterItem[]) {
+        const comments = Object.values(allComments).filter(filterFn); //TODO - sort by dt
+        for (const comment of comments) {
+            delete allComments[comment.id];
 
-        if (comments) {
-            for (const comment of comments) {
-                results.push({
-                    depth,
-                    comment,
-                    viewState: this.commentState[comment.id]
-                })
-
-                if (comment.comments) {
-                    this.iterateComments(comment.comments, depth + 1, results);
-                }
-            }
+            results.push({
+                depth,
+                comment,
+                viewState: this.commentState[comment.id]
+            });
+            this._recurse(allComments,
+                (x) => x.parentId === comment.id,
+                depth + 1,
+                results);
         }
+    }
 
+    iterateComments(filterFn?: { (c: ReviewComment): boolean }) {
+        if (!filterFn) {
+            filterFn = (c: ReviewComment) => !c.parentId;
+        }
+        const tmpComments: { [key: string]: ReviewComment } = (this.comments).reduce((obj, item) => {
+            obj[item.id] = item
+            return obj
+        }, {});
+
+        const results: ReviewCommentIterItem[] = [];
+        this._recurse(tmpComments, filterFn, 0, results);
         return results;
     }
 
     removeComment(comment: ReviewComment) {
-        for (const item of this.iterateComments([comment])) {
-            item.comment.deleted = true;
+        for (const item of this.iterateComments((c) => c.id === comment.id)) {
+            item.comment.status = ReviewCommentStatus.deleted;
         }
         if (this.activeComment == comment) {
             this.setActiveComment(null);
@@ -490,14 +497,14 @@ class ReviewManager {
             const lineNumbers: { [key: number]: number } = {};
 
             for (const item of this.iterateComments()) {
-                if (item.comment.deleted) {
+                if (item.comment.status && item.comment.status === ReviewCommentStatus.deleted) {
                     console.debug('Zone.Delete', item.comment.id);
 
                     changeAccessor.removeZone(item.viewState.viewZoneId);
                     continue;
                 }
 
-                if (item.viewState.renderStatus === ReviewCommentStatus.hidden) {
+                if (item.viewState.renderStatus === ReviewCommentRenderState.hidden) {
                     console.debug('Zone.Hidden', item.comment.id);
 
                     changeAccessor.removeZone(item.viewState.viewZoneId);
@@ -506,12 +513,12 @@ class ReviewManager {
                     continue;
                 }
 
-                if (item.viewState.renderStatus === ReviewCommentStatus.dirty) {
+                if (item.viewState.renderStatus === ReviewCommentRenderState.dirty) {
                     console.debug('Zone.Dirty', item.comment.id);
 
                     changeAccessor.removeZone(item.viewState.viewZoneId);
                     item.viewState.viewZoneId = null;
-                    item.viewState.renderStatus = ReviewCommentStatus.normal;
+                    item.viewState.renderStatus = ReviewCommentRenderState.normal;
                 }
 
                 if (!item.viewState.viewZoneId) {
@@ -667,7 +674,7 @@ enum EditorMode {
     toolbar = 2
 }
 
-enum ReviewCommentStatus {
+enum ReviewCommentRenderState {
     dirty = 1,
     hidden = 2,
     normal = 3
