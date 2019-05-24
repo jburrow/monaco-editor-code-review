@@ -1,4 +1,4 @@
-# monaco-editor-code-review
+# monaco-editor-code-review ![logo]("https://travis-ci.org/jburrow/monaco-editor-code-review.svg?branch=master")
 Lightweight extension (31KiB) for monaco-editor to allow commenting off code. 
 This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.
 
