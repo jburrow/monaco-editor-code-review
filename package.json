@@ -1,21 +1,22 @@
 {
   "name": "monaco-review",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "start": "webpack-dev-server",
     "compile": "webpack",
-    "test": "jest"
+    "doc": "./node_modules/.bin/typedoc.cmd --out ./docs ./src/index.ts",
+    "test": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@types/uuid": "^3.4.4",
+  "dependencies": {    
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.13",
+    "@types/uuid": "^3.4.4",
     "jest": "^24.8.0",
     "monaco-editor": "^0.17.0",
     "timestamp-webpack-plugin": "^0.2.3",
