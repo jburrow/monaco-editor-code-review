@@ -13,12 +13,20 @@ export interface ReviewComment {
     dt: Date | string;
     lineNumber: number;
     text: string;
+    selection?: CodeSelection;
     status?: ReviewCommentStatus;
 }
 
 export enum ReviewCommentStatus {
     active = 1,
     deleted = 2
+}
+
+interface CodeSelection {
+    startColumn: number,
+    endColumn: number,
+    startLineNumber: number,
+    endLineNumber: number
 }
 
 class ReviewCommentState {
@@ -213,7 +221,8 @@ class ReviewManager {
 
     handleSave() {
         const r = this.setEditorMode(EditorMode.toolbar);
-        this.addComment(r.lineNumber, r.text);
+        const selection = this.activeComment ? null : this.editor.getSelection() as CodeSelection;
+        this.addComment(r.lineNumber, r.text, selection);
         this.editor.focus();
     }
 
@@ -392,13 +401,11 @@ class ReviewManager {
     setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
         console.debug('setEditorMode', this.activeComment);
 
-        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
+        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         this.editorMode = mode;
 
         const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
         editorRoot.style.marginTop = `-${this.calculateMarginTopOffset()}px`;
-
-
 
         this.layoutInlineToolbar();
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
@@ -413,11 +420,11 @@ class ReviewManager {
 
         return {
             text: text,
-            lineNumber: lineNumber
+            lineNumber: lineNumber //TODO - stop returning this as it is a mess
         };
     }
 
-    addComment(lineNumber: number, text: string): ReviewComment {
+    addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewComment {
         const ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
         const comment: ReviewComment = {
             id: uuid(),
@@ -426,6 +433,7 @@ class ReviewManager {
             dt: new Date(),
             text: text,
             status: ReviewCommentStatus.active,
+            selection: selection,
             parentId: this.activeComment ? this.activeComment.id : null
         };
 
@@ -446,7 +454,7 @@ class ReviewManager {
         return comment;
     }
 
-    _recurse(allComments: { [key: string]: ReviewComment }, filterFn: { (c: ReviewComment): boolean }, depth: number, results: ReviewCommentIterItem[]) {
+    private recurseComments(allComments: { [key: string]: ReviewComment }, filterFn: { (c: ReviewComment): boolean }, depth: number, results: ReviewCommentIterItem[]) {
         const comments = Object.values(allComments).filter(filterFn); //TODO - sort by dt
         for (const comment of comments) {
             delete allComments[comment.id];
@@ -456,14 +464,14 @@ class ReviewManager {
                 comment,
                 viewState: this.commentState[comment.id]
             });
-            this._recurse(allComments,
+            this.recurseComments(allComments,
                 (x) => x.parentId === comment.id,
                 depth + 1,
                 results);
         }
     }
 
-    iterateComments(filterFn?: { (c: ReviewComment): boolean }) {
+    private iterateComments(filterFn?: { (c: ReviewComment): boolean }) {
         if (!filterFn) {
             filterFn = (c: ReviewComment) => !c.parentId;
         }
@@ -473,7 +481,7 @@ class ReviewManager {
         }, {});
 
         const results: ReviewCommentIterItem[] = [];
-        this._recurse(tmpComments, filterFn, 0, results);
+        this.recurseComments(tmpComments, filterFn, 0, results);
         return results;
     }
 
@@ -494,7 +502,7 @@ class ReviewManager {
 
     refreshComments() {
         this.editor.changeViewZones((changeAccessor) => {
-            const lineNumbers: { [key: number]: number } = {};
+            const lineNumbers: { [key: number]: CodeSelection } = {};
 
             for (const item of this.iterateComments()) {
                 if (item.comment.status && item.comment.status === ReviewCommentStatus.deleted) {
@@ -521,10 +529,15 @@ class ReviewManager {
                     item.viewState.renderStatus = ReviewCommentRenderState.normal;
                 }
 
+
+
+                if (!lineNumbers[item.comment.lineNumber]) {
+                    lineNumbers[item.comment.lineNumber] = item.comment.selection;
+                }
+
                 if (!item.viewState.viewZoneId) {
                     console.debug('Zone.Create', item.comment.id);
 
-                    lineNumbers[item.comment.lineNumber] = 0;
                     const isActive = this.activeComment == item.comment;
 
                     const domNode = document.createElement('span') as HTMLSpanElement;
@@ -559,7 +572,8 @@ class ReviewManager {
 
             if (this.config.showInRuler) {
                 const decorators = [];
-                for (const ln in lineNumbers) {
+                for (const [ln, selection] of Object.entries(lineNumbers)) {
+
                     decorators.push({
                         range: new monacoWindow.monaco.Range(ln, 0, ln, 0),
                         options: {
@@ -571,6 +585,15 @@ class ReviewManager {
                             }
                         }
                     })
+
+                    if (selection) {
+                        decorators.push({
+                            range: new monacoWindow.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn),
+                            options: {
+                                className: 'reviewComment selection',
+                            }
+                        })
+                    }
                 }
 
                 //TODO - Preserver any other decorators

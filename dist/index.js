@@ -352,7 +352,8 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.handleSave = function () {
         var r = this.setEditorMode(EditorMode.toolbar);
-        this.addComment(r.lineNumber, r.text);
+        var selection = this.activeComment ? null : this.editor.getSelection();
+        this.addComment(r.lineNumber, r.text, selection);
         this.editor.focus();
     };
     ReviewManager.prototype.handleTextAreaKeyDown = function (e) {
@@ -514,7 +515,7 @@ var ReviewManager = /** @class */ (function () {
     ReviewManager.prototype.setEditorMode = function (mode) {
         var _this = this;
         console.debug('setEditorMode', this.activeComment);
-        var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber;
+        var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         this.editorMode = mode;
         var editorRoot = this.widgetInlineCommentEditor.getDomNode();
         editorRoot.style.marginTop = "-" + this.calculateMarginTopOffset() + "px";
@@ -528,10 +529,10 @@ var ReviewManager = /** @class */ (function () {
         }
         return {
             text: text,
-            lineNumber: lineNumber
+            lineNumber: lineNumber //TODO - stop returning this as it is a mess
         };
     };
-    ReviewManager.prototype.addComment = function (lineNumber, text) {
+    ReviewManager.prototype.addComment = function (lineNumber, text, selection) {
         var _this = this;
         var ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
         var comment = {
@@ -541,6 +542,7 @@ var ReviewManager = /** @class */ (function () {
             dt: new Date(),
             text: text,
             status: ReviewCommentStatus.active,
+            selection: selection,
             parentId: this.activeComment ? this.activeComment.id : null
         };
         this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(text));
@@ -555,7 +557,7 @@ var ReviewManager = /** @class */ (function () {
         }
         return comment;
     };
-    ReviewManager.prototype._recurse = function (allComments, filterFn, depth, results) {
+    ReviewManager.prototype.recurseComments = function (allComments, filterFn, depth, results) {
         var comments = Object.values(allComments).filter(filterFn); //TODO - sort by dt
         var _loop_1 = function (comment) {
             delete allComments[comment.id];
@@ -564,7 +566,7 @@ var ReviewManager = /** @class */ (function () {
                 comment: comment,
                 viewState: this_1.commentState[comment.id]
             });
-            this_1._recurse(allComments, function (x) { return x.parentId === comment.id; }, depth + 1, results);
+            this_1.recurseComments(allComments, function (x) { return x.parentId === comment.id; }, depth + 1, results);
         };
         var this_1 = this;
         for (var _i = 0, comments_2 = comments; _i < comments_2.length; _i++) {
@@ -581,7 +583,7 @@ var ReviewManager = /** @class */ (function () {
             return obj;
         }, {});
         var results = [];
-        this._recurse(tmpComments, filterFn, 0, results);
+        this.recurseComments(tmpComments, filterFn, 0, results);
         return results;
     };
     ReviewManager.prototype.removeComment = function (comment) {
@@ -621,9 +623,11 @@ var ReviewManager = /** @class */ (function () {
                     item.viewState.viewZoneId = null;
                     item.viewState.renderStatus = ReviewCommentRenderState.normal;
                 }
+                if (!lineNumbers[item.comment.lineNumber]) {
+                    lineNumbers[item.comment.lineNumber] = item.comment.selection;
+                }
                 if (!item.viewState.viewZoneId) {
                     console.debug('Zone.Create', item.comment.id);
-                    lineNumbers[item.comment.lineNumber] = 0;
                     var isActive = _this.activeComment == item.comment;
                     var domNode = document.createElement('span');
                     domNode.style.marginLeft = (_this.config.commentIndent * (item.depth + 1)) + _this.config.commentIndentOffset + "px";
@@ -651,7 +655,8 @@ var ReviewManager = /** @class */ (function () {
             }
             if (_this.config.showInRuler) {
                 var decorators = [];
-                for (var ln in lineNumbers) {
+                for (var _b = 0, _c = Object.entries(lineNumbers); _b < _c.length; _b++) {
+                    var _d = _c[_b], ln = _d[0], selection = _d[1];
                     decorators.push({
                         range: new monacoWindow.monaco.Range(ln, 0, ln, 0),
                         options: {
@@ -663,6 +668,14 @@ var ReviewManager = /** @class */ (function () {
                             }
                         }
                     });
+                    if (selection) {
+                        decorators.push({
+                            range: new monacoWindow.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn),
+                            options: {
+                                className: 'reviewComment selection',
+                            }
+                        });
+                    }
                 }
                 //TODO - Preserver any other decorators
                 _this.editor.deltaDecorations([], decorators);

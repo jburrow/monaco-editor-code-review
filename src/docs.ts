@@ -157,10 +157,17 @@ function createRandomComments(): ReviewComment[] {
     return [
         {
             id: "id-0",
-            lineNumber: firstLine + 1,
+            lineNumber: firstLine + 10,
             author: "another reviewer",
             dt: new Date(),
-            text: "at start"
+            text: "at start",
+            selection: {
+                startColumn: 5,
+                startLineNumber: firstLine + 5,
+                endColumn: 10,
+                endLineNumber: firstLine + 10
+
+            }
         },
         {
             id: "id-1",
@@ -214,7 +221,8 @@ function renderComments(comments) {
                     <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
                     <div style="width:100px;overflow:hidden;">${comment.author}</div> 
                     <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
-                    <div style="width:300px;overflow:hidden;">${comment.text}</div>                    
+                    <div style="width:auto;overflow:hidden;">${comment.text}</div>                    
+                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment.selection||'')}</div>                    
                 </div>`
         )
         .join("");

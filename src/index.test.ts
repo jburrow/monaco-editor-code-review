@@ -17,6 +17,7 @@ function getMockEditor() {
         _zones: {},
         focus: () => null,
         addAction: () => null,
+        getSelection: () =>{ return { startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }},
         addContentWidget: () => null,
         onMouseDown: () => null,
         revealLineInCenter: () => null,

@@ -46,6 +46,10 @@
   /* background-color: yellow; */
 }
 
+.reviewComment.selection {
+  border-bottom: 2px dotted darkorange; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
+}
+
 .editButtonsContainer {
   font-size: 12px;
   width: 45px;
@@ -55,7 +59,7 @@
 }
 .editButton:hover {
   text-decoration: underline;
-  cursor: pointer
+  cursor: pointer;
 }
 
 .editButton.add {
