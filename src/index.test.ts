@@ -17,7 +17,7 @@ function getMockEditor() {
         _zones: {},
         focus: () => null,
         addAction: () => null,
-        getSelection: () =>{ return { startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }},
+        getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
         onMouseDown: () => null,
         revealLineInCenter: () => null,
@@ -51,11 +51,15 @@ function getMockEditor() {
 test('Widget Coverage', () => {
     const editor = getMockEditor();
     const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
+    rm.activeComment = { id: 'id.1', author: "", dt: "", text: "", lineNumber: 1 };
     rm.widgetInlineToolbar.getId();
     rm.widgetInlineToolbar.getPosition();
 
     rm.setEditorMode(1);
     rm.widgetInlineCommentEditor.getId();
+    rm.widgetInlineCommentEditor.getPosition();
+
+    rm.activeComment = null;
     rm.widgetInlineCommentEditor.getPosition();
 })
 

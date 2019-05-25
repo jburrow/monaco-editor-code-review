@@ -356,9 +356,7 @@ class ReviewManager {
     }
 
     handleMouseDown(ev: { target: { element: { hasAttribute: { (string): boolean } }, detail: any } }) {
-        if (ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
-            return;
-        } else {
+        if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
@@ -528,8 +526,6 @@ class ReviewManager {
                     item.viewState.viewZoneId = null;
                     item.viewState.renderStatus = ReviewCommentRenderState.normal;
                 }
-
-
 
                 if (!lineNumbers[item.comment.lineNumber]) {
                     lineNumbers[item.comment.lineNumber] = item.comment.selection;

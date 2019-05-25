@@ -472,10 +472,7 @@ var ReviewManager = /** @class */ (function () {
         }
     };
     ReviewManager.prototype.handleMouseDown = function (ev) {
-        if (ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
-            return;
-        }
-        else {
+        if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             var activeComment = null;
             if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
                 for (var _i = 0, _a = this.comments; _i < _a.length; _i++) {
