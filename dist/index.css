@@ -25,26 +25,27 @@
   font-size: 12px;
   /* background-color: red; */
 }
-
+/*
 .reviewComment.active {
-  /* background-color: orangered; */
+   background-color: orangered; 
 }
 
 .reviewComment.inactive {
-  /* background-color: lightgreen; */
+   background-color: lightgreen; 
 }
 
 .reviewComment.author {
-  /* background-color: pink; */
+  background-color: pink;
 }
 
 .reviewComment.dt {
-  /* background-color: green; */
+  background-color: green;
 }
 
-.reviewComment.text {
-  /* background-color: yellow; */
+.reviewComment.text { 
+  background-color: yellow;
 }
+*/
 
 .reviewComment.selection {
   border-bottom: 2px dotted darkorange; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
@@ -61,9 +62,10 @@
   text-decoration: underline;
   cursor: pointer;
 }
-
+/*
 .editButton.add {
 }
 
 .editButton.remove {
 }
+*/
