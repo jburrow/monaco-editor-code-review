@@ -539,7 +539,7 @@ var ReviewManager = /** @class */ (function () {
             // Remove all the existing comments     
             for (var _i = 0, _a = Object.values(_this.commentState); _i < _a.length; _i++) {
                 var viewState = _a[_i];
-                if (viewState.viewZoneId) {
+                if (viewState.viewZoneId !== null) {
                     changeAccessor.removeZone(viewState.viewZoneId);
                 }
             }
@@ -727,7 +727,7 @@ var ReviewManager = /** @class */ (function () {
     ReviewManager.prototype.handleMouseDown = function (ev) {
         if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             var activeComment = null;
-            if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
+            if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
                 for (var _i = 0, _a = this.comments; _i < _a.length; _i++) {
                     var comment = _a[_i];
                     var viewState = this.commentState[comment.id];
@@ -876,7 +876,7 @@ var ReviewManager = /** @class */ (function () {
                 if (!lineNumbers[item.comment.lineNumber]) {
                     lineNumbers[item.comment.lineNumber] = item.comment.selection;
                 }
-                if (!item.viewState.viewZoneId) {
+                if (item.viewState.viewZoneId == null) {
                     console.debug('Zone.Create', item.comment.id);
                     var isActive = _this.activeComment == item.comment;
                     var domNode = document.createElement('span');
@@ -986,11 +986,13 @@ var ReviewManager = /** @class */ (function () {
             currentLine = this.editor.getPosition().lineNumber;
         }
         var comments = this.comments.filter(function (c) {
-            if (direction === NavigationDirection.next) {
-                return c.lineNumber > currentLine;
-            }
-            else if (direction === NavigationDirection.prev) {
-                return c.lineNumber < currentLine;
+            if (c.status !== ReviewCommentStatus.deleted && !c.parentId) {
+                if (direction === NavigationDirection.next) {
+                    return c.lineNumber > currentLine;
+                }
+                else if (direction === NavigationDirection.prev) {
+                    return c.lineNumber < currentLine;
+                }
             }
         });
         if (comments.length) {

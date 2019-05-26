@@ -63,59 +63,81 @@ test('Widget Coverage', () => {
     rm.widgetInlineCommentEditor.getPosition();
 })
 
-test('can attach createReviewManager to editor', () => {
+test('createReviewManager to editor and add comments', () => {
     const editor = getMockEditor();
     const comment: ReviewComment = { lineNumber: 1, author: "author", dt: new Date("2019-01-01"), text: "#1" };
 
-    const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
-    rm.load([comment]);
+    const rm = createReviewManager(editor, 'current.user', [comment], (comments) => { });
+
     expect(Object.keys(editor._zones).length).toBe(1);
     expect(rm.activeComment).toBe(null);
-
-    rm.handleMouseDown({ target: { element: { hasAttribute: () => false }, detail: { viewZoneId: 0 } } })
-    expect(rm.activeComment).toBe(comment);
-
-    //check active comment
-    //check the widget moved
-    //check the contentview has active classes on it.
-
-    rm.removeComment(comment);
-    expect(rm.activeComment).toBe(null);
-
-    expect(rm.comments.length).toBe(1); //TODO marked deleted ;)
-    expect(Object.keys(editor._zones).length).toBe(0);
+    expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
+    expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     const num2 = rm.addComment(2, "#2");
+    expect(num2.parentId).toBe(null);
     expect(rm.comments.length).toBe(2);
-    expect(Object.keys(editor._zones).length).toBe(1);
+    expect(Object.keys(editor._zones).length).toBe(2);
 
     rm.setActiveComment(num2);
     const num3 = rm.addComment(null, "#2.2");
+    expect(num3.parentId).toBe(num2.id);
     expect(rm.comments.length).toBe(3);
-    expect(Object.keys(editor._zones).length).toBe(2);
+    expect(Object.keys(editor._zones).length).toBe(3);
 
     rm.setActiveComment(null);
     const num4 = rm.addComment(4, "#4");
-    expect(Object.keys(editor._zones).length).toBe(3);
+    expect(num4.parentId).toBe(null);
+    expect(Object.keys(editor._zones).length).toBe(4);
+});
 
-    rm.setActiveComment(num4);
 
-    rm.navigateToComment(2);
-    expect(rm.activeComment.text).toBe('#2');
+test('load clears the comments', () => {
+    const editor = getMockEditor();
+    const comment: ReviewComment = { lineNumber: 1, author: "author", dt: new Date("2019-01-01"), text: "#1" };
 
-    rm.navigateToComment(2);
-    expect(rm.activeComment.text).toBe('#1');
+    const rm = createReviewManager(editor, 'current.user', [comment], (comments) => { });
+    rm.load([]);
+    expect(Object.keys(editor._zones).length).toBe(0);
+    expect(rm.comments.length).toBe(0);
+    expect(Object.keys(rm.commentState).length).toBe(0);
+});
 
-    rm.navigateToComment(1);
-    expect(rm.activeComment.text).toBe('#2');
 
-    console.debug('COMMENTS', rm.comments.length, rm.comments);
+test('Remove a comment via the widgets', () => {
+    const editor = getMockEditor();
+    const rm = createReviewManager(editor, 'current.user');
 
-    rm.setActiveComment(null);
+    expect(rm.activeComment).toBe(null);
+    expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
+    expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
+
+    const comment = rm.addComment(1, '');
+    const viewZoneId = rm.commentState[comment.id].viewZoneId;
+
+    // Simulate a click on the comment
+    rm.handleMouseDown({ target: { element: { hasAttribute: () => false }, detail: { viewZoneId: viewZoneId } } })
+    expect(rm.activeComment).toBe(comment);
+    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber + 1);
+    expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
+
+    rm.removeComment(comment);
+    expect(comment.status).toBe(2);
+    expect(rm.activeComment).toBe(null);
+    expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
+    expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
+});
+
+test('Enter Comment Widgets', () => {
+    const editor = getMockEditor();
+    const rm = createReviewManager(editor, 'current.user');
 
     rm.setEditorMode(1); // Edit Mode
     rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(2); //Toolbar
+
+    expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
+    expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     rm.setEditorMode(1);
     rm.textarea.value = '#5';
@@ -123,6 +145,33 @@ test('can attach createReviewManager to editor', () => {
     rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(2); //Toolbar
     expect(rm.textarea.value).toBe("");
-    expect(Object.keys(editor._zones).length).toBe(4);
-    expect(rm.comments[4].text).toBe('#5');
+    expect(rm.commentState[rm.comments[0].id].viewZoneId).toBe(0);
+    expect(rm.comments[0].text).toBe('#5');
 });
+
+test('Navigation - Forward and Back', () => {
+    const editor = getMockEditor();
+    const rm = createReviewManager(editor, 'current.user');
+    const c1 = rm.addComment(1, "1");
+    const c2 = rm.addComment(2, "2");
+    const c3 = rm.addComment(3, "3");
+    const c4 = rm.addComment(4, "4");
+    const c5 = rm.addComment(5, "5");
+
+    rm.activeComment = c1;
+    const c1_1 = rm.addComment(1, "1.1");
+
+    rm.removeComment(c2);
+    rm.removeComment(c4);
+
+    rm.activeComment = c3;
+
+    rm.navigateToComment(2);
+    expect(rm.activeComment.id).toBe(c1.id);
+
+    rm.navigateToComment(2);
+    expect(rm.activeComment.id).toBe(c1.id); // Should this wrap around to the end?
+
+    rm.navigateToComment(1);
+    expect(rm.activeComment.id).toBe(c3.id);
+})

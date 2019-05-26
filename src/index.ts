@@ -140,7 +140,7 @@ class ReviewManager {
         this.editor.changeViewZones((changeAccessor) => {
             // Remove all the existing comments     
             for (const viewState of Object.values(this.commentState)) {
-                if (viewState.viewZoneId) {
+                if (viewState.viewZoneId !== null) {
                     changeAccessor.removeZone(viewState.viewZoneId);
                 }
             }
@@ -359,7 +359,7 @@ class ReviewManager {
         if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             let activeComment: ReviewComment = null;
 
-            if (ev.target.detail && ev.target.detail.viewZoneId !== undefined) {
+            if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
                 for (const comment of this.comments) {
                     const viewState = this.commentState[comment.id];
                     if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
@@ -531,7 +531,7 @@ class ReviewManager {
                     lineNumbers[item.comment.lineNumber] = item.comment.selection;
                 }
 
-                if (!item.viewState.viewZoneId) {
+                if (item.viewState.viewZoneId == null) {
                     console.debug('Zone.Create', item.comment.id);
 
                     const isActive = this.activeComment == item.comment;
@@ -657,10 +657,12 @@ class ReviewManager {
         }
 
         const comments = this.comments.filter((c) => {
-            if (direction === NavigationDirection.next) {
-                return c.lineNumber > currentLine;
-            } else if (direction === NavigationDirection.prev) {
-                return c.lineNumber < currentLine;
+            if (c.status !== ReviewCommentStatus.deleted && !c.parentId ) {
+                if (direction === NavigationDirection.next) {
+                    return c.lineNumber > currentLine;
+                } else if (direction === NavigationDirection.prev) {
+                    return c.lineNumber < currentLine;
+                }
             }
         });
 
