@@ -260,7 +260,8 @@ var defaultReviewManagerConfig = {
     commentIndentOffset: 20,
     showInRuler: true,
     rulerMarkerColor: 'darkorange',
-    rulerMarkerDarkColor: 'darkorange'
+    rulerMarkerDarkColor: 'darkorange',
+    formatDate: null
 };
 var CONTROL_ATTR_NAME = 'ReviewManagerControl';
 var ReviewManager = /** @class */ (function () {
@@ -597,6 +598,17 @@ var ReviewManager = /** @class */ (function () {
             this.onChange(this.comments);
         }
     };
+    ReviewManager.prototype.formatDate = function (dt) {
+        if (this.config.formatDate) {
+            return this.config.formatDate(dt);
+        }
+        else if (dt instanceof Date) {
+            return dt.toISOString();
+        }
+        else {
+            return dt;
+        }
+    };
     ReviewManager.prototype.refreshComments = function () {
         var _this = this;
         this.editor.changeViewZones(function (changeAccessor) {
@@ -635,7 +647,7 @@ var ReviewManager = /** @class */ (function () {
                     author.innerText = (item.comment.author || ' ') + " at ";
                     var dt = document.createElement('span');
                     dt.className = 'reviewComment dt';
-                    dt.innerText = item.comment.dt.toLocaleString();
+                    dt.innerText = _this.formatDate(item.comment.dt);
                     var text = document.createElement('span');
                     text.className = 'reviewComment text';
                     text.innerText = item.comment.text + " by ";

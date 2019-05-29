@@ -1,4 +1,5 @@
 import * as uuid from "uuid/v4";
+import { numberLiteralTypeAnnotation, stringLiteral } from "@babel/types";
 
 interface MonacoWindow {
     monaco: any;
@@ -70,6 +71,7 @@ export interface ReviewManagerConfig {
     reviewCommentIconSelect?: string;
     reviewCommentIconActive?: string;
     showInRuler?: boolean
+    formatDate?: { (dt: Date): string }
 }
 
 interface ReviewManagerConfigPrivate {
@@ -83,6 +85,7 @@ interface ReviewManagerConfigPrivate {
     editButtonRemoveText: string;
     editButtonOffset: string;
     showInRuler: boolean;
+    formatDate?: { (dt: Date | string): string }
 }
 
 
@@ -96,7 +99,8 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     commentIndentOffset: 20,
     showInRuler: true,
     rulerMarkerColor: 'darkorange',
-    rulerMarkerDarkColor: 'darkorange'
+    rulerMarkerDarkColor: 'darkorange',
+    formatDate: null
 };
 
 const CONTROL_ATTR_NAME = 'ReviewManagerControl';
@@ -498,8 +502,21 @@ class ReviewManager {
         }
     }
 
+    private formatDate(dt: Date | string) {
+        if (this.config.formatDate) {
+            return this.config.formatDate(dt)
+        } else if (dt instanceof Date) {
+            return dt.toISOString();
+        } else {
+            return dt;
+        }
+    }
+
     refreshComments() {
-        this.editor.changeViewZones((changeAccessor) => {
+        this.editor.changeViewZones((changeAccessor: {
+            addZone: { (zone: { afterLineNumber: number, heightInLines: number, domNode: HTMLElement, suppressMouseDown: boolean }): number },
+            removeZone: { (id: number): void }
+        }) => {
             const lineNumbers: { [key: number]: CodeSelection } = {};
 
             for (const item of this.iterateComments()) {
@@ -547,7 +564,7 @@ class ReviewManager {
 
                     const dt = document.createElement('span') as HTMLSpanElement;
                     dt.className = 'reviewComment dt'
-                    dt.innerText = item.comment.dt.toLocaleString();
+                    dt.innerText = this.formatDate(item.comment.dt);
 
                     const text = document.createElement('span') as HTMLSpanElement;
                     text.className = 'reviewComment text'
@@ -657,7 +674,7 @@ class ReviewManager {
         }
 
         const comments = this.comments.filter((c) => {
-            if (c.status !== ReviewCommentStatus.deleted && !c.parentId ) {
+            if (c.status !== ReviewCommentStatus.deleted && !c.parentId) {
                 if (direction === NavigationDirection.next) {
                     return c.lineNumber > currentLine;
                 } else if (direction === NavigationDirection.prev) {

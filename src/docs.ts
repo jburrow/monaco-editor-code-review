@@ -1,4 +1,5 @@
 import { ReviewComment, createReviewManager } from "./index";
+import * as moment from "moment";
 
 interface WindowDoc {
     require: any;
@@ -135,7 +136,10 @@ function initReviewManager(editor: any) {
         "mr reviewer",
         createRandomComments(),
         updatedComments => renderComments(updatedComments),
-        { editButtonEnableRemove: true }
+        {
+            editButtonEnableRemove: true,
+            formatDate: (dt: Date|string) => moment(dt).format('YY-MM-DD HH:mm')
+        }
     );
 
     renderComments(reviewManager.comments);
@@ -159,38 +163,37 @@ function createRandomComments(): ReviewComment[] {
             id: "id-0",
             lineNumber: firstLine + 10,
             author: "another reviewer",
-            dt: new Date(),
-            text: "at start",
+            dt: '2019-01-01T00:00:00.000',
+            text: "id-0: Near the start",
             selection: {
                 startColumn: 5,
                 startLineNumber: firstLine + 5,
                 endColumn: 10,
                 endLineNumber: firstLine + 10
-
             }
         },
         {
             id: "id-1",
-            lineNumber: firstLine + 50,
+            lineNumber: firstLine + 5,
             author: "another reviewer",
-            dt: new Date(),
-            text: "at start"
+            dt: '2019-06-01T00:00:00.000Z',
+            text: "id-1: at start"
         },
         {
             id: "id-2",
             parentId: "id-1",
             lineNumber: firstLine + 5,
             author: "another reviewer",
-            dt: '2019-01-01 12:22:33',
-            text: "this code isn't very good",
+            dt: '2019-12-01T00:00:00.000Z',
+            text: "id-2: this code isn't very good",
         },
         {
             id: "id-3",
             parentId: "id-2",
             lineNumber: firstLine + 5,
             author: "original author",
-            dt: new Date(),
-            text: "I think you will find it is good enough"
+            dt: '2019-06-01T00:00:00.000Z',
+            text: "id-3: I think you will find it is good enough"
         },
         {
             parentId: "id-3",
@@ -222,7 +225,7 @@ function renderComments(comments) {
                     <div style="width:100px;overflow:hidden;">${comment.author}</div> 
                     <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
                     <div style="width:auto;overflow:hidden;">${comment.text}</div>                    
-                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment.selection||'')}</div>                    
+                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment.selection || '')}</div>                    
                 </div>`
         )
         .join("");
