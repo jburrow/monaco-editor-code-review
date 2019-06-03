@@ -85,7 +85,8 @@ interface ReviewManagerConfigPrivate {
     editButtonRemoveText: string;
     editButtonOffset: string;
     showInRuler: boolean;
-    formatDate?: { (dt: Date | string): string }
+    formatDate?: { (dt: Date | string): string };
+    showAddCommentGlyph: boolean
 }
 
 
@@ -100,7 +101,8 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     showInRuler: true,
     rulerMarkerColor: 'darkorange',
     rulerMarkerDarkColor: 'darkorange',
-    formatDate: null
+    formatDate: null,
+    showAddCommentGlyph: true,
 };
 
 const CONTROL_ATTR_NAME = 'ReviewManagerControl';
@@ -144,7 +146,10 @@ class ReviewManager {
         this.createInlineEditorWidget();
 
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        this.editor.onMouseMove(this.handleMouseMove.bind(this));
+
+        if (this.config.showAddCommentGlyph) {
+            this.editor.onMouseMove(this.handleMouseMove.bind(this));
+        }
     }
 
     load(comments: ReviewComment[]): void {

@@ -18156,7 +18156,8 @@ var defaultReviewManagerConfig = {
     showInRuler: true,
     rulerMarkerColor: 'darkorange',
     rulerMarkerDarkColor: 'darkorange',
-    formatDate: null
+    formatDate: null,
+    showAddCommentGlyph: true,
 };
 var CONTROL_ATTR_NAME = 'ReviewManagerControl';
 var ReviewManager = /** @class */ (function () {
@@ -18171,10 +18172,16 @@ var ReviewManager = /** @class */ (function () {
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
         this.config = __assign({}, defaultReviewManagerConfig, (config || {}));
+        this.currentLineDecorations = [];
+        this.currentCommentDecorations = [];
+        this.currentLineDecorationLineNumber = null;
         this.addActions();
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        if (this.config.showAddCommentGlyph) {
+            this.editor.onMouseMove(this.handleMouseMove.bind(this));
+        }
     }
     ReviewManager.prototype.load = function (comments) {
         var _this = this;
@@ -18367,8 +18374,27 @@ var ReviewManager = /** @class */ (function () {
             }
         }
     };
+    ReviewManager.prototype.handleMouseMove = function (ev) {
+        if (ev.target && ev.target.position && ev.target.position.lineNumber) {
+            this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
+            this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
+                {
+                    isWholeLine: true,
+                    range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
+                    options: {
+                        glyphMarginClassName: 'activeLineGlyphmyMarginClass'
+                    }
+                }
+            ]);
+        }
+    };
     ReviewManager.prototype.handleMouseDown = function (ev) {
-        if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
+        // Not ideal - but couldn't figure out a different way to identify the glyph event
+        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
+            this.editor.setPosition({ lineNumber: this.currentLineDecorationLineNumber, column: 1 });
+            this.setEditorMode(EditorMode.editComment);
+        }
+        else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             var activeComment = null;
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
                 for (var _i = 0, _a = this.comments; _i < _a.length; _i++) {
@@ -18581,8 +18607,7 @@ var ReviewManager = /** @class */ (function () {
                         });
                     }
                 }
-                //TODO - Preserver any other decorators
-                _this.editor.deltaDecorations([], decorators);
+                _this.currentCommentDecorations = _this.editor.deltaDecorations(_this.currentCommentDecorations, decorators);
             }
         });
     };
