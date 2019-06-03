@@ -69,3 +69,7 @@
 .editButton.remove {
 }
 */
+
+.activeLineGlyphmyMarginClass{  
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PGxpbmVhckdyYWRpZW50IGlkPSdncmFkaWVudCc+PHN0b3Agb2Zmc2V0PScxMCUnIHN0b3AtY29sb3I9JyNGMDAnLz48c3RvcCBvZmZzZXQ9JzkwJScgc3RvcC1jb2xvcj0nI2ZjYycvPiA8L2xpbmVhckdyYWRpZW50PjxyZWN0IGZpbGw9J3VybCgjZ3JhZGllbnQpJyB4PScwJyB5PScwJyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJy8+PC9zdmc+");
+}

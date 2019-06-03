@@ -119,6 +119,9 @@ class ReviewManager {
     config: ReviewManagerConfigPrivate;
 
     textarea: HTMLTextAreaElement;
+    currentLineDecorations: string[];
+    currentCommentDecorations: string[];
+    currentLineDecorationLineNumber?: number;
 
 
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
@@ -132,12 +135,16 @@ class ReviewManager {
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
         this.config = { ...defaultReviewManagerConfig, ...(config || {}) };
+        this.currentLineDecorations = [];
+        this.currentCommentDecorations = []
+        this.currentLineDecorationLineNumber = null;
 
         this.addActions();
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
 
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        this.editor.onMouseMove(this.handleMouseMove.bind(this));
     }
 
     load(comments: ReviewComment[]): void {
@@ -359,8 +366,27 @@ class ReviewManager {
         }
     }
 
-    handleMouseDown(ev: { target: { element: { hasAttribute: { (string): boolean } }, detail: any } }) {
-        if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
+    handleMouseMove(ev) {
+        if (ev.target && ev.target.position && ev.target.position.lineNumber) {
+            this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
+            this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
+                {
+                    isWholeLine: true,
+                    range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
+                    options: {
+                        glyphMarginClassName: 'activeLineGlyphmyMarginClass'
+                    }
+                }
+            ]);
+        }
+    }
+
+    handleMouseDown(ev: { target: { element: { className: string, hasAttribute: { (string): boolean } }, detail: any } }) {
+        // Not ideal - but couldn't figure out a different way to identify the glyph event
+        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
+            this.editor.setPosition({ lineNumber: this.currentLineDecorationLineNumber, column: 1 });
+            this.setEditorMode(EditorMode.editComment);
+        } else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
@@ -609,8 +635,7 @@ class ReviewManager {
                     }
                 }
 
-                //TODO - Preserver any other decorators
-                this.editor.deltaDecorations([], decorators);
+                this.currentCommentDecorations = this.editor.deltaDecorations(this.currentCommentDecorations, decorators);
             }
         });
     }

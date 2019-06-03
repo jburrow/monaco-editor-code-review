@@ -20,6 +20,7 @@ function getMockEditor() {
         getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
         onMouseDown: () => null,
+        onMouseMove: () => null,
         revealLineInCenter: () => null,
         deltaDecorations: () => null,
         changeViewZones: (cb) => cb({
@@ -116,7 +117,7 @@ test('Remove a comment via the widgets', () => {
     const viewZoneId = rm.commentState[comment.id].viewZoneId;
 
     // Simulate a click on the comment
-    rm.handleMouseDown({ target: { element: { hasAttribute: () => false }, detail: { viewZoneId: viewZoneId } } })
+    rm.handleMouseDown({ target: { element: { className: "", hasAttribute: () => false }, detail: { viewZoneId: viewZoneId } } })
     expect(rm.activeComment).toBe(comment);
     expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber + 1);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
