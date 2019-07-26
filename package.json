@@ -13,21 +13,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "coveralls": "^3.0.5",
     "moment": "^2.24.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.13",
-    "@types/uuid": "^3.4.4",
+    "@types/jest": "^24.0.15",
+    "@types/uuid": "^3.4.5",
     "jest": "^24.8.0",
-    "monaco-editor": "^0.17.0",
+    "monaco-editor": "^0.17.1",
     "timestamp-webpack-plugin": "^0.2.3",
     "ts-jest": "^24.0.2",
-    "ts-loader": "^6.0.0",
+    "ts-loader": "^6.0.4",
     "typedoc": "^0.14.2",
-    "typescript": "^3.4.5",
-    "webpack": "^4.31.0",
-    "webpack-cli": "^3.3.2",
-    "webpack-dev-server": "^3.3.1"
+    "typescript": "^3.5.3",
+    "webpack": "^4.38.0",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2"
   }
 }
