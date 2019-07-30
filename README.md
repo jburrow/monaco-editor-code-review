@@ -1,5 +1,7 @@
 # monaco-editor-code-review [![Build Status](https://travis-ci.org/jburrow/monaco-editor-code-review.svg?branch=master)](https://travis-ci.org/jburrow/monaco-editor-code-review) [![Coverage Status](https://coveralls.io/repos/github/jburrow/monaco-editor-code-review/badge.svg?branch=master)](https://coveralls.io/github/jburrow/monaco-editor-code-review?branch=master)
 
+![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true)
+
 Lightweight extension (31KiB) for monaco-editor to allow commenting off code. 
 This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.
 
@@ -49,7 +51,7 @@ Features
 - Supports Monaco Themes
 
 
-![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true)
+
 
 ## Motivation
 
