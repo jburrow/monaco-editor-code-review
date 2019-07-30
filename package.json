@@ -12,12 +12,12 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "coveralls": "^3.0.5",
+  "dependencies": {    
     "moment": "^2.24.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "coveralls": "^3.0.5",
     "@types/jest": "^24.0.15",
     "@types/uuid": "^3.4.5",
     "jest": "^24.8.0",
