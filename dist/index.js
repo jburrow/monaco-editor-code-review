@@ -289,7 +289,6 @@ var ReviewManager = /** @class */ (function () {
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
-        monacoWindow.__editor__ = this.editor;
     }
     ReviewManager.prototype.load = function (comments) {
         var _this = this;

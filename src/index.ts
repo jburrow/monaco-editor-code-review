@@ -4,8 +4,7 @@ import * as monacoEditor from "monaco-editor";
 
 
 interface MonacoWindow {
-    monaco: any;
-    __editor__: any;
+    monaco: any;    
 }
 
 const monacoWindow = (window as any) as MonacoWindow;
@@ -153,9 +152,7 @@ class ReviewManager {
 
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
-        }
-
-        monacoWindow.__editor__ = this.editor;
+        }        
     }
 
     load(comments: ReviewComment[]): void {
