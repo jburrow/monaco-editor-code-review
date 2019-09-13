@@ -17,10 +17,12 @@ function getMockEditor() {
         _zones: {},
         focus: () => null,
         addAction: () => null,
+        getConfiguration:()=>({fontInfo:{lineHeight:19}}),
         getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
         onMouseDown: () => null,
         onMouseMove: () => null,
+        onDidChangeConfiguration:(cb)=>null,
         revealLineInCenter: () => null,
         deltaDecorations: () => null,
         changeViewZones: (cb) => cb({
@@ -133,7 +135,9 @@ test('Enter Comment Widgets', () => {
     const editor = getMockEditor();
     const rm = createReviewManager(editor, 'current.user');
 
-    rm.setEditorMode(1); // Edit Mode
+    rm.textarea.value = 'xxxx'
+    rm.setEditorMode(1); // Edit Mode    
+    expect(rm.textarea.value).toBe(""); //Toolbar
     rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(2); //Toolbar
 
@@ -144,8 +148,7 @@ test('Enter Comment Widgets', () => {
     rm.textarea.value = '#5';
 
     rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true } as any) as KeyboardEvent);
-    expect(rm.editorMode).toBe(2); //Toolbar
-    expect(rm.textarea.value).toBe("");
+    expect(rm.editorMode).toBe(2); //Toolbar    
     expect(rm.commentState[rm.comments[0].id].viewZoneId).toBe(0);
     expect(rm.comments[0].text).toBe('#5');
 });

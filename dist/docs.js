@@ -18151,7 +18151,6 @@ var defaultReviewManagerConfig = {
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
     editButtonEnableRemove: true,
-    lineHeight: 19,
     commentIndent: 20,
     commentIndentOffset: 20,
     showInRuler: true,
@@ -18163,6 +18162,7 @@ var defaultReviewManagerConfig = {
 var CONTROL_ATTR_NAME = 'ReviewManagerControl';
 var ReviewManager = /** @class */ (function () {
     function ReviewManager(editor, currentUser, onChange, config) {
+        var _this = this;
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
@@ -18180,9 +18180,12 @@ var ReviewManager = /** @class */ (function () {
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        this.editorConfig = this.editor.getConfiguration();
+        this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
+        monacoWindow.__editor__ = this.editor;
     }
     ReviewManager.prototype.load = function (comments) {
         var _this = this;
@@ -18255,9 +18258,11 @@ var ReviewManager = /** @class */ (function () {
         this.editor.focus();
     };
     ReviewManager.prototype.handleSave = function () {
-        var r = this.setEditorMode(EditorMode.toolbar);
+        this.setEditorMode(EditorMode.toolbar);
+        var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
+        var text = this.textarea.value;
         var selection = this.activeComment ? null : this.editor.getSelection();
-        this.addComment(r.lineNumber, r.text, selection);
+        this.addComment(lineNumber, text, selection);
         this.editor.focus();
     };
     ReviewManager.prototype.handleTextAreaKeyDown = function (e) {
@@ -18380,10 +18385,10 @@ var ReviewManager = /** @class */ (function () {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
             this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
                 {
-                    isWholeLine: true,
                     range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
                     options: {
-                        glyphMarginClassName: 'activeLineGlyphmyMarginClass'
+                        glyphMarginClassName: 'activeLineGlyphmyMarginClass',
+                        isWholeLine: true
                     }
                 }
             ]);
@@ -18417,7 +18422,7 @@ var ReviewManager = /** @class */ (function () {
         var idx = 0;
         var count = 0;
         var marginTop = 0;
-        var lineHeight = this.config.lineHeight; //FIXME - Magic number for line height            
+        var lineHeight = this.editorConfig.fontInfo.lineHeight;
         if (this.activeComment) {
             for (var _i = 0, _a = this.iterateComments(); _i < _a.length; _i++) {
                 var item = _a[_i];
@@ -18435,22 +18440,16 @@ var ReviewManager = /** @class */ (function () {
     ReviewManager.prototype.setEditorMode = function (mode) {
         var _this = this;
         console.debug('setEditorMode', this.activeComment);
-        var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         this.editorMode = mode;
         var editorRoot = this.widgetInlineCommentEditor.getDomNode();
         editorRoot.style.marginTop = "-" + this.calculateMarginTopOffset() + "px";
         this.layoutInlineToolbar();
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
-        var text = this.textarea.value;
-        this.textarea.value = "";
         if (mode == EditorMode.editComment) {
-            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...            
+            this.textarea.value = "";
+            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
             setTimeout(function () { return _this.textarea.focus(); }, 100);
         }
-        return {
-            text: text,
-            lineNumber: lineNumber //TODO - stop returning this as it is a mess
-        };
     };
     ReviewManager.prototype.addComment = function (lineNumber, text, selection) {
         var _this = this;
@@ -18478,7 +18477,7 @@ var ReviewManager = /** @class */ (function () {
         return comment;
     };
     ReviewManager.prototype.recurseComments = function (allComments, filterFn, depth, results) {
-        var comments = Object.values(allComments).filter(filterFn); //TODO - sort by dt
+        var comments = Object.values(allComments).filter(filterFn).sort(function (a, b) { return a.dt > b.dt ? 1 : -1; });
         var _loop_1 = function (comment) {
             delete allComments[comment.id];
             results.push({

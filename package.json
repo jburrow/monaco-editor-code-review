@@ -6,13 +6,13 @@
   "scripts": {
     "start": "webpack-dev-server",
     "compile": "webpack",
-    "doc": "./node_modules/.bin/typedoc.cmd --out ./docs ./src/index.ts",
+    "doc": "typedoc --out ./docs ./src/index.ts",
     "test": "jest --coverage",
     "testpub": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "dependencies": {    
     "moment": "^2.24.0",
     "uuid": "^3.3.2"
   },

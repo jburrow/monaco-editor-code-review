@@ -1,8 +1,11 @@
 import * as uuid from "uuid/v4";
-import { numberLiteralTypeAnnotation, stringLiteral } from "@babel/types";
+import * as monacoEditor from "monaco-editor";
+
+
 
 interface MonacoWindow {
     monaco: any;
+    __editor__: any;
 }
 
 const monacoWindow = (window as any) as MonacoWindow;
@@ -31,7 +34,7 @@ interface CodeSelection {
 }
 
 class ReviewCommentState {
-    viewZoneId: number;
+    viewZoneId: string;
     renderStatus: ReviewCommentRenderState;
     numberOfLines: number;
 
@@ -62,7 +65,6 @@ interface OnCommentsChanged {
 
 export interface ReviewManagerConfig {
     editButtonEnableRemove?: boolean;
-    lineHeight?: number;
     commentIndent?: number;
     commentIndentOffset?: number;
     editButtonAddText?: string;
@@ -78,7 +80,6 @@ interface ReviewManagerConfigPrivate {
     rulerMarkerColor: any;
     rulerMarkerDarkColor: any;
     editButtonEnableRemove: boolean;
-    lineHeight: number;
     commentIndent: number;
     commentIndentOffset: number;
     editButtonAddText: string;
@@ -95,7 +96,6 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
     editButtonEnableRemove: true,
-    lineHeight: 19,
     commentIndent: 20,
     commentIndentOffset: 20,
     showInRuler: true,
@@ -109,7 +109,8 @@ const CONTROL_ATTR_NAME = 'ReviewManagerControl';
 
 class ReviewManager {
     currentUser: string;
-    editor: any;
+    editor: monacoEditor.editor.IStandaloneCodeEditor;
+    editorConfig: monacoEditor.editor.InternalEditorOptions;
     comments: ReviewComment[];
     commentState: { [reviewCommentId: string]: ReviewCommentState };
 
@@ -147,9 +148,14 @@ class ReviewManager {
 
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
 
+        this.editorConfig = this.editor.getConfiguration();
+        this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
+
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
+
+        monacoWindow.__editor__ = this.editor;
     }
 
     load(comments: ReviewComment[]): void {
@@ -191,14 +197,14 @@ class ReviewManager {
         return text.split(/\r*\n/).length;
     }
 
-    getThemedColor(name: string): string {
+    getThemedColor(name: string): string {        
         // editor.background: e {rgba: e}
         // editor.foreground: e {rgba: e}
         // editor.inactiveSelectionBackground: e {rgba: e}
         // editor.selectionHighlightBackground: e {rgba: e}
         // editorIndentGuide.activeBackground: e {rgba: e}
         // editorIndentGuide.background: e {rgba: e}
-        return this.editor._themeService.getTheme().getColor(name);
+        return (this.editor as any)._themeService.getTheme().getColor(name);
     }
 
     createInlineEditButtonsElement() {
@@ -236,9 +242,11 @@ class ReviewManager {
     }
 
     handleSave() {
-        const r = this.setEditorMode(EditorMode.toolbar);
+        this.setEditorMode(EditorMode.toolbar);
+        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
+        const text = this.textarea.value;
         const selection = this.activeComment ? null : this.editor.getSelection() as CodeSelection;
-        this.addComment(r.lineNumber, r.text, selection);
+        this.addComment(lineNumber, text, selection);
         this.editor.focus();
     }
 
@@ -376,10 +384,10 @@ class ReviewManager {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
             this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
                 {
-                    isWholeLine: true,
                     range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
                     options: {
-                        glyphMarginClassName: 'activeLineGlyphmyMarginClass'
+                        glyphMarginClassName: 'activeLineGlyphmyMarginClass',
+                        isWholeLine: true
                     }
                 }
             ]);
@@ -413,7 +421,7 @@ class ReviewManager {
         let idx = 0;
         let count = 0;
         let marginTop: number = 0;
-        const lineHeight = this.config.lineHeight;//FIXME - Magic number for line height            
+        const lineHeight = this.editorConfig.fontInfo.lineHeight;
 
         if (this.activeComment) {
             for (var item of this.iterateComments()) {
@@ -431,10 +439,9 @@ class ReviewManager {
         return marginTop;
     }
 
-    setEditorMode(mode: EditorMode): { lineNumber: number, text: string } {
+    setEditorMode(mode: EditorMode) {
         console.debug('setEditorMode', this.activeComment);
-
-        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
+        
         this.editorMode = mode;
 
         const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
@@ -443,18 +450,11 @@ class ReviewManager {
         this.layoutInlineToolbar();
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
 
-        const text = this.textarea.value;
-        this.textarea.value = "";
-
         if (mode == EditorMode.editComment) {
-            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...            
+            this.textarea.value = "";
+            //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
             setTimeout(() => this.textarea.focus(), 100);
         }
-
-        return {
-            text: text,
-            lineNumber: lineNumber //TODO - stop returning this as it is a mess
-        };
     }
 
     addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewComment {
@@ -488,7 +488,7 @@ class ReviewManager {
     }
 
     private recurseComments(allComments: { [key: string]: ReviewComment }, filterFn: { (c: ReviewComment): boolean }, depth: number, results: ReviewCommentIterItem[]) {
-        const comments = Object.values(allComments).filter(filterFn); //TODO - sort by dt
+        const comments = Object.values(allComments).filter(filterFn).sort((a, b) => a.dt > b.dt ? 1 : -1);
         for (const comment of comments) {
             delete allComments[comment.id];
 
@@ -545,8 +545,8 @@ class ReviewManager {
 
     refreshComments() {
         this.editor.changeViewZones((changeAccessor: {
-            addZone: { (zone: { afterLineNumber: number, heightInLines: number, domNode: HTMLElement, suppressMouseDown: boolean }): number },
-            removeZone: { (id: number): void }
+            addZone: { (zone: { afterLineNumber: number, heightInLines: number, domNode: HTMLElement, suppressMouseDown: boolean }): string },
+            removeZone: { (id: string): void }
         }) => {
             const lineNumbers: { [key: number]: CodeSelection } = {};
 
