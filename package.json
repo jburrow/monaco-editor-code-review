@@ -1,6 +1,6 @@
 {
   "name": "monaco-review",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -12,22 +12,22 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {    
+  "dependencies": {
     "moment": "^2.24.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "coveralls": "^3.0.5",
     "@types/jest": "^24.0.15",
     "@types/uuid": "^3.4.5",
+    "coveralls": "^3.0.5",
     "jest": "^24.8.0",
-    "monaco-editor": "^0.17.1",
+    "monaco-editor": "^0.18.0",
     "timestamp-webpack-plugin": "^0.2.3",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
-    "typedoc": "^0.14.2",
+    "typedoc": "^0.15.0",
     "typescript": "^3.5.3",
-    "webpack": "^4.38.0",
+    "webpack": "^4.40.2",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2"
   }
