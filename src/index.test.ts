@@ -42,6 +42,7 @@ function getMockEditor() {
         _themeService: {
             getTheme: () => {
                 return {
+                    themeName:'',
                     getColor: () => ''
                 }
             }

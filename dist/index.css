@@ -1,24 +1,29 @@
-.reviewCommentEdit {
+.reviewCommentEditor {
   border: 1px solid black;
   width: 80%;
   padding: 5px;
   background-color: white;
+  /* vscode fallback order */
+  font-family: Monaco,Menlo,Consolas,"Droid Sans Mono","Inconsolata","Courier New",monospace;
 }
-
-.reviewCommentText {
+.reviewCommentEditor.text {
   /* background-color: lightseagreen; */
   width: 100%;
   height: 60px;
 }
 
-.reviewCommentSave {
+.reviewCommentEditor.save {
   /* background-color: blue; */
   margin: 0 5px 5px 0;
+  width:100px;
+  border:0px;
 }
 
-.reviewCommentCancel {
+.reviewCommentEditor.cancel {
   /* background-color: rebeccapurple; */
   margin: 5px 5px 5px 0;
+  width:100px;
+  border:0px;
 }
 
 .reviewComment {

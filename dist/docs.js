@@ -18226,7 +18226,23 @@ var ReviewManager = /** @class */ (function () {
         // editor.selectionHighlightBackground: e {rgba: e}
         // editorIndentGuide.activeBackground: e {rgba: e}
         // editorIndentGuide.background: e {rgba: e}
-        return this.editor._themeService.getTheme().getColor(name);
+        var theme = this.editor._themeService.getTheme();
+        var value = theme.getColor(name);
+        // HACK - Buttons themes are not in monaco ... so just hack in theme for dark
+        var missingThemes = {
+            'dark': {
+                "button.background": "#0e639c",
+                "button.foreground": "#ffffff",
+            },
+            'light': {
+                "button.background": "#007acc",
+                "button.foreground": "#ffffff"
+            }
+        };
+        if (!value) {
+            value = missingThemes[theme.themeName.indexOf('dark') > -1 ? 'dark' : 'light'][name];
+        }
+        return value;
     };
     ReviewManager.prototype.createInlineEditButtonsElement = function () {
         var _this = this;
@@ -18274,21 +18290,30 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.createInlineEditorElement = function () {
         var root = document.createElement('span');
-        root.className = "reviewCommentEdit";
+        root.className = "reviewCommentEditor";
+        root.style.backgroundColor = this.getThemedColor("editor.background");
+        root.style.color = this.getThemedColor("editor.foreground");
         var textarea = document.createElement('textarea');
         textarea.setAttribute(CONTROL_ATTR_NAME, '');
-        textarea.className = "reviewCommentText";
+        textarea.className = "reviewCommentEditor text";
+        textarea.style.backgroundColor = this.getThemedColor("editor.background");
+        textarea.style.color = this.getThemedColor("editor.foreground");
         textarea.innerText = '';
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
         var save = document.createElement('button');
         save.setAttribute(CONTROL_ATTR_NAME, '');
-        save.className = "reviewCommentSave";
+        save.className = "reviewCommentEditor save";
+        save.style.backgroundColor = this.getThemedColor("button.background");
+        save.style.color = this.getThemedColor("button.foreground");
+        save.style.fontFamily = "Consolas";
         save.innerText = 'Save';
         save.onclick = this.handleSave.bind(this);
         var cancel = document.createElement('button');
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
-        cancel.className = "reviewCommentCancel";
+        cancel.className = "reviewCommentEditor cancel";
+        cancel.style.backgroundColor = this.getThemedColor("button.background");
+        cancel.style.color = this.getThemedColor("button.foreground");
         cancel.innerText = 'Cancel';
         cancel.onclick = this.handleCancel.bind(this);
         root.appendChild(textarea);
@@ -18323,6 +18348,7 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.createInlineEditorWidget = function () {
         var _this = this;
+        // doesn't re-theme when
         var editorElement = this.createInlineEditorElement();
         this.widgetInlineCommentEditor = {
             allowEditorOverflow: true,
