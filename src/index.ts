@@ -4,7 +4,7 @@ import * as monacoEditor from "monaco-editor";
 
 
 interface MonacoWindow {
-    monaco: any;    
+    monaco: any;
 }
 
 const monacoWindow = (window as any) as MonacoWindow;
@@ -152,7 +152,7 @@ class ReviewManager {
 
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
-        }        
+        }
     }
 
     load(comments: ReviewComment[]): void {
@@ -194,7 +194,7 @@ class ReviewManager {
         return text.split(/\r*\n/).length;
     }
 
-    getThemedColor(name: string): string {        
+    getThemedColor(name: string): string {
         // editor.background: e {rgba: e}
         // editor.foreground: e {rgba: e}
         // editor.inactiveSelectionBackground: e {rgba: e}
@@ -392,7 +392,7 @@ class ReviewManager {
     }
 
     handleMouseDown(ev: { target: { element: { className: string, hasAttribute: { (string): boolean } }, detail: any } }) {
-        // Not ideal - but couldn't figure out a different way to identify the glyph event
+        // Not ideal - but couldn't figure out a different way to identify the glyph event        
         if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
             this.editor.setPosition({ lineNumber: this.currentLineDecorationLineNumber, column: 1 });
             this.setEditorMode(EditorMode.editComment);
@@ -438,7 +438,7 @@ class ReviewManager {
 
     setEditorMode(mode: EditorMode) {
         console.debug('setEditorMode', this.activeComment);
-        
+
         this.editorMode = mode;
 
         const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;

@@ -18394,7 +18394,7 @@ var ReviewManager = /** @class */ (function () {
         }
     };
     ReviewManager.prototype.handleMouseDown = function (ev) {
-        // Not ideal - but couldn't figure out a different way to identify the glyph event
+        // Not ideal - but couldn't figure out a different way to identify the glyph event        
         if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
             this.editor.setPosition({ lineNumber: this.currentLineDecorationLineNumber, column: 1 });
             this.setEditorMode(EditorMode.editComment);
