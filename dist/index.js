@@ -376,7 +376,7 @@ var ReviewManager = /** @class */ (function () {
         this.setEditorMode(EditorMode.toolbar);
         this.editor.focus();
     };
-    ReviewManager.prototype.handleSave = function () {
+    ReviewManager.prototype.handleAddComment = function () {
         this.setEditorMode(EditorMode.toolbar);
         var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         var text = this.textarea.value;
@@ -389,7 +389,7 @@ var ReviewManager = /** @class */ (function () {
             this.handleCancel();
         }
         else if (e.code === "Enter" && e.ctrlKey) {
-            this.handleSave();
+            this.handleAddComment();
         }
     };
     ReviewManager.prototype.createInlineEditorElement = function () {
@@ -405,14 +405,14 @@ var ReviewManager = /** @class */ (function () {
         textarea.innerText = '';
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
-        var save = document.createElement('button');
-        save.setAttribute(CONTROL_ATTR_NAME, '');
-        save.className = "reviewCommentEditor save";
-        save.style.backgroundColor = this.getThemedColor("button.background");
-        save.style.color = this.getThemedColor("button.foreground");
-        save.style.fontFamily = "Consolas";
-        save.innerText = 'Save';
-        save.onclick = this.handleSave.bind(this);
+        var add = document.createElement('button');
+        add.setAttribute(CONTROL_ATTR_NAME, '');
+        add.className = "reviewCommentEditor save";
+        add.style.backgroundColor = this.getThemedColor("button.background");
+        add.style.color = this.getThemedColor("button.foreground");
+        add.style.fontFamily = "Consolas";
+        add.innerText = 'Add Comment';
+        add.onclick = this.handleAddComment.bind(this);
         var cancel = document.createElement('button');
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
         cancel.className = "reviewCommentEditor cancel";
@@ -421,7 +421,7 @@ var ReviewManager = /** @class */ (function () {
         cancel.innerText = 'Cancel';
         cancel.onclick = this.handleCancel.bind(this);
         root.appendChild(textarea);
-        root.appendChild(save);
+        root.appendChild(add);
         root.appendChild(cancel);
         this.textarea = textarea;
         return root;

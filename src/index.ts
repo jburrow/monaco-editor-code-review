@@ -255,7 +255,7 @@ class ReviewManager {
         this.editor.focus();
     }
 
-    handleSave() {
+    handleAddComment() {
         this.setEditorMode(EditorMode.toolbar);
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         const text = this.textarea.value;
@@ -268,7 +268,7 @@ class ReviewManager {
         if (e.code === "Escape") {
             this.handleCancel();
         } else if (e.code === "Enter" && e.ctrlKey) {
-            this.handleSave();
+            this.handleAddComment();
         }
     }
 
@@ -287,15 +287,15 @@ class ReviewManager {
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
-        const save = document.createElement('button') as HTMLButtonElement;
-        save.setAttribute(CONTROL_ATTR_NAME, '');
-        save.className = "reviewCommentEditor save";
-        save.style.backgroundColor = this.getThemedColor("button.background")
-        save.style.color = this.getThemedColor("button.foreground")
-        save.style.fontFamily = "Consolas";
+        const add = document.createElement('button') as HTMLButtonElement;
+        add.setAttribute(CONTROL_ATTR_NAME, '');
+        add.className = "reviewCommentEditor save";
+        add.style.backgroundColor = this.getThemedColor("button.background")
+        add.style.color = this.getThemedColor("button.foreground")
+        add.style.fontFamily = "Consolas";
 
-        save.innerText = 'Save';
-        save.onclick = this.handleSave.bind(this);
+        add.innerText = 'Add Comment';
+        add.onclick = this.handleAddComment.bind(this);
 
         const cancel = document.createElement('button') as HTMLButtonElement;
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
@@ -307,7 +307,7 @@ class ReviewManager {
         cancel.onclick = this.handleCancel.bind(this);
 
         root.appendChild(textarea);
-        root.appendChild(save);
+        root.appendChild(add);
         root.appendChild(cancel);
 
         this.textarea = textarea;
