@@ -122,7 +122,7 @@ test('Remove a comment via the widgets', () => {
     // Simulate a click on the comment
     rm.handleMouseDown({ target: { element: { className: "", hasAttribute: () => false }, detail: { viewZoneId: viewZoneId } } })
     expect(rm.activeComment).toBe(comment);
-    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber + 1);
+    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     rm.removeComment(comment);

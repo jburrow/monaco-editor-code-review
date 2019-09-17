@@ -105,6 +105,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
 };
 
 const CONTROL_ATTR_NAME = 'ReviewManagerControl';
+const POSITION_BELOW = 2; //above=1, below=2, exact=0
 
 class ReviewManager {
     currentUser: string;
@@ -114,8 +115,8 @@ class ReviewManager {
     commentState: { [reviewCommentId: string]: ReviewCommentState };
 
     activeComment?: ReviewComment;
-    widgetInlineToolbar: any;
-    widgetInlineCommentEditor: any;
+    widgetInlineToolbar: monacoEditor.editor.IContentWidget;
+    widgetInlineCommentEditor: monacoEditor.editor.IContentWidget;
     onChange: OnCommentsChanged;
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
@@ -209,7 +210,7 @@ class ReviewManager {
             'dark': {
                 "button.background": "#0e639c",
                 "button.foreground": "#ffffff",
-            }, 
+            },
             'light': {
                 "button.background": "#007acc",
                 "button.foreground": "#ffffff"
@@ -275,14 +276,10 @@ class ReviewManager {
     createInlineEditorElement() {
         var root = document.createElement('span') as HTMLSpanElement;
         root.className = "reviewCommentEditor"
-        root.style.backgroundColor = this.getThemedColor("editor.background");
-        root.style.color = this.getThemedColor("editor.foreground");
 
         const textarea = document.createElement('textarea') as HTMLTextAreaElement;
         textarea.setAttribute(CONTROL_ATTR_NAME, '');
         textarea.className = "reviewCommentEditor text";
-        textarea.style.backgroundColor = this.getThemedColor("editor.background");
-        textarea.style.color = this.getThemedColor("editor.foreground");
         textarea.innerText = '';
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
@@ -290,19 +287,13 @@ class ReviewManager {
         const add = document.createElement('button') as HTMLButtonElement;
         add.setAttribute(CONTROL_ATTR_NAME, '');
         add.className = "reviewCommentEditor save";
-        add.style.backgroundColor = this.getThemedColor("button.background")
-        add.style.color = this.getThemedColor("button.foreground")
         add.style.fontFamily = "Consolas";
-
         add.innerText = 'Add Comment';
         add.onclick = this.handleAddComment.bind(this);
 
         const cancel = document.createElement('button') as HTMLButtonElement;
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
         cancel.className = "reviewCommentEditor cancel";
-        cancel.style.backgroundColor = this.getThemedColor("button.background")
-        cancel.style.color = this.getThemedColor("button.foreground")
-
         cancel.innerText = 'Cancel';
         cancel.onclick = this.handleCancel.bind(this);
 
@@ -329,9 +320,10 @@ class ReviewManager {
                 if (this.activeComment && this.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
-                            lineNumber: this.activeComment.lineNumber + 1,
+                            lineNumber: this.activeComment.lineNumber,
+                            column: 1
                         },
-                        preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
+                        preference: [POSITION_BELOW]
                     }
                 }
             }
@@ -357,15 +349,16 @@ class ReviewManager {
                     return {
                         position: {
                             // We are using negative marginTop to shift it above the line to the previous
-                            lineNumber: this.activeComment ? this.activeComment.lineNumber + 1 : this.editor.getPosition().lineNumber
+                            lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber,
+                            column: 1
                         },
-                        preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
+                        preference: [POSITION_BELOW]
                     }
                 }
             }
         };
 
-        this.editor.addContentWidget(this.widgetInlineCommentEditor);        
+        this.editor.addContentWidget(this.widgetInlineCommentEditor);
     }
 
     setActiveComment(comment: ReviewComment) {
@@ -389,11 +382,8 @@ class ReviewManager {
 
     layoutInlineToolbar() {
         const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
-
-        if (this.activeComment) {
-            toolbarRoot.style.marginTop = `-${this.calculateMarginTopOffset(2)}px`;
-        }
         toolbarRoot.style.backgroundColor = this.getThemedColor("editor.background");
+
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
@@ -423,7 +413,10 @@ class ReviewManager {
     handleMouseDown(ev: { target: { element: { className: string, hasAttribute: { (string): boolean } }, detail: any } }) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event        
         if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
-            this.editor.setPosition({ lineNumber: this.currentLineDecorationLineNumber, column: 1 });
+            this.editor.setPosition({
+                lineNumber: this.currentLineDecorationLineNumber,
+                column: 1
+            });
             this.setEditorMode(EditorMode.editComment);
         } else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             let activeComment: ReviewComment = null;
@@ -465,16 +458,30 @@ class ReviewManager {
         return marginTop;
     }
 
+    layoutInlineCommentEditor() {
+        const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
+
+        Array.prototype.slice.call(editorRoot.getElementsByTagName('textarea')).concat([editorRoot]).forEach(e => {
+            e.style.backgroundColor = this.getThemedColor("editor.background");
+            e.style.color = this.getThemedColor("editor.foreground");
+        })
+
+        Array.prototype.slice.call(editorRoot.getElementsByTagName('button'))
+            .forEach((button) => {
+                button.style.backgroundColor = this.getThemedColor("button.background");
+                button.style.color = this.getThemedColor("button.foreground");
+            });
+
+        this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
+    }
+
     setEditorMode(mode: EditorMode) {
         console.debug('setEditorMode', this.activeComment);
 
         this.editorMode = mode;
 
-        const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
-        editorRoot.style.marginTop = `-${this.calculateMarginTopOffset()}px`;
-
+        this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
-        this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
 
         if (mode == EditorMode.editComment) {
             this.textarea.value = "";

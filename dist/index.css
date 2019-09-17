@@ -61,7 +61,7 @@
   width: 45px;
   padding-right: 2px;
   text-align: right;
-  background-color: red;
+color: darkorange;  
 }
 .editButton:hover {
   text-decoration: underline;

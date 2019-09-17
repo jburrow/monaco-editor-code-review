@@ -18160,6 +18160,7 @@ var defaultReviewManagerConfig = {
     showAddCommentGlyph: true,
 };
 var CONTROL_ATTR_NAME = 'ReviewManagerControl';
+var POSITION_BELOW = 2; //above=1, below=2, exact=0
 var ReviewManager = /** @class */ (function () {
     function ReviewManager(editor, currentUser, onChange, config) {
         var _this = this;
@@ -18291,29 +18292,21 @@ var ReviewManager = /** @class */ (function () {
     ReviewManager.prototype.createInlineEditorElement = function () {
         var root = document.createElement('span');
         root.className = "reviewCommentEditor";
-        root.style.backgroundColor = this.getThemedColor("editor.background");
-        root.style.color = this.getThemedColor("editor.foreground");
         var textarea = document.createElement('textarea');
         textarea.setAttribute(CONTROL_ATTR_NAME, '');
         textarea.className = "reviewCommentEditor text";
-        textarea.style.backgroundColor = this.getThemedColor("editor.background");
-        textarea.style.color = this.getThemedColor("editor.foreground");
         textarea.innerText = '';
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
         var add = document.createElement('button');
         add.setAttribute(CONTROL_ATTR_NAME, '');
         add.className = "reviewCommentEditor save";
-        add.style.backgroundColor = this.getThemedColor("button.background");
-        add.style.color = this.getThemedColor("button.foreground");
         add.style.fontFamily = "Consolas";
         add.innerText = 'Add Comment';
         add.onclick = this.handleAddComment.bind(this);
         var cancel = document.createElement('button');
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
         cancel.className = "reviewCommentEditor cancel";
-        cancel.style.backgroundColor = this.getThemedColor("button.background");
-        cancel.style.color = this.getThemedColor("button.foreground");
         cancel.innerText = 'Cancel';
         cancel.onclick = this.handleCancel.bind(this);
         root.appendChild(textarea);
@@ -18337,9 +18330,10 @@ var ReviewManager = /** @class */ (function () {
                 if (_this.activeComment && _this.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
-                            lineNumber: _this.activeComment.lineNumber + 1,
+                            lineNumber: _this.activeComment.lineNumber,
+                            column: 1
                         },
-                        preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
+                        preference: [POSITION_BELOW]
                     };
                 }
             }
@@ -18363,9 +18357,10 @@ var ReviewManager = /** @class */ (function () {
                     return {
                         position: {
                             // We are using negative marginTop to shift it above the line to the previous
-                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber + 1 : _this.editor.getPosition().lineNumber
+                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber : _this.editor.getPosition().lineNumber,
+                            column: 1
                         },
-                        preference: [monacoWindow.monaco.editor.ContentWidgetPositionPreference.BELOW]
+                        preference: [POSITION_BELOW]
                     };
                 }
             }
@@ -18391,9 +18386,6 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.layoutInlineToolbar = function () {
         var toolbarRoot = this.widgetInlineToolbar.getDomNode();
-        if (this.activeComment) {
-            toolbarRoot.style.marginTop = "-" + this.calculateMarginTopOffset(2) + "px";
-        }
         toolbarRoot.style.backgroundColor = this.getThemedColor("editor.background");
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     };
@@ -18422,7 +18414,10 @@ var ReviewManager = /** @class */ (function () {
     ReviewManager.prototype.handleMouseDown = function (ev) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event        
         if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
-            this.editor.setPosition({ lineNumber: this.currentLineDecorationLineNumber, column: 1 });
+            this.editor.setPosition({
+                lineNumber: this.currentLineDecorationLineNumber,
+                column: 1
+            });
             this.setEditorMode(EditorMode.editComment);
         }
         else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
@@ -18462,14 +18457,26 @@ var ReviewManager = /** @class */ (function () {
         }
         return marginTop;
     };
+    ReviewManager.prototype.layoutInlineCommentEditor = function () {
+        var _this = this;
+        var editorRoot = this.widgetInlineCommentEditor.getDomNode();
+        Array.prototype.slice.call(editorRoot.getElementsByTagName('textarea')).concat([editorRoot]).forEach(function (e) {
+            e.style.backgroundColor = _this.getThemedColor("editor.background");
+            e.style.color = _this.getThemedColor("editor.foreground");
+        });
+        Array.prototype.slice.call(editorRoot.getElementsByTagName('button'))
+            .forEach(function (button) {
+            button.style.backgroundColor = _this.getThemedColor("button.background");
+            button.style.color = _this.getThemedColor("button.foreground");
+        });
+        this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
+    };
     ReviewManager.prototype.setEditorMode = function (mode) {
         var _this = this;
         console.debug('setEditorMode', this.activeComment);
         this.editorMode = mode;
-        var editorRoot = this.widgetInlineCommentEditor.getDomNode();
-        editorRoot.style.marginTop = "-" + this.calculateMarginTopOffset() + "px";
+        this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
-        this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
         if (mode == EditorMode.editComment) {
             this.textarea.value = "";
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
