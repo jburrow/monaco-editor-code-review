@@ -72,6 +72,7 @@ export interface ReviewManagerConfig {
     reviewCommentIconSelect?: string;
     reviewCommentIconActive?: string;
     showInRuler?: boolean
+    verticalOffset?:number;
     formatDate?: { (dt: Date): string }
 }
 
@@ -84,6 +85,7 @@ interface ReviewManagerConfigPrivate {
     editButtonAddText: string;
     editButtonRemoveText: string;
     editButtonOffset: string;
+    verticalOffset:number;
     showInRuler: boolean;
     formatDate?: { (dt: Date | string): string };
     showAddCommentGlyph: boolean
@@ -91,7 +93,8 @@ interface ReviewManagerConfigPrivate {
 
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
-    editButtonOffset: '-10px',
+    verticalOffset:0,
+    editButtonOffset: '-10px',    
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
     editButtonEnableRemove: true,
@@ -380,12 +383,6 @@ class ReviewManager {
         }
     }
 
-    layoutInlineToolbar() {
-        const toolbarRoot = this.widgetInlineToolbar.getDomNode() as HTMLElement;
-        toolbarRoot.style.backgroundColor = this.getThemedColor("editor.background");
-
-        this.editor.layoutContentWidget(this.widgetInlineToolbar);
-    }
 
     filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
         for (const comment of this.comments) {
@@ -436,7 +433,7 @@ class ReviewManager {
         }
     }
 
-    private calculateMarginTopOffset(extraOffsetLines: number = 1): number {
+    private calculateMarginTopOffset(): number {
         let idx = 0;
         let count = 0;
         let marginTop: number = 0;
@@ -452,26 +449,35 @@ class ReviewManager {
                     idx = count + 0;
                 }
             }
-            marginTop = ((extraOffsetLines + count - idx) * lineHeight);
+            marginTop = idx * lineHeight;
         }
 
-        return marginTop;
+        return marginTop + this.config.verticalOffset;
+    }
+
+    layoutInlineToolbar() {
+        const root = this.widgetInlineToolbar.getDomNode() as HTMLElement;
+        root.style.backgroundColor = this.getThemedColor("editor.background");
+        root.style.marginTop = `${this.calculateMarginTopOffset()}px`;
+
+        this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
 
     layoutInlineCommentEditor() {
-        const editorRoot = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
+        const root = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
 
-        Array.prototype.slice.call(editorRoot.getElementsByTagName('textarea')).concat([editorRoot]).forEach(e => {
+        Array.prototype.slice.call(root.getElementsByTagName('textarea')).concat([root]).forEach(e => {
             e.style.backgroundColor = this.getThemedColor("editor.background");
             e.style.color = this.getThemedColor("editor.foreground");
         })
 
-        Array.prototype.slice.call(editorRoot.getElementsByTagName('button'))
+        Array.prototype.slice.call(root.getElementsByTagName('button'))
             .forEach((button) => {
                 button.style.backgroundColor = this.getThemedColor("button.background");
                 button.style.color = this.getThemedColor("button.foreground");
             });
 
+        root.style.marginTop = `${this.calculateMarginTopOffset()}px`;
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
 

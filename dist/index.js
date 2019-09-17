@@ -251,6 +251,7 @@ function createReviewManager(editor, currentUser, comments, onChange, config) {
 }
 exports.createReviewManager = createReviewManager;
 var defaultReviewManagerConfig = {
+    verticalOffset: 0,
     editButtonOffset: '-10px',
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
@@ -488,11 +489,6 @@ var ReviewManager = /** @class */ (function () {
             });
         }
     };
-    ReviewManager.prototype.layoutInlineToolbar = function () {
-        var toolbarRoot = this.widgetInlineToolbar.getDomNode();
-        toolbarRoot.style.backgroundColor = this.getThemedColor("editor.background");
-        this.editor.layoutContentWidget(this.widgetInlineToolbar);
-    };
     ReviewManager.prototype.filterAndMapComments = function (lineNumbers, fn) {
         for (var _i = 0, _a = this.comments; _i < _a.length; _i++) {
             var comment = _a[_i];
@@ -541,8 +537,7 @@ var ReviewManager = /** @class */ (function () {
             this.setEditorMode(EditorMode.toolbar);
         }
     };
-    ReviewManager.prototype.calculateMarginTopOffset = function (extraOffsetLines) {
-        if (extraOffsetLines === void 0) { extraOffsetLines = 1; }
+    ReviewManager.prototype.calculateMarginTopOffset = function () {
         var idx = 0;
         var count = 0;
         var marginTop = 0;
@@ -557,22 +552,29 @@ var ReviewManager = /** @class */ (function () {
                     idx = count + 0;
                 }
             }
-            marginTop = ((extraOffsetLines + count - idx) * lineHeight);
+            marginTop = idx * lineHeight;
         }
-        return marginTop;
+        return marginTop + this.config.verticalOffset;
+    };
+    ReviewManager.prototype.layoutInlineToolbar = function () {
+        var root = this.widgetInlineToolbar.getDomNode();
+        root.style.backgroundColor = this.getThemedColor("editor.background");
+        root.style.marginTop = this.calculateMarginTopOffset() + "px";
+        this.editor.layoutContentWidget(this.widgetInlineToolbar);
     };
     ReviewManager.prototype.layoutInlineCommentEditor = function () {
         var _this = this;
-        var editorRoot = this.widgetInlineCommentEditor.getDomNode();
-        Array.prototype.slice.call(editorRoot.getElementsByTagName('textarea')).concat([editorRoot]).forEach(function (e) {
+        var root = this.widgetInlineCommentEditor.getDomNode();
+        Array.prototype.slice.call(root.getElementsByTagName('textarea')).concat([root]).forEach(function (e) {
             e.style.backgroundColor = _this.getThemedColor("editor.background");
             e.style.color = _this.getThemedColor("editor.foreground");
         });
-        Array.prototype.slice.call(editorRoot.getElementsByTagName('button'))
+        Array.prototype.slice.call(root.getElementsByTagName('button'))
             .forEach(function (button) {
             button.style.backgroundColor = _this.getThemedColor("button.background");
             button.style.color = _this.getThemedColor("button.foreground");
         });
+        root.style.marginTop = this.calculateMarginTopOffset() + "px";
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     };
     ReviewManager.prototype.setEditorMode = function (mode) {
