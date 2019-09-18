@@ -286,12 +286,16 @@ var ReviewManager = /** @class */ (function () {
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        this.editor.onDidChangeModelDecorations(this.handleDidChangeModelDecorations.bind(this));
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
     }
+    ReviewManager.prototype.handleDidChangeModelDecorations = function (e) {
+        console.log('handleDidChangeModelDecorations', e);
+    };
     ReviewManager.prototype.load = function (comments) {
         var _this = this;
         this.editor.changeViewZones(function (changeAccessor) {
@@ -461,8 +465,7 @@ var ReviewManager = /** @class */ (function () {
                 if (_this.editorMode == EditorMode.editComment) {
                     return {
                         position: {
-                            // We are using negative marginTop to shift it above the line to the previous
-                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber : _this.editor.getPosition().lineNumber,
+                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber : _this.editor.getPosition().lineNumber + 1,
                             column: 1
                         },
                         preference: [POSITION_BELOW]
@@ -504,8 +507,8 @@ var ReviewManager = /** @class */ (function () {
                 {
                     range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
                     options: {
-                        glyphMarginClassName: 'activeLineGlyphmyMarginClass',
-                        isWholeLine: true
+                        marginClassName: 'activeLineMarginClass',
+                        zIndex: 100
                     }
                 }
             ]);
@@ -513,7 +516,7 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.handleMouseDown = function (ev) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event        
-        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
+        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineMarginClass') > -1) {
             this.editor.setPosition({
                 lineNumber: this.currentLineDecorationLineNumber,
                 column: 1
@@ -830,6 +833,7 @@ var ReviewManager = /** @class */ (function () {
     };
     return ReviewManager;
 }());
+exports.ReviewManager = ReviewManager;
 var NavigationDirection;
 (function (NavigationDirection) {
     NavigationDirection[NavigationDirection["next"] = 1] = "next";

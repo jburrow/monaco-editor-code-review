@@ -17938,22 +17938,24 @@ function setView(mode) {
     else {
         var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
         var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
-        currentEditor = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), { renderSideBySide: mode !== "inline" });
-        currentEditor.setModel({
+        var e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), { renderSideBySide: mode !== "inline" });
+        e.setModel({
             original: originalModel,
             modified: modifiedModel
         });
-        initReviewManager(currentEditor.modifiedEditor);
+        currentEditor = e;
+        initReviewManager(e.modifiedEditor);
     }
 }
 function generateDifferentContents() {
     var idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
     if (currentMode.startsWith("standard")) {
-        currentEditor.setValue(exampleSourceCode[idx]);
+        (currentEditor).setValue(exampleSourceCode[idx]);
     }
     else {
-        currentEditor.getModel().modified.setValue(exampleSourceCode[idx]);
-        currentEditor.getModel().modified.setValue(exampleSourceCode[idx + 1]);
+        var e = (currentEditor);
+        e.getModel().modified.setValue(exampleSourceCode[idx]);
+        e.getModel().modified.setValue(exampleSourceCode[idx + 1]);
     }
 }
 var exampleSourceCode = [];
@@ -18093,11 +18095,29 @@ function clearComments() {
     reviewManager.load([]);
     renderComments([]);
 }
+function generateLineDecorations() {
+    var model = null;
+    if (currentMode.startsWith("standard")) {
+        var e = (currentEditor);
+        model = e.getModel();
+    }
+    else {
+        var e = (currentEditor);
+        model = e.getModel().modified;
+    }
+    model.deltaDecorations([], [
+        {
+            range: new win.monaco.Range(3, 1, 5, 1),
+            options: { isWholeLine: true, linesDecorationsClassName: 'myLineDecoration' }
+        },
+    ]);
+}
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.toggleTheme = toggleTheme;
 win.clearComments = clearComments;
+win.generateLineDecorations = generateLineDecorations;
 init();
 
 
@@ -18182,12 +18202,16 @@ var ReviewManager = /** @class */ (function () {
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        this.editor.onDidChangeModelDecorations(this.handleDidChangeModelDecorations.bind(this));
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
     }
+    ReviewManager.prototype.handleDidChangeModelDecorations = function (e) {
+        console.log('handleDidChangeModelDecorations', e);
+    };
     ReviewManager.prototype.load = function (comments) {
         var _this = this;
         this.editor.changeViewZones(function (changeAccessor) {
@@ -18357,8 +18381,7 @@ var ReviewManager = /** @class */ (function () {
                 if (_this.editorMode == EditorMode.editComment) {
                     return {
                         position: {
-                            // We are using negative marginTop to shift it above the line to the previous
-                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber : _this.editor.getPosition().lineNumber,
+                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber : _this.editor.getPosition().lineNumber + 1,
                             column: 1
                         },
                         preference: [POSITION_BELOW]
@@ -18400,8 +18423,8 @@ var ReviewManager = /** @class */ (function () {
                 {
                     range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
                     options: {
-                        glyphMarginClassName: 'activeLineGlyphmyMarginClass',
-                        isWholeLine: true
+                        marginClassName: 'activeLineMarginClass',
+                        zIndex: 100
                     }
                 }
             ]);
@@ -18409,7 +18432,7 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.handleMouseDown = function (ev) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event        
-        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
+        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineMarginClass') > -1) {
             this.editor.setPosition({
                 lineNumber: this.currentLineDecorationLineNumber,
                 column: 1
@@ -18726,6 +18749,7 @@ var ReviewManager = /** @class */ (function () {
     };
     return ReviewManager;
 }());
+exports.ReviewManager = ReviewManager;
 var NavigationDirection;
 (function (NavigationDirection) {
     NavigationDirection[NavigationDirection["next"] = 1] = "next";

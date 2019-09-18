@@ -1,20 +1,23 @@
-import { ReviewComment, createReviewManager } from "./index";
+import { ReviewComment, createReviewManager, ReviewManager } from "./index";
 import * as moment from "moment";
+
+
 
 interface WindowDoc {
     require: any;
     monaco: any;
-    setView: any;
-    generateDifferentComments: any;
-    generateDifferentContents: any;
-    toggleTheme: any;
-    clearComments: any;
+    setView: (mode: string) => void;
+    generateDifferentComments: () => void;
+    generateDifferentContents: () => void;
+    generateLineDecorations: () => void;
+    toggleTheme: () => void;
+    clearComments: () => void;
 }
 
 const win = (window as any) as WindowDoc;
-let reviewManager: any = null;
+let reviewManager: ReviewManager = null;
 let currentMode: string = '';
-let currentEditor: any = null;
+let currentEditor: any= null;
 let theme = 'vs-dark';
 
 function ensureMonacoIsAvailable() {
@@ -41,7 +44,7 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-function setView(mode) {
+function setView(mode: string) {
     const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
 
     currentMode = mode;
@@ -58,8 +61,7 @@ function setView(mode) {
                 readOnly: mode === "standard-readonly",
                 theme: theme
             }
-        );
-
+        );        
         initReviewManager(currentEditor);
     } else {
         var originalModel = win.monaco.editor.createModel(
@@ -71,16 +73,17 @@ function setView(mode) {
             "typescript"
         );
 
-        currentEditor = win.monaco.editor.createDiffEditor(
+        const e = win.monaco.editor.createDiffEditor(
             document.getElementById("containerEditor"),
             { renderSideBySide: mode !== "inline" }
         );
-        currentEditor.setModel({
+        e.setModel({
             original: originalModel,
             modified: modifiedModel
         });
 
-        initReviewManager(currentEditor.modifiedEditor);
+        currentEditor = e;
+        initReviewManager(e.modifiedEditor);
     }
 }
 
@@ -88,10 +91,11 @@ function generateDifferentContents() {
     const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
 
     if (currentMode.startsWith("standard")) {
-        currentEditor.setValue(exampleSourceCode[idx]);
+        (currentEditor).setValue(exampleSourceCode[idx]);
     } else {
-        currentEditor.getModel().modified.setValue(exampleSourceCode[idx]);
-        currentEditor.getModel().modified.setValue(exampleSourceCode[idx + 1]);
+        const e = (currentEditor);
+        e.getModel().modified.setValue(exampleSourceCode[idx]);
+        e.getModel().modified.setValue(exampleSourceCode[idx + 1]);
     }
 }
 
@@ -124,8 +128,8 @@ async function init() {
         paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
     });
 
-    win.require(["vs/editor/editor.main"], function () {
-        setView("standard");
+    win.require(["vs/editor/editor.main"], function () {        
+        setView("standard");       
     });
 }
 
@@ -138,7 +142,7 @@ function initReviewManager(editor: any) {
         updatedComments => renderComments(updatedComments),
         {
             editButtonEnableRemove: true,
-            formatDate: (dt: Date|string) => moment(dt).format('YY-MM-DD HH:mm')
+            formatDate: (dt: Date | string) => moment(dt).format('YY-MM-DD HH:mm')
         }
     );
 
@@ -214,7 +218,7 @@ function createRandomComments(): ReviewComment[] {
     ]
 }
 
-function renderComments(comments) {
+function renderComments(comments: ReviewComment[]) {
     comments = comments || [];
     document.getElementById("summaryEditor").innerHTML = reviewManager.comments
         .map(
@@ -237,10 +241,29 @@ function clearComments() {
     renderComments([]);
 }
 
+function generateLineDecorations() {
+    let model :any=null;
+    if (currentMode.startsWith("standard")) {
+        const e = (currentEditor );
+        model = e.getModel();
+    } else {
+        const e = (currentEditor );
+        model = e.getModel().modified;
+    }
+
+    model.deltaDecorations([], [
+        {
+            range: new win.monaco.Range(3, 1, 5, 1),
+            options: { isWholeLine: true, linesDecorationsClassName: 'myLineDecoration' }
+        },
+    ]);
+}
+
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.toggleTheme = toggleTheme;
 win.clearComments = clearComments;
+win.generateLineDecorations = generateLineDecorations;
 init();
 

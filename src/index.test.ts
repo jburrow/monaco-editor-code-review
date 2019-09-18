@@ -1,4 +1,4 @@
-import { ReviewComment, createReviewManager } from "./index";
+import { ReviewComment, createReviewManager, ReviewManagerConfig } from "./index";
 
 interface MonacoWindow {
     monaco: any;
@@ -17,12 +17,12 @@ function getMockEditor() {
         _zones: {},
         focus: () => null,
         addAction: () => null,
-        getConfiguration:()=>({fontInfo:{lineHeight:19}}),
+        getConfiguration: () => ({ fontInfo: { lineHeight: 19 } }),
         getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
         onMouseDown: () => null,
         onMouseMove: () => null,
-        onDidChangeConfiguration:(cb)=>null,
+        onDidChangeConfiguration: (cb) => null,
         revealLineInCenter: () => null,
         deltaDecorations: () => null,
         changeViewZones: (cb) => cb({
@@ -42,7 +42,7 @@ function getMockEditor() {
         _themeService: {
             getTheme: () => {
                 return {
-                    themeName:'',
+                    themeName: '',
                     getColor: () => ''
                 }
             }

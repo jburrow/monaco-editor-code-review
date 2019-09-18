@@ -72,7 +72,7 @@ export interface ReviewManagerConfig {
     reviewCommentIconSelect?: string;
     reviewCommentIconActive?: string;
     showInRuler?: boolean
-    verticalOffset?:number;
+    verticalOffset?: number;
     formatDate?: { (dt: Date): string }
 }
 
@@ -85,7 +85,7 @@ interface ReviewManagerConfigPrivate {
     editButtonAddText: string;
     editButtonRemoveText: string;
     editButtonOffset: string;
-    verticalOffset:number;
+    verticalOffset: number;
     showInRuler: boolean;
     formatDate?: { (dt: Date | string): string };
     showAddCommentGlyph: boolean
@@ -93,8 +93,8 @@ interface ReviewManagerConfigPrivate {
 
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
-    verticalOffset:0,
-    editButtonOffset: '-10px',    
+    verticalOffset: 0,
+    editButtonOffset: '-10px',
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
     editButtonEnableRemove: true,
@@ -110,7 +110,9 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
 const CONTROL_ATTR_NAME = 'ReviewManagerControl';
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
 
-class ReviewManager {
+
+
+export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
     editorConfig: monacoEditor.editor.InternalEditorOptions;
@@ -350,7 +352,7 @@ class ReviewManager {
             getPosition: () => {
                 if (this.editorMode == EditorMode.editComment) {
                     return {
-                        position: {                            
+                        position: {
                             lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber + 1,
                             column: 1
                         },
@@ -398,8 +400,8 @@ class ReviewManager {
                 {
                     range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
                     options: {
-                        glyphMarginClassName: 'activeLineGlyphmyMarginClass',
-                        isWholeLine: true
+                        marginClassName: 'activeLineMarginClass',
+                        zIndex: 100
                     }
                 }
             ]);
@@ -408,7 +410,7 @@ class ReviewManager {
 
     handleMouseDown(ev: { target: { element: { className: string, hasAttribute: { (string): boolean } }, detail: any } }) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event        
-        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineGlyphmyMarginClass') > -1) {
+        if (ev.target.element.className && ev.target.element.className.indexOf('activeLineMarginClass') > -1) {
             this.editor.setPosition({
                 lineNumber: this.currentLineDecorationLineNumber,
                 column: 1
