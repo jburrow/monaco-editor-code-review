@@ -286,16 +286,12 @@ var ReviewManager = /** @class */ (function () {
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        this.editor.onDidChangeModelDecorations(this.handleDidChangeModelDecorations.bind(this));
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
     }
-    ReviewManager.prototype.handleDidChangeModelDecorations = function (e) {
-        console.log('handleDidChangeModelDecorations', e);
-    };
     ReviewManager.prototype.load = function (comments) {
         var _this = this;
         this.editor.changeViewZones(function (changeAccessor) {
