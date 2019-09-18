@@ -350,9 +350,8 @@ class ReviewManager {
             getPosition: () => {
                 if (this.editorMode == EditorMode.editComment) {
                     return {
-                        position: {
-                            // We are using negative marginTop to shift it above the line to the previous
-                            lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber,
+                        position: {                            
+                            lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber + 1,
                             column: 1
                         },
                         preference: [POSITION_BELOW]
@@ -436,7 +435,7 @@ class ReviewManager {
     private calculateMarginTopOffset(): number {
         let idx = 0;
         let count = 0;
-        let marginTop: number = 0;
+        let marginTop = 0;
         const lineHeight = this.editorConfig.fontInfo.lineHeight;
 
         if (this.activeComment) {
