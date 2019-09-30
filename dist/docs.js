@@ -18018,7 +18018,7 @@ function initReviewManager(editor) {
         editButtonEnableRemove: true,
         formatDate: function (dt) { return moment(dt).format('YY-MM-DD HH:mm'); }
     });
-    renderComments(reviewManager.comments);
+    renderComments(Object.values(reviewManager.commentState).map(function (cs) { return cs.comment; }));
 }
 function toggleTheme() {
     theme = theme == 'vs' ? 'vs-dark' : 'vs';
@@ -18026,7 +18026,7 @@ function toggleTheme() {
 }
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
-    renderComments(reviewManager.comments);
+    renderComments(Object.values(reviewManager.commentState).map(function (cs) { return cs.comment; }));
 }
 function createRandomComments() {
     var firstLine = Math.floor(Math.random() * 10);
@@ -18085,7 +18085,7 @@ function createRandomComments() {
 }
 function renderComments(comments) {
     comments = comments || [];
-    document.getElementById("summaryEditor").innerHTML = reviewManager.comments
+    document.getElementById("summaryEditor").innerHTML = Object.values(reviewManager.commentState).map(function (cs) { return cs.comment; })
         .map(function (comment) {
         return "<div style=\"display:flex;height:16px;text-decoration:" + (comment.status && comment.status === 2 ? 'line-through' : 'normal') + "\">\n                    <div style=\"width:100px;overflow:hidden;\">" + comment.id + "</div>\n                    <div style=\"width:50px;overflow:hidden;\">" + comment.lineNumber + "</div>\n                    <div style=\"width:100px;overflow:hidden;\">" + comment.author + "</div> \n                    <div style=\"width:100px;overflow:hidden;\">" + comment.dt + "</div> \n                    <div style=\"width:auto;overflow:hidden;\">" + comment.text + "</div>                    \n                    <div style=\"width:auto;overflow:hidden;\">" + JSON.stringify(comment.selection || '') + "</div>                    \n                </div>";
     })
@@ -18150,12 +18150,31 @@ var ReviewCommentStatus;
 (function (ReviewCommentStatus) {
     ReviewCommentStatus[ReviewCommentStatus["active"] = 1] = "active";
     ReviewCommentStatus[ReviewCommentStatus["deleted"] = 2] = "deleted";
+    ReviewCommentStatus[ReviewCommentStatus["edit"] = 3] = "edit";
 })(ReviewCommentStatus = exports.ReviewCommentStatus || (exports.ReviewCommentStatus = {}));
+var NavigationDirection;
+(function (NavigationDirection) {
+    NavigationDirection[NavigationDirection["next"] = 1] = "next";
+    NavigationDirection[NavigationDirection["prev"] = 2] = "prev";
+})(NavigationDirection || (NavigationDirection = {}));
+var EditorMode;
+(function (EditorMode) {
+    EditorMode[EditorMode["editComment"] = 1] = "editComment";
+    EditorMode[EditorMode["toolbar"] = 2] = "toolbar";
+})(EditorMode || (EditorMode = {}));
+var ReviewCommentRenderState;
+(function (ReviewCommentRenderState) {
+    ReviewCommentRenderState[ReviewCommentRenderState["dirty"] = 1] = "dirty";
+    ReviewCommentRenderState[ReviewCommentRenderState["hidden"] = 2] = "hidden";
+    ReviewCommentRenderState[ReviewCommentRenderState["normal"] = 3] = "normal";
+})(ReviewCommentRenderState || (ReviewCommentRenderState = {}));
 var ReviewCommentState = /** @class */ (function () {
-    function ReviewCommentState(numberOfLines) {
+    function ReviewCommentState(comment, numberOfLines) {
         this.renderStatus = ReviewCommentRenderState.normal;
         this.viewZoneId = null;
+        this.comment = comment;
         this.numberOfLines = numberOfLines;
+        this.history = [];
     }
     return ReviewCommentState;
 }());
@@ -18188,7 +18207,6 @@ var ReviewManager = /** @class */ (function () {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
-        this.comments = [];
         this.commentState = {};
         this.widgetInlineToolbar = null;
         this.widgetInlineCommentEditor = null;
@@ -18198,12 +18216,12 @@ var ReviewManager = /** @class */ (function () {
         this.currentLineDecorations = [];
         this.currentCommentDecorations = [];
         this.currentLineDecorationLineNumber = null;
-        this.addActions();
-        this.createInlineToolbarWidget();
-        this.createInlineEditorWidget();
-        this.editor.onMouseDown(this.handleMouseDown.bind(this));
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
+        this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        this.createInlineToolbarWidget();
+        this.createInlineEditorWidget();
+        this.addActions();
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
@@ -18218,7 +18236,6 @@ var ReviewManager = /** @class */ (function () {
                     changeAccessor.removeZone(viewState.viewZoneId);
                 }
             }
-            _this.comments = comments || [];
             _this.commentState = {};
             // Check all comments that they have unique and present id's
             for (var _b = 0, comments_1 = comments; _b < comments_1.length; _b++) {
@@ -18232,10 +18249,10 @@ var ReviewManager = /** @class */ (function () {
                 if (changedId) {
                     console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', comment.id, ' due to collision');
                 }
-                _this.commentState[comment.id] = new ReviewCommentState(_this.calculateNumberOfLines(comment.text));
+                _this.commentState[comment.id] = new ReviewCommentState(comment, _this.calculateNumberOfLines(comment.text));
             }
             _this.refreshComments();
-            console.debug('Comments Loaded: ', _this.comments.length);
+            console.debug('Comments Loaded: ', _this.commentState.length);
         });
     };
     ReviewManager.prototype.calculateNumberOfLines = function (text) {
@@ -18405,10 +18422,10 @@ var ReviewManager = /** @class */ (function () {
         }
     };
     ReviewManager.prototype.filterAndMapComments = function (lineNumbers, fn) {
-        for (var _i = 0, _a = this.comments; _i < _a.length; _i++) {
-            var comment = _a[_i];
-            if (lineNumbers.indexOf(comment.lineNumber) > -1) {
-                fn(comment);
+        for (var _i = 0, _a = Object.values(this.commentState); _i < _a.length; _i++) {
+            var cs = _a[_i];
+            if (lineNumbers.indexOf(cs.comment.lineNumber) > -1) {
+                fn(cs.comment);
             }
         }
     };
@@ -18438,7 +18455,7 @@ var ReviewManager = /** @class */ (function () {
         else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             var activeComment = null;
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
-                for (var _i = 0, _a = this.comments; _i < _a.length; _i++) {
+                for (var _i = 0, _a = Object.values(this.commentState).map(function (c) { return c.comment; }); _i < _a.length; _i++) {
                     var comment = _a[_i];
                     var viewState = this.commentState[comment.id];
                     if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
@@ -18460,10 +18477,10 @@ var ReviewManager = /** @class */ (function () {
         if (this.activeComment) {
             for (var _i = 0, _a = this.iterateComments(); _i < _a.length; _i++) {
                 var item = _a[_i];
-                if (item.comment.lineNumber == this.activeComment.lineNumber) {
+                if (item.state.comment.lineNumber == this.activeComment.lineNumber) {
                     count++;
                 }
-                if (item.comment == this.activeComment) {
+                if (item.state.comment == this.activeComment) {
                     idx = count + 0;
                 }
             }
@@ -18517,51 +18534,61 @@ var ReviewManager = /** @class */ (function () {
             selection: selection,
             parentId: this.activeComment ? this.activeComment.id : null
         };
-        this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(text));
-        this.comments.push(comment);
+        this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
+        // Make all comments for this line as dirty.
         this.filterAndMapComments([ln], function (comment) {
             _this.commentState[comment.id].renderStatus = ReviewCommentRenderState.dirty;
         });
         this.refreshComments();
         this.layoutInlineToolbar();
         if (this.onChange) {
-            this.onChange(this.comments);
+            this.onChange(Object.values(this.commentState).map(function (cs) { return cs.comment; }));
         }
         return comment;
     };
+    ReviewManager.prototype.compareComments = function (a, b) {
+        return a.comment.dt > b.comment.dt ? 1 : -1;
+    };
     ReviewManager.prototype.recurseComments = function (allComments, filterFn, depth, results) {
-        var comments = Object.values(allComments).filter(filterFn).sort(function (a, b) { return a.dt > b.dt ? 1 : -1; });
-        var _loop_1 = function (comment) {
+        var comments = Object.values(allComments).filter(filterFn).sort(this.compareComments);
+        var _loop_1 = function (cs) {
+            var comment = cs.comment;
             delete allComments[comment.id];
             results.push({
                 depth: depth,
-                comment: comment,
-                viewState: this_1.commentState[comment.id]
+                state: cs
             });
-            this_1.recurseComments(allComments, function (x) { return x.parentId === comment.id; }, depth + 1, results);
+            this_1.recurseComments(allComments, function (x) { return x.comment.parentId === comment.id; }, depth + 1, results);
         };
         var this_1 = this;
         for (var _i = 0, comments_2 = comments; _i < comments_2.length; _i++) {
-            var comment = comments_2[_i];
-            _loop_1(comment);
+            var cs = comments_2[_i];
+            _loop_1(cs);
+        }
+    };
+    ReviewManager.prototype.processEdits = function (allComments) {
+        var edits = Object.values(allComments).filter(function (c) { return c.comment.status === ReviewCommentStatus.edit; }).sort(this.compareComments);
+        for (var _i = 0, edits_1 = edits; _i < edits_1.length; _i++) {
+            var e = edits_1[_i];
+            if (allComments[e.comment.parentId]) {
+                allComments[e.comment.parentId].history.push(allComments[e.comment.parentId].comment);
+                allComments[e.comment.parentId] = e;
+            }
         }
     };
     ReviewManager.prototype.iterateComments = function (filterFn) {
         if (!filterFn) {
-            filterFn = function (c) { return !c.parentId; };
+            filterFn = function (cs) { return !cs.comment.parentId; };
         }
-        var tmpComments = (this.comments).reduce(function (obj, item) {
-            obj[item.id] = item;
-            return obj;
-        }, {});
+        var copyCommentState = __assign({}, this.commentState);
         var results = [];
-        this.recurseComments(tmpComments, filterFn, 0, results);
+        this.recurseComments(copyCommentState, filterFn, 0, results);
         return results;
     };
     ReviewManager.prototype.removeComment = function (comment) {
-        for (var _i = 0, _a = this.iterateComments(function (c) { return c.id === comment.id; }); _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.iterateComments(function (cs) { return cs.comment.id === comment.id; }); _i < _a.length; _i++) {
             var item = _a[_i];
-            item.comment.status = ReviewCommentStatus.deleted;
+            item.state.comment.status = ReviewCommentStatus.deleted;
         }
         if (this.activeComment == comment) {
             this.setActiveComment(null);
@@ -18569,7 +18596,7 @@ var ReviewManager = /** @class */ (function () {
         }
         this.refreshComments();
         if (this.onChange) {
-            this.onChange(this.comments);
+            this.onChange(Object.values(this.commentState).map(function (cs) { return cs.comment; }));
         }
     };
     ReviewManager.prototype.formatDate = function (dt) {
@@ -18589,48 +18616,48 @@ var ReviewManager = /** @class */ (function () {
             var lineNumbers = {};
             for (var _i = 0, _a = _this.iterateComments(); _i < _a.length; _i++) {
                 var item = _a[_i];
-                if (item.comment.status && item.comment.status === ReviewCommentStatus.deleted) {
-                    console.debug('Zone.Delete', item.comment.id);
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
+                if (item.state.comment.status && item.state.comment.status === ReviewCommentStatus.deleted) {
+                    console.debug('Zone.Delete', item.state.comment.id);
+                    changeAccessor.removeZone(item.state.viewZoneId);
                     continue;
                 }
-                if (item.viewState.renderStatus === ReviewCommentRenderState.hidden) {
-                    console.debug('Zone.Hidden', item.comment.id);
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
-                    item.viewState.viewZoneId = null;
+                if (item.state.renderStatus === ReviewCommentRenderState.hidden) {
+                    console.debug('Zone.Hidden', item.state.comment.id);
+                    changeAccessor.removeZone(item.state.viewZoneId);
+                    item.state.viewZoneId = null;
                     continue;
                 }
-                if (item.viewState.renderStatus === ReviewCommentRenderState.dirty) {
-                    console.debug('Zone.Dirty', item.comment.id);
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
-                    item.viewState.viewZoneId = null;
-                    item.viewState.renderStatus = ReviewCommentRenderState.normal;
+                if (item.state.renderStatus === ReviewCommentRenderState.dirty) {
+                    console.debug('Zone.Dirty', item.state.comment.id);
+                    changeAccessor.removeZone(item.state.viewZoneId);
+                    item.state.viewZoneId = null;
+                    item.state.renderStatus = ReviewCommentRenderState.normal;
                 }
-                if (!lineNumbers[item.comment.lineNumber]) {
-                    lineNumbers[item.comment.lineNumber] = item.comment.selection;
+                if (!lineNumbers[item.state.comment.lineNumber]) {
+                    lineNumbers[item.state.comment.lineNumber] = item.state.comment.selection;
                 }
-                if (item.viewState.viewZoneId == null) {
-                    console.debug('Zone.Create', item.comment.id);
-                    var isActive = _this.activeComment == item.comment;
+                if (item.state.viewZoneId == null) {
+                    console.debug('Zone.Create', item.state.comment.id);
+                    var isActive = _this.activeComment == item.state.comment;
                     var domNode = document.createElement('span');
                     domNode.style.marginLeft = (_this.config.commentIndent * (item.depth + 1)) + _this.config.commentIndentOffset + "px";
                     domNode.style.backgroundColor = _this.getThemedColor("editor.selectionHighlightBackground");
                     domNode.className = "reviewComment " + (isActive ? 'active' : ' inactive');
                     var author = document.createElement('span');
                     author.className = 'reviewComment author';
-                    author.innerText = (item.comment.author || ' ') + " at ";
+                    author.innerText = (item.state.comment.author || ' ') + " at ";
                     var dt = document.createElement('span');
                     dt.className = 'reviewComment dt';
-                    dt.innerText = _this.formatDate(item.comment.dt);
+                    dt.innerText = _this.formatDate(item.state.comment.dt);
                     var text = document.createElement('span');
                     text.className = 'reviewComment text';
-                    text.innerText = item.comment.text + " by ";
+                    text.innerText = item.state.comment.text + " by ";
                     domNode.appendChild(text);
                     domNode.appendChild(author);
                     domNode.appendChild(dt);
-                    item.viewState.viewZoneId = changeAccessor.addZone({
-                        afterLineNumber: item.comment.lineNumber,
-                        heightInLines: item.viewState.numberOfLines,
+                    item.state.viewZoneId = changeAccessor.addZone({
+                        afterLineNumber: item.state.comment.lineNumber,
+                        heightInLines: item.state.numberOfLines,
                         domNode: domNode,
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
@@ -18717,7 +18744,7 @@ var ReviewManager = /** @class */ (function () {
         else {
             currentLine = this.editor.getPosition().lineNumber;
         }
-        var comments = this.comments.filter(function (c) {
+        var comments = Object.values(this.commentState).map(function (cs) { return cs.comment; }).filter(function (c) {
             if (c.status !== ReviewCommentStatus.deleted && !c.parentId) {
                 if (direction === NavigationDirection.next) {
                     return c.lineNumber > currentLine;
@@ -18746,22 +18773,6 @@ var ReviewManager = /** @class */ (function () {
     return ReviewManager;
 }());
 exports.ReviewManager = ReviewManager;
-var NavigationDirection;
-(function (NavigationDirection) {
-    NavigationDirection[NavigationDirection["next"] = 1] = "next";
-    NavigationDirection[NavigationDirection["prev"] = 2] = "prev";
-})(NavigationDirection || (NavigationDirection = {}));
-var EditorMode;
-(function (EditorMode) {
-    EditorMode[EditorMode["editComment"] = 1] = "editComment";
-    EditorMode[EditorMode["toolbar"] = 2] = "toolbar";
-})(EditorMode || (EditorMode = {}));
-var ReviewCommentRenderState;
-(function (ReviewCommentRenderState) {
-    ReviewCommentRenderState[ReviewCommentRenderState["dirty"] = 1] = "dirty";
-    ReviewCommentRenderState[ReviewCommentRenderState["hidden"] = 2] = "hidden";
-    ReviewCommentRenderState[ReviewCommentRenderState["normal"] = 3] = "normal";
-})(ReviewCommentRenderState || (ReviewCommentRenderState = {}));
 
 
 /***/ })

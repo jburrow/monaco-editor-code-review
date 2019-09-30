@@ -22,7 +22,24 @@ export interface ReviewComment {
 
 export enum ReviewCommentStatus {
     active = 1,
-    deleted = 2
+    deleted = 2,
+    edit = 3,
+}
+
+enum NavigationDirection {
+    next = 1,
+    prev = 2
+}
+
+enum EditorMode {
+    editComment = 1,
+    toolbar = 2
+}
+
+enum ReviewCommentRenderState {
+    dirty = 1,
+    hidden = 2,
+    normal = 3
 }
 
 interface CodeSelection {
@@ -36,11 +53,15 @@ class ReviewCommentState {
     viewZoneId: string;
     renderStatus: ReviewCommentRenderState;
     numberOfLines: number;
+    comment: ReviewComment;
+    history: ReviewComment[];
 
-    constructor(numberOfLines: number) {
+    constructor(comment: ReviewComment, numberOfLines: number) {
         this.renderStatus = ReviewCommentRenderState.normal;
         this.viewZoneId = null;
+        this.comment = comment;
         this.numberOfLines = numberOfLines;
+        this.history = []
     }
 }
 
@@ -54,8 +75,7 @@ export function createReviewManager(editor: any, currentUser: string, comments?:
 
 interface ReviewCommentIterItem {
     depth: number;
-    comment: ReviewComment,
-    viewState: ReviewCommentState
+    state: ReviewCommentState
 }
 
 interface OnCommentsChanged {
@@ -116,7 +136,6 @@ export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
     editorConfig: monacoEditor.editor.InternalEditorOptions;
-    comments: ReviewComment[];
     commentState: { [reviewCommentId: string]: ReviewCommentState };
 
     activeComment?: ReviewComment;
@@ -136,7 +155,6 @@ export class ReviewManager {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
-        this.comments = [];
         this.commentState = {};
         this.widgetInlineToolbar = null;
         this.widgetInlineCommentEditor = null;
@@ -147,14 +165,15 @@ export class ReviewManager {
         this.currentCommentDecorations = []
         this.currentLineDecorationLineNumber = null;
 
-        this.addActions();
-        this.createInlineToolbarWidget();
-        this.createInlineEditorWidget();
-
-        this.editor.onMouseDown(this.handleMouseDown.bind(this));
-
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
+        this.editor.onMouseDown(this.handleMouseDown.bind(this));
+        
+        this.createInlineToolbarWidget();
+        this.createInlineEditorWidget();
+        this.addActions();
+
+
 
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
@@ -170,7 +189,6 @@ export class ReviewManager {
                 }
             }
 
-            this.comments = comments || [];
             this.commentState = {};
 
             // Check all comments that they have unique and present id's
@@ -187,12 +205,12 @@ export class ReviewManager {
                     console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', comment.id, ' due to collision');
                 }
 
-                this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(comment.text));
+                this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(comment.text));
             }
 
             this.refreshComments();
 
-            console.debug('Comments Loaded: ', this.comments.length);
+            console.debug('Comments Loaded: ', this.commentState.length);
         })
     }
 
@@ -386,9 +404,9 @@ export class ReviewManager {
 
 
     filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
-        for (const comment of this.comments) {
-            if (lineNumbers.indexOf(comment.lineNumber) > -1) {
-                fn(comment);
+        for (const cs of Object.values(this.commentState)) {
+            if (lineNumbers.indexOf(cs.comment.lineNumber) > -1) {
+                fn(cs.comment);
             }
         }
     }
@@ -420,7 +438,7 @@ export class ReviewManager {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
-                for (const comment of this.comments) {
+                for (const comment of Object.values(this.commentState).map(c => c.comment)) {
                     const viewState = this.commentState[comment.id];
                     if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = comment;
@@ -442,11 +460,11 @@ export class ReviewManager {
 
         if (this.activeComment) {
             for (var item of this.iterateComments()) {
-                if (item.comment.lineNumber == this.activeComment.lineNumber) {
+                if (item.state.comment.lineNumber == this.activeComment.lineNumber) {
                     count++;
                 }
 
-                if (item.comment == this.activeComment) {
+                if (item.state.comment == this.activeComment) {
                     idx = count + 0;
                 }
             }
@@ -510,57 +528,69 @@ export class ReviewManager {
             parentId: this.activeComment ? this.activeComment.id : null
         };
 
-        this.commentState[comment.id] = new ReviewCommentState(this.calculateNumberOfLines(text));
-        this.comments.push(comment);
+        this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
 
+        // Make all comments for this line as dirty.
         this.filterAndMapComments([ln], (comment) => {
             this.commentState[comment.id].renderStatus = ReviewCommentRenderState.dirty;
         });
 
         this.refreshComments()
         this.layoutInlineToolbar();
-
         if (this.onChange) {
-            this.onChange(this.comments);
+            this.onChange(Object.values(this.commentState).map(cs => cs.comment));
         }
 
         return comment;
     }
 
-    private recurseComments(allComments: { [key: string]: ReviewComment }, filterFn: { (c: ReviewComment): boolean }, depth: number, results: ReviewCommentIterItem[]) {
-        const comments = Object.values(allComments).filter(filterFn).sort((a, b) => a.dt > b.dt ? 1 : -1);
-        for (const comment of comments) {
+    private compareComments(a: ReviewCommentState, b: ReviewCommentState) {
+        return a.comment.dt > b.comment.dt ? 1 : -1;
+    }
+
+    private recurseComments(allComments: { [key: string]: ReviewCommentState }, filterFn: { (c: ReviewCommentState): boolean }, depth: number, results: ReviewCommentIterItem[]) {
+        const comments = Object.values(allComments).filter(filterFn).sort(this.compareComments);
+        for (const cs of comments) {
+            const comment = cs.comment;
             delete allComments[comment.id];
 
             results.push({
                 depth,
-                comment,
-                viewState: this.commentState[comment.id]
+                state: cs
             });
             this.recurseComments(allComments,
-                (x) => x.parentId === comment.id,
+                (x) => x.comment.parentId === comment.id,
                 depth + 1,
                 results);
         }
     }
 
-    private iterateComments(filterFn?: { (c: ReviewComment): boolean }) {
-        if (!filterFn) {
-            filterFn = (c: ReviewComment) => !c.parentId;
-        }
-        const tmpComments: { [key: string]: ReviewComment } = (this.comments).reduce((obj, item) => {
-            obj[item.id] = item
-            return obj
-        }, {});
+    private processEdits(allComments: { [key: string]: ReviewCommentState }) {
+        const edits = Object.values(allComments).filter(c => c.comment.status === ReviewCommentStatus.edit).sort(this.compareComments);
+        for (const e of edits) {
+            if (allComments[e.comment.parentId]) {
 
+
+                allComments[e.comment.parentId].history.push(allComments[e.comment.parentId].comment);
+                allComments[e.comment.parentId] = e;
+
+            }
+        }
+    }
+
+    private iterateComments(filterFn?: { (c: ReviewCommentState): boolean }) {
+        if (!filterFn) {
+            filterFn = (cs: ReviewCommentState) => !cs.comment.parentId;
+        }
+        const copyCommentState = { ...this.commentState };
         const results: ReviewCommentIterItem[] = [];
-        this.recurseComments(tmpComments, filterFn, 0, results);
+        this.recurseComments(copyCommentState, filterFn, 0, results);
         return results;
     }
 
     removeComment(comment: ReviewComment) {
-        for (const item of this.iterateComments((c) => c.id === comment.id)) {
-            item.comment.status = ReviewCommentStatus.deleted;
+        for (const item of this.iterateComments((cs) => cs.comment.id === comment.id)) {
+            item.state.comment.status = ReviewCommentStatus.deleted;
         }
         if (this.activeComment == comment) {
             this.setActiveComment(null);
@@ -569,7 +599,7 @@ export class ReviewManager {
 
         this.refreshComments();
         if (this.onChange) {
-            this.onChange(this.comments);
+            this.onChange(Object.values(this.commentState).map(cs => cs.comment));
         }
     }
 
@@ -591,38 +621,38 @@ export class ReviewManager {
             const lineNumbers: { [key: number]: CodeSelection } = {};
 
             for (const item of this.iterateComments()) {
-                if (item.comment.status && item.comment.status === ReviewCommentStatus.deleted) {
-                    console.debug('Zone.Delete', item.comment.id);
+                if (item.state.comment.status && item.state.comment.status === ReviewCommentStatus.deleted) {
+                    console.debug('Zone.Delete', item.state.comment.id);
 
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
+                    changeAccessor.removeZone(item.state.viewZoneId);
                     continue;
                 }
 
-                if (item.viewState.renderStatus === ReviewCommentRenderState.hidden) {
-                    console.debug('Zone.Hidden', item.comment.id);
+                if (item.state.renderStatus === ReviewCommentRenderState.hidden) {
+                    console.debug('Zone.Hidden', item.state.comment.id);
 
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
-                    item.viewState.viewZoneId = null;
+                    changeAccessor.removeZone(item.state.viewZoneId);
+                    item.state.viewZoneId = null;
 
                     continue;
                 }
 
-                if (item.viewState.renderStatus === ReviewCommentRenderState.dirty) {
-                    console.debug('Zone.Dirty', item.comment.id);
+                if (item.state.renderStatus === ReviewCommentRenderState.dirty) {
+                    console.debug('Zone.Dirty', item.state.comment.id);
 
-                    changeAccessor.removeZone(item.viewState.viewZoneId);
-                    item.viewState.viewZoneId = null;
-                    item.viewState.renderStatus = ReviewCommentRenderState.normal;
+                    changeAccessor.removeZone(item.state.viewZoneId);
+                    item.state.viewZoneId = null;
+                    item.state.renderStatus = ReviewCommentRenderState.normal;
                 }
 
-                if (!lineNumbers[item.comment.lineNumber]) {
-                    lineNumbers[item.comment.lineNumber] = item.comment.selection;
+                if (!lineNumbers[item.state.comment.lineNumber]) {
+                    lineNumbers[item.state.comment.lineNumber] = item.state.comment.selection;
                 }
 
-                if (item.viewState.viewZoneId == null) {
-                    console.debug('Zone.Create', item.comment.id);
+                if (item.state.viewZoneId == null) {
+                    console.debug('Zone.Create', item.state.comment.id);
 
-                    const isActive = this.activeComment == item.comment;
+                    const isActive = this.activeComment == item.state.comment;
 
                     const domNode = document.createElement('span') as HTMLSpanElement;
                     domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "px";
@@ -631,23 +661,23 @@ export class ReviewManager {
 
                     const author = document.createElement('span') as HTMLSpanElement;
                     author.className = 'reviewComment author'
-                    author.innerText = `${item.comment.author || ' '} at `;
+                    author.innerText = `${item.state.comment.author || ' '} at `;
 
                     const dt = document.createElement('span') as HTMLSpanElement;
                     dt.className = 'reviewComment dt'
-                    dt.innerText = this.formatDate(item.comment.dt);
+                    dt.innerText = this.formatDate(item.state.comment.dt);
 
                     const text = document.createElement('span') as HTMLSpanElement;
                     text.className = 'reviewComment text'
-                    text.innerText = `${item.comment.text} by `;
+                    text.innerText = `${item.state.comment.text} by `;
 
                     domNode.appendChild(text);
                     domNode.appendChild(author);
                     domNode.appendChild(dt);
 
-                    item.viewState.viewZoneId = changeAccessor.addZone({
-                        afterLineNumber: item.comment.lineNumber,
-                        heightInLines: item.viewState.numberOfLines,
+                    item.state.viewZoneId = changeAccessor.addZone({
+                        afterLineNumber: item.state.comment.lineNumber,
+                        heightInLines: item.state.numberOfLines,
                         domNode: domNode,
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
@@ -743,7 +773,7 @@ export class ReviewManager {
             currentLine = this.editor.getPosition().lineNumber;
         }
 
-        const comments = this.comments.filter((c) => {
+        const comments = Object.values(this.commentState).map(cs => cs.comment).filter((c) => {
             if (c.status !== ReviewCommentStatus.deleted && !c.parentId) {
                 if (direction === NavigationDirection.next) {
                     return c.lineNumber > currentLine;
@@ -772,18 +802,3 @@ export class ReviewManager {
 }
 
 
-enum NavigationDirection {
-    next = 1,
-    prev = 2
-}
-
-enum EditorMode {
-    editComment = 1,
-    toolbar = 2
-}
-
-enum ReviewCommentRenderState {
-    dirty = 1,
-    hidden = 2,
-    normal = 3
-}

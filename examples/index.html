@@ -3,12 +3,18 @@
     <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
 
     <link rel="stylesheet" type="text/css" href="../dist/index.css" />
-
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
     <style>
       body {
         height: calc(100% - 20px);
         display: flex;
         flex-direction: column;
+        margin: 5px;
       }
 
       .editor {
@@ -18,56 +24,42 @@
 
       h5 {
         height: 20px;
-        margin: 1px;
+        margin-bottom: 5px;
+        margin-top: 5px;
       }
-
       .summary {
         height: auto;
         max-height: 200px;
         min-height: 100px;
         padding: 10px;
         overflow: auto;
-      }
-
-      .myLineDecoration {
-        background: lightblue;
-        width: 5px !important;
-        margin-left: 3px;
+        font-size: 12px;
+        text-overflow: clip;
       }
     </style>
   </head>
 
   <body>
-    <div style="display:flex">
-      <button onclick="setView('standard')">Editor</button>
-      <button onclick="setView('standard-readonly')">Editor - Readonly</button>
-      <button onclick="setView('inline')">Diff - Inline</button>
-      <button onclick="setView('side-by-side')">Diff - Side-by-Side</button>
-      <button
-        onclick="generateDifferentComments()"
-        style="background-color:lightgoldenrodyellow"
-      >
+    <div >
+      <button onclick="setView('standard')" class="btn btn-primary">Editor</button>
+      <button onclick="setView('standard-readonly')" class="btn btn-primary">
+        Editor - Readonly
+      </button>
+      <button onclick="setView('inline')" class="btn btn-primary">Diff - Inline</button>
+      <button onclick="setView('side-by-side')" class="btn btn-primary">Diff - Side-by-Side</button>
+      <button onclick="generateDifferentComments()" class="btn btn-secondary">
         Change Comments (in-place)
       </button>
-      <button
-        onclick="generateDifferentContents()"
-        style="background-color:lightgoldenrodyellow"
-      >
+      <button onclick="generateDifferentContents()" class="btn btn-secondary">
         Change Contents (in-place)
       </button>
-      <button
-        onclick="toggleTheme()"
-        style="background-color:lightgoldenrodyellow"
-      >
+      <button onclick="toggleTheme()" class="btn btn-secondary">
         Toggle Theme
       </button>
-      <button
-        onclick="clearComments()"
-        style="background-color:lightgoldenrodyellow"
-      >
+      <button onclick="clearComments()" class="btn btn-secondary">
         Clear Comments
       </button>
-      <button onclick="generateLineDecorations()">
+      <button onclick="generateLineDecorations()" class="btn btn-secondary">
         Generate Margin Decorators
       </button>
     </div>

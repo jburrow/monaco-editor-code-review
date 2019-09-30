@@ -17,7 +17,7 @@ interface WindowDoc {
 const win = (window as any) as WindowDoc;
 let reviewManager: ReviewManager = null;
 let currentMode: string = '';
-let currentEditor: any= null;
+let currentEditor: any = null;
 let theme = 'vs-dark';
 
 function ensureMonacoIsAvailable() {
@@ -61,7 +61,7 @@ function setView(mode: string) {
                 readOnly: mode === "standard-readonly",
                 theme: theme
             }
-        );        
+        );
         initReviewManager(currentEditor);
     } else {
         var originalModel = win.monaco.editor.createModel(
@@ -128,8 +128,8 @@ async function init() {
         paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
     });
 
-    win.require(["vs/editor/editor.main"], function () {        
-        setView("standard");       
+    win.require(["vs/editor/editor.main"], function () {
+        setView("standard");
     });
 }
 
@@ -146,7 +146,7 @@ function initReviewManager(editor: any) {
         }
     );
 
-    renderComments(reviewManager.comments);
+    renderComments(Object.values(reviewManager.commentState).map(cs => cs.comment));
 }
 
 function toggleTheme() {
@@ -156,7 +156,7 @@ function toggleTheme() {
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
-    renderComments(reviewManager.comments);
+    renderComments(Object.values(reviewManager.commentState).map(cs => cs.comment));
 }
 
 function createRandomComments(): ReviewComment[] {
@@ -220,7 +220,8 @@ function createRandomComments(): ReviewComment[] {
 
 function renderComments(comments: ReviewComment[]) {
     comments = comments || [];
-    document.getElementById("summaryEditor").innerHTML = reviewManager.comments
+
+    document.getElementById("summaryEditor").innerHTML = Object.values(reviewManager.commentState).map(cs => cs.comment)
         .map(
             comment =>
                 `<div style="display:flex;height:16px;text-decoration:${comment.status && comment.status === 2 ? 'line-through' : 'normal'}">
@@ -242,12 +243,12 @@ function clearComments() {
 }
 
 function generateLineDecorations() {
-    let model :any=null;
+    let model: any = null;
     if (currentMode.startsWith("standard")) {
-        const e = (currentEditor );
+        const e = (currentEditor);
         model = e.getModel();
     } else {
-        const e = (currentEditor );
+        const e = (currentEditor);
         model = e.getModel().modified;
     }
 

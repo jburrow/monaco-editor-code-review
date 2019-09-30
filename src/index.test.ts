@@ -15,8 +15,9 @@ function getMockEditor() {
     const editor = {
         _zoneId: 0,
         _zones: {},
+        _actions: [],
         focus: () => null,
-        addAction: () => null,
+        addAction: (action) => editor._actions.push(action),
         getConfiguration: () => ({ fontInfo: { lineHeight: 19 } }),
         getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
@@ -65,6 +66,8 @@ test('Widget Coverage', () => {
 
     rm.activeComment = null;
     rm.widgetInlineCommentEditor.getPosition();
+
+    editor._actions.map(action=>action.run());
 })
 
 test('createReviewManager to editor and add comments', () => {
@@ -80,13 +83,13 @@ test('createReviewManager to editor and add comments', () => {
 
     const num2 = rm.addComment(2, "#2");
     expect(num2.parentId).toBe(null);
-    expect(rm.comments.length).toBe(2);
+    expect(Object.keys(rm.commentState).length).toBe(2);
     expect(Object.keys(editor._zones).length).toBe(2);
 
     rm.setActiveComment(num2);
     const num3 = rm.addComment(null, "#2.2");
     expect(num3.parentId).toBe(num2.id);
-    expect(rm.comments.length).toBe(3);
+    expect(Object.keys(rm.commentState).length).toBe(3);
     expect(Object.keys(editor._zones).length).toBe(3);
 
     rm.setActiveComment(null);
@@ -102,8 +105,7 @@ test('load clears the comments', () => {
 
     const rm = createReviewManager(editor, 'current.user', [comment], (comments) => { });
     rm.load([]);
-    expect(Object.keys(editor._zones).length).toBe(0);
-    expect(rm.comments.length).toBe(0);
+    expect(Object.keys(editor._zones).length).toBe(0);    
     expect(Object.keys(rm.commentState).length).toBe(0);
 });
 
@@ -117,6 +119,9 @@ test('Remove a comment via the widgets', () => {
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     const comment = rm.addComment(1, '');
+    console.log('##1',comment);
+    console.log('##2',rm.commentState);
+    
     const viewZoneId = rm.commentState[comment.id].viewZoneId;
 
     // Simulate a click on the comment
@@ -150,8 +155,10 @@ test('Enter Comment Widgets', () => {
 
     rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(2); //Toolbar    
-    expect(rm.commentState[rm.comments[0].id].viewZoneId).toBe(0);
-    expect(rm.comments[0].text).toBe('#5');
+    
+    const cs = Object.values(rm.commentState)[0];
+    expect(cs.comment.text).toBe('#5');
+    expect(cs.viewZoneId).toBe(0);
 });
 
 test('Navigation - Forward and Back', () => {
