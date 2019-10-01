@@ -234,9 +234,9 @@ export class ReviewManager {
                 }
 
                 parent.history.push(c);
-                //Copy the comment applying the edit - however preserve id, parentId, and dt from the original
-                parent.comment = { ...parent.comment, text: c.text, author: c.author };
-                // console.debug('here', e, parent);
+                
+                //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
+                parent.comment = { ...parent.comment, text: c.text, author: c.author };                
             }
             console.log('Removing ', c.id, ' from comments because it has been processed as a edit')
             delete this.commentState[c.id]; //mutation of state - removal of comment as it is edit.            
