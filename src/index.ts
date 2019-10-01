@@ -142,7 +142,7 @@ export class ReviewManager {
     editor: monacoEditor.editor.IStandaloneCodeEditor;
     editorConfig: monacoEditor.editor.InternalEditorOptions;
     commentState: { [reviewCommentId: string]: ReviewCommentState };
-
+    comments: ReviewComment[];
     activeComment?: ReviewComment;
     widgetInlineToolbar: monacoEditor.editor.IContentWidget;
     widgetInlineCommentEditor: monacoEditor.editor.IContentWidget;
@@ -169,6 +169,7 @@ export class ReviewManager {
         this.currentLineDecorations = [];
         this.currentCommentDecorations = []
         this.currentLineDecorationLineNumber = null;
+        this.comments = [];
 
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
@@ -210,8 +211,8 @@ export class ReviewManager {
 
                 this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(comment.text));
             }
-
-            this.processEdits(this.commentState);
+            this.comments = comments;
+            this.processEdits(comments);
 
             this.refreshComments();
 
@@ -222,29 +223,30 @@ export class ReviewManager {
     //TODO ...
     //TODO - type - TODO, QUESTION
 
-    private processEdits(allComments: { [key: string]: ReviewCommentState }) {
-        const edits = Object.values(allComments).filter(c => c.comment.status === ReviewCommentStatus.edit).sort(this.compareComments);
-        for (const e of edits) {
-            const parent = allComments[e.comment.parentId];
+    private processEdits(comments: ReviewComment[]) {
+        const edits = comments.filter(c => c.status === ReviewCommentStatus.edit)//.sort(this.compareComments);
+
+        for (const c of edits) {            
+            const parent = this.commentState[c.parentId];
             if (parent) {
-                if(parent.history.length === 0){
+                if (parent.history.length === 0) {
                     parent.history.push(parent.comment);
                 }
-                
-                parent.history.push(e.comment);
+
+                parent.history.push(c);
                 //Copy the comment applying the edit - however preserve id, parentId, and dt from the original
-                parent.comment = { ...parent.comment, text:e.comment.text, author:e.comment.author};
+                parent.comment = { ...parent.comment, text: c.text, author: c.author };
                 // console.debug('here', e, parent);
             }
-            console.log('Removing ', e.comment.id, ' from comments because it has been processed as a edit')
-            delete allComments[e.comment.id]; //mutation of state - removal of comment as it is edit.
+            console.log('Removing ', c.id, ' from comments because it has been processed as a edit')
+            delete this.commentState[c.id]; //mutation of state - removal of comment as it is edit.            
         }
         console.log('Processed', edits.length, 'editted comments');
     }
 
 
     calculateNumberOfLines(text: string): number {
-        return text.split(/\r*\n/).length;
+        return text.split(/\r*\n/).length + 1;
     }
 
     getThemedColor(name: string): string {
@@ -322,7 +324,6 @@ export class ReviewManager {
     }
 
     handleAddComment() {
-        
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         const text = this.textarea.value;
         const selection = this.activeComment ? null : this.editor.getSelection() as CodeSelection;
@@ -334,8 +335,10 @@ export class ReviewManager {
     handleTextAreaKeyDown(e: KeyboardEvent) {
         if (e.code === "Escape") {
             this.handleCancel();
+            e.preventDefault();
         } else if (e.code === "Enter" && e.ctrlKey) {
             this.handleAddComment();
+            e.preventDefault();
         }
     }
 
@@ -445,7 +448,6 @@ export class ReviewManager {
             });
         }
     }
-
 
     filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
         for (const cs of Object.values(this.commentState)) {
@@ -580,10 +582,10 @@ export class ReviewManager {
             parentId: this.activeComment ? this.activeComment.id : null,
         };
 
-
+        this.comments.push(comment);
         this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
-        
-        this.processEdits(this.commentState);
+
+        this.processEdits([comment]);
 
         // Make all comments for this line as dirty.
         this.filterAndMapComments([ln], (comment) => {
@@ -594,7 +596,7 @@ export class ReviewManager {
         this.layoutInlineToolbar();
 
         if (this.onChange) {
-            this.onChange(Object.values(this.commentState).map(cs => cs.comment));
+            this.onChange(this.comments);
         }
 
         return comment;
@@ -633,7 +635,7 @@ export class ReviewManager {
 
     removeComment(comment: ReviewComment) {
         for (const item of this.iterateComments((cs) => cs.comment.id === comment.id)) {
-            item.state.comment.status = ReviewCommentStatus.deleted;
+            item.state.comment.status = ReviewCommentStatus.deleted; //WRONG - We are mutating the comment - we should be creating a new one ...
         }
         if (this.activeComment == comment) {
             this.setActiveComment(null);
@@ -642,7 +644,7 @@ export class ReviewManager {
 
         this.refreshComments();
         if (this.onChange) {
-            this.onChange(Object.values(this.commentState).map(cs => cs.comment));
+            this.onChange(this.comments);
         }
     }
 
@@ -654,6 +656,13 @@ export class ReviewManager {
         } else {
             return dt;
         }
+    }
+
+    private createElement(text: string, className: string, tagName: string = null) {
+        const span = document.createElement(tagName || 'span') as HTMLSpanElement;
+        span.className = className;
+        span.innerText = text;
+        return span;
     }
 
     refreshComments() {
@@ -697,23 +706,18 @@ export class ReviewManager {
 
                     const isActive = this.activeComment == item.state.comment;
 
-                    const domNode = document.createElement('span') as HTMLSpanElement;
+                    const domNode = this.createElement("", `reviewComment ${isActive ? 'active' : ' inactive'}`);
                     domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "px";
                     domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
-                    domNode.className = `reviewComment ${isActive ? 'active' : ' inactive'}`;
 
-                    const createElement = (text, className) => {
-                        const span = document.createElement('span') as HTMLSpanElement;
-                        span.className = className;
-                        span.innerText = text;
-                        return span;
+                    // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
+
+                    domNode.appendChild(this.createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
+                    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
+                    if (item.state.history.length) {
+                        domNode.appendChild(this.createElement(`Edited #${item.state.history.length} Times`, 'reviewComment history'))
                     }
-
-                    domNode.appendChild(createElement(`${item.state.comment.id}`, 'reviewComment id'))
-                    domNode.appendChild(createElement(`${item.state.history.length}`, 'reviewComment history'))
-                    domNode.appendChild(createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
-                    domNode.appendChild(createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
-                    domNode.appendChild(createElement(`${item.state.comment.text} by `, 'reviewComment text'))
+                    domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'))
 
 
                     item.state.viewZoneId = changeAccessor.addZone({

@@ -36,11 +36,15 @@
         font-size: 12px;
         text-overflow: clip;
       }
+
+      .btn{
+        margin-top:5px;
+      }
     </style>
   </head>
 
   <body>
-    <div >
+    <div class="buttons">
       <button onclick="setView('standard')" class="btn btn-primary">Editor</button>
       <button onclick="setView('standard-readonly')" class="btn btn-primary">
         Editor - Readonly
@@ -50,18 +54,13 @@
       <button onclick="generateDifferentComments()" class="btn btn-secondary">
         Change Comments (in-place)
       </button>
-      <button onclick="generateDifferentContents()" class="btn btn-secondary">
-        Change Contents (in-place)
-      </button>
       <button onclick="toggleTheme()" class="btn btn-secondary">
         Toggle Theme
       </button>
       <button onclick="clearComments()" class="btn btn-secondary">
         Clear Comments
       </button>
-      <button onclick="generateLineDecorations()" class="btn btn-secondary">
-        Generate Margin Decorators
-      </button>
+
     </div>
     <h5>
       Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment

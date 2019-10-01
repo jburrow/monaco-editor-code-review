@@ -9,7 +9,6 @@ interface WindowDoc {
     setView: (mode: string) => void;
     generateDifferentComments: () => void;
     generateDifferentContents: () => void;
-    generateLineDecorations: () => void;
     toggleTheme: () => void;
     clearComments: () => void;
 }
@@ -178,8 +177,8 @@ function createRandomComments(): ReviewComment[] {
         },
         {
             id: "id-2-edit",
-            parentId:"id-2",
-            status:ReviewCommentStatus.edit,
+            parentId: "id-2",
+            status: ReviewCommentStatus.edit,
             lineNumber: firstLine + 5,
             author: "another reviewer",
             dt: '2019-06-01T00:00:00.000Z',
@@ -227,20 +226,33 @@ function createRandomComments(): ReviewComment[] {
 }
 
 function renderComments(comments: ReviewComment[]) {
+    console.log('Render Comments #', comments.length, comments);
+    
     comments = comments || [];
 
-    document.getElementById("summaryEditor").innerHTML = Object.values(reviewManager.commentState).map(cs => cs.comment)
+    const header = {
+        author: "Author",
+        dt: "Created At",
+        id: "Id",
+        parentId: "ParentId",
+        lineNumber: "Line Number",
+        selection: "",
+        status: "Status",
+        text: "Text"
+    }
+
+    document.getElementById("summaryEditor").innerHTML = [header as any].concat(comments as any[])
         .map(
             comment =>
-                `<div style="display:flex;height:16px;text-decoration:${comment.status && comment.status === ReviewCommentStatus.deleted ? 'line-through' : 'normal'}">
-                    <div style="width:100px;overflow:hidden;">${comment.id}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.parentId || ''}</div>
-                    <div style="width:100px;overflow:hidden;">${ {undefined:'active', 1:'active', 2:'deleted', 3:'edit'}[comment.status]}</div>
+                `<div style="text-align:left;display:flex;height:16px;text-decoration:${comment.status && comment.status === ReviewCommentStatus.deleted ? 'line-through' : 'normal'}">
+                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>
+                    <div style="width:100px;overflow:hidden;">${comment.parentId || '&nbsp;'}</div>
+                    <div style="width:100px;overflow:hidden;">${ { undefined: 'active', 1: 'active', 2: 'deleted', 3: 'edit' }[comment.status] || comment.status}</div>
                     <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
                     <div style="width:100px;overflow:hidden;">${comment.author}</div> 
                     <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
                     <div style="width:auto;overflow:hidden;">${comment.text}</div>                    
-                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment.selection || '')}</div>                    
+                    <div style="width:auto;overflow:hidden;">${comment.selection && JSON.stringify(comment.selection) || '&nbsp;'}</div>                    
                 </div>`
         )
         .join("");
@@ -252,29 +264,12 @@ function clearComments() {
     renderComments([]);
 }
 
-function generateLineDecorations() {
-    let model: any = null;
-    if (currentMode.startsWith("standard")) {
-        const e = (currentEditor);
-        model = e.getModel();
-    } else {
-        const e = (currentEditor);
-        model = e.getModel().modified;
-    }
 
-    model.deltaDecorations([], [
-        {
-            range: new win.monaco.Range(3, 1, 5, 1),
-            options: { isWholeLine: true, linesDecorationsClassName: 'myLineDecoration' }
-        },
-    ]);
-}
 
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.toggleTheme = toggleTheme;
 win.clearComments = clearComments;
-win.generateLineDecorations = generateLineDecorations;
 init();
 

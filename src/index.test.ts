@@ -177,7 +177,7 @@ test('Enter Comment Widgets', () => {
     rm.textarea.value = 'xxxx'
     rm.setEditorMode(EditorMode.insertComment); // Edit Mode    
     expect(rm.textarea.value).toBe(""); //Toolbar
-    rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false } as any) as KeyboardEvent);
+    rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false, preventDefault:()=>null } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 
     expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
@@ -186,7 +186,7 @@ test('Enter Comment Widgets', () => {
     rm.setEditorMode(EditorMode.insertComment);
     rm.textarea.value = '#5';
 
-    rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true } as any) as KeyboardEvent);
+    rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true, preventDefault:()=>null } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar    
 
     const cs = Object.values(rm.commentState)[0];

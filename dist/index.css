@@ -29,12 +29,9 @@
 
 .reviewComment {
   font-size: 12px;
-  color:black;
-  padding-left:5px;
-  padding-right:5px;
-  /* background-color: red; */
+  
 }
-/**/
+/*
 .reviewComment.active {
    background-color: orangered; 
 }
@@ -63,7 +60,7 @@
 .reviewComment.history { 
   background-color: #FF0AAA;  
 }
-
+*/
 
 .reviewComment.selection {
   border-bottom: 2px dotted darkorange; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
