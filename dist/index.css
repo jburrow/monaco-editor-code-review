@@ -29,29 +29,41 @@
 
 .reviewComment {
   font-size: 12px;
+  color:black;
+  padding-left:5px;
+  padding-right:5px;
   /* background-color: red; */
 }
-/*
+/**/
 .reviewComment.active {
    background-color: orangered; 
 }
 
 .reviewComment.inactive {
-   background-color: lightgreen; 
+   background-color: #FF1111; 
 }
 
 .reviewComment.author {
-  background-color: pink;
+  background-color: #FF3333;
 }
 
 .reviewComment.dt {
-  background-color: green;
+  background-color: #FF5555;
 }
 
 .reviewComment.text { 
-  background-color: yellow;
+  background-color: #FF7777;
 }
-*/
+
+.reviewComment.id { 
+  background-color: #FF9999;
+  color:black;
+}
+
+.reviewComment.history { 
+  background-color: #FF0AAA;  
+}
+
 
 .reviewComment.selection {
   border-bottom: 2px dotted darkorange; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/

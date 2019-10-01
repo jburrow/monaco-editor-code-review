@@ -1,4 +1,4 @@
-import { ReviewComment, createReviewManager, ReviewManagerConfig } from "./index";
+import { ReviewComment, createReviewManager, EditorMode, ReviewCommentStatus } from "./index";
 
 interface MonacoWindow {
     monaco: any;
@@ -60,14 +60,14 @@ test('Widget Coverage', () => {
     rm.widgetInlineToolbar.getId();
     rm.widgetInlineToolbar.getPosition();
 
-    rm.setEditorMode(1);
+    rm.setEditorMode(EditorMode.insertComment)
     rm.widgetInlineCommentEditor.getId();
     rm.widgetInlineCommentEditor.getPosition();
 
     rm.activeComment = null;
     rm.widgetInlineCommentEditor.getPosition();
 
-    editor._actions.map(action=>action.run());
+    editor._actions.map(action => action.run());
 })
 
 test('createReviewManager to editor and add comments', () => {
@@ -105,7 +105,7 @@ test('load clears the comments', () => {
 
     const rm = createReviewManager(editor, 'current.user', [comment], (comments) => { });
     rm.load([]);
-    expect(Object.keys(editor._zones).length).toBe(0);    
+    expect(Object.keys(editor._zones).length).toBe(0);
     expect(Object.keys(rm.commentState).length).toBe(0);
 });
 
@@ -119,15 +119,20 @@ test('Remove a comment via the widgets', () => {
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     const comment = rm.addComment(1, '');
-    console.log('##1',comment);
-    console.log('##2',rm.commentState);
-    
+    console.log('##1', comment);
+    console.log('##2', rm.commentState);
+
     const viewZoneId = rm.commentState[comment.id].viewZoneId;
 
     // Simulate a click on the comment
-    rm.handleMouseDown({ target: { element: { className: "", hasAttribute: () => false }, detail: { viewZoneId: viewZoneId } } })
+    rm.handleMouseDown({
+        target: {
+            element: { className: "", hasAttribute: () => false },
+            detail: { viewZoneId: viewZoneId }
+        }
+    })
     expect(rm.activeComment).toBe(comment);
-    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber);
+    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber-1);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     rm.removeComment(comment);
@@ -137,25 +142,53 @@ test('Remove a comment via the widgets', () => {
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 });
 
+test('Edited Comments', () => {
+    const now = () => new Date("2010-01-01");
+    const editor = getMockEditor();
+    const rm = createReviewManager(editor, 'current.user', [{ id: 'id1', author: 'author#1', dt: now(), lineNumber: 1, text: "text" }]);
+    rm.getDateTimeNow = now
+
+    expect(Object.values(rm.commentState).length).toBe(1);
+    const comment = Object.values(rm.commentState)[0].comment;
+    rm.setActiveComment(comment);
+    rm.setEditorMode(EditorMode.editComment);
+
+    rm.addComment(null, 'editted');
+
+    const expectedEdittedComment = {
+        "author": "current.user", //Copied from edit
+        "dt": rm.getDateTimeNow(), //Copied from edit
+        "id": comment.id,
+        "lineNumber": comment.lineNumber,                    
+        "text": "editted", //Copied from edit
+    }
+
+    const comments = Object.values(rm.commentState);
+    expect(comments.length).toBe(1);
+    expect(comments[0].comment).toStrictEqual(expectedEdittedComment);
+    expect(comments[0].history.length).toBe(2);
+});
+
+
 test('Enter Comment Widgets', () => {
     const editor = getMockEditor();
     const rm = createReviewManager(editor, 'current.user');
 
     rm.textarea.value = 'xxxx'
-    rm.setEditorMode(1); // Edit Mode    
+    rm.setEditorMode(EditorMode.insertComment); // Edit Mode    
     expect(rm.textarea.value).toBe(""); //Toolbar
     rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false } as any) as KeyboardEvent);
-    expect(rm.editorMode).toBe(2); //Toolbar
+    expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 
     expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
-    rm.setEditorMode(1);
+    rm.setEditorMode(EditorMode.insertComment);
     rm.textarea.value = '#5';
 
     rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true } as any) as KeyboardEvent);
-    expect(rm.editorMode).toBe(2); //Toolbar    
-    
+    expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar    
+
     const cs = Object.values(rm.commentState)[0];
     expect(cs.comment.text).toBe('#5');
     expect(cs.viewZoneId).toBe(0);

@@ -31,9 +31,10 @@ enum NavigationDirection {
     prev = 2
 }
 
-enum EditorMode {
-    editComment = 1,
-    toolbar = 2
+export enum EditorMode {
+    insertComment = 1,
+    editComment = 2,
+    toolbar = 3
 }
 
 enum ReviewCommentRenderState {
@@ -100,10 +101,12 @@ interface ReviewManagerConfigPrivate {
     rulerMarkerColor: any;
     rulerMarkerDarkColor: any;
     editButtonEnableRemove: boolean;
+    editButtonEnableEdit: boolean;
     commentIndent: number;
     commentIndentOffset: number;
     editButtonAddText: string;
     editButtonRemoveText: string;
+    editButtonEditText: string;
     editButtonOffset: string;
     verticalOffset: number;
     showInRuler: boolean;
@@ -117,7 +120,9 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     editButtonOffset: '-10px',
     editButtonAddText: 'Reply',
     editButtonRemoveText: 'Remove',
+    editButtonEditText: 'Edit',
     editButtonEnableRemove: true,
+    editButtonEnableEdit: true,
     commentIndent: 20,
     commentIndentOffset: 20,
     showInRuler: true,
@@ -168,12 +173,10 @@ export class ReviewManager {
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        
+
         this.createInlineToolbarWidget();
         this.createInlineEditorWidget();
         this.addActions();
-
-
 
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
@@ -208,11 +211,37 @@ export class ReviewManager {
                 this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(comment.text));
             }
 
+            this.processEdits(this.commentState);
+
             this.refreshComments();
 
-            console.debug('Comments Loaded: ', this.commentState.length);
+            console.debug('Comments Loaded: ', Object.values(this.commentState).length);
         })
     }
+
+    //TODO ...
+    //TODO - type - TODO, QUESTION
+
+    private processEdits(allComments: { [key: string]: ReviewCommentState }) {
+        const edits = Object.values(allComments).filter(c => c.comment.status === ReviewCommentStatus.edit).sort(this.compareComments);
+        for (const e of edits) {
+            const parent = allComments[e.comment.parentId];
+            if (parent) {
+                if(parent.history.length === 0){
+                    parent.history.push(parent.comment);
+                }
+                
+                parent.history.push(e.comment);
+                //Copy the comment applying the edit - however preserve id, parentId, and dt from the original
+                parent.comment = { ...parent.comment, text:e.comment.text, author:e.comment.author};
+                // console.debug('here', e, parent);
+            }
+            console.log('Removing ', e.comment.id, ' from comments because it has been processed as a edit')
+            delete allComments[e.comment.id]; //mutation of state - removal of comment as it is edit.
+        }
+        console.log('Processed', edits.length, 'editted comments');
+    }
+
 
     calculateNumberOfLines(text: string): number {
         return text.split(/\r*\n/).length;
@@ -254,7 +283,7 @@ export class ReviewManager {
         add.innerText = this.config.editButtonAddText;
         add.className = 'editButton add'
         add.setAttribute(CONTROL_ATTR_NAME, '');
-        add.onclick = () => this.setEditorMode(EditorMode.editComment);
+        add.onclick = () => this.setEditorMode(EditorMode.insertComment);
         root.appendChild(add);
 
         if (this.config.editButtonEnableRemove) {
@@ -270,6 +299,19 @@ export class ReviewManager {
             root.appendChild(remove);
         }
 
+        if (this.config.editButtonEnableEdit) {
+            const spacer = document.createElement('div') as HTMLDivElement;
+            spacer.innerText = ' '
+            root.appendChild(spacer);
+
+            const edit = document.createElement('span') as HTMLSpanElement;
+            edit.setAttribute(CONTROL_ATTR_NAME, '');
+            edit.innerText = this.config.editButtonEditText;
+            edit.className = 'editButton edit'
+            edit.onclick = () => this.setEditorMode(EditorMode.editComment);
+            root.appendChild(edit);
+        }
+
 
         return root;
     }
@@ -280,11 +322,12 @@ export class ReviewManager {
     }
 
     handleAddComment() {
-        this.setEditorMode(EditorMode.toolbar);
+        
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         const text = this.textarea.value;
         const selection = this.activeComment ? null : this.editor.getSelection() as CodeSelection;
         this.addComment(lineNumber, text, selection);
+        this.setEditorMode(EditorMode.toolbar);
         this.editor.focus();
     }
 
@@ -330,6 +373,7 @@ export class ReviewManager {
 
     createInlineToolbarWidget() {
         const buttonsElement = this.createInlineEditButtonsElement();
+        const this_ = this;
 
         this.widgetInlineToolbar = {
             allowEditorOverflow: true,
@@ -340,10 +384,10 @@ export class ReviewManager {
                 return buttonsElement;
             },
             getPosition: () => {
-                if (this.activeComment && this.editorMode == EditorMode.toolbar) {
+                if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
-                            lineNumber: this.activeComment.lineNumber,
+                            lineNumber: this_.activeComment.lineNumber - 1,
                             column: 1
                         },
                         preference: [POSITION_BELOW]
@@ -368,7 +412,7 @@ export class ReviewManager {
                 return editorElement;
             },
             getPosition: () => {
-                if (this.editorMode == EditorMode.editComment) {
+                if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
                     return {
                         position: {
                             lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber + 1,
@@ -433,7 +477,7 @@ export class ReviewManager {
                 lineNumber: this.currentLineDecorationLineNumber,
                 column: 1
             });
-            this.setEditorMode(EditorMode.editComment);
+            this.setEditorMode(EditorMode.insertComment);
         } else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             let activeComment: ReviewComment = null;
 
@@ -501,18 +545,26 @@ export class ReviewManager {
     }
 
     setEditorMode(mode: EditorMode) {
-        console.debug('setEditorMode', this.activeComment);
+        console.debug('setEditorMode', EditorMode[mode], this.activeComment);
 
         this.editorMode = mode;
 
         this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
 
-        if (mode == EditorMode.editComment) {
-            this.textarea.value = "";
+        if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
+            if (mode == EditorMode.insertComment) {
+                this.textarea.value = "";
+            } else if (mode == EditorMode.editComment) {
+                this.textarea.value = this.activeComment.text;
+            }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
-            setTimeout(() => this.textarea.focus(), 100);
+            setTimeout(() => this.textarea.focus(), 100);//TODO - make configurable
         }
+    }
+
+    getDateTimeNow() {
+        return new Date();
     }
 
     addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewComment {
@@ -521,14 +573,17 @@ export class ReviewManager {
             id: uuid(),
             lineNumber: ln,
             author: this.currentUser,
-            dt: new Date(),
+            dt: this.getDateTimeNow(),
             text: text,
-            status: ReviewCommentStatus.active,
+            status: this.editorMode === EditorMode.editComment ? ReviewCommentStatus.edit : ReviewCommentStatus.active,
             selection: selection,
-            parentId: this.activeComment ? this.activeComment.id : null
+            parentId: this.activeComment ? this.activeComment.id : null,
         };
 
+
         this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
+        
+        this.processEdits(this.commentState);
 
         // Make all comments for this line as dirty.
         this.filterAndMapComments([ln], (comment) => {
@@ -537,6 +592,7 @@ export class ReviewManager {
 
         this.refreshComments()
         this.layoutInlineToolbar();
+
         if (this.onChange) {
             this.onChange(Object.values(this.commentState).map(cs => cs.comment));
         }
@@ -562,19 +618,6 @@ export class ReviewManager {
                 (x) => x.comment.parentId === comment.id,
                 depth + 1,
                 results);
-        }
-    }
-
-    private processEdits(allComments: { [key: string]: ReviewCommentState }) {
-        const edits = Object.values(allComments).filter(c => c.comment.status === ReviewCommentStatus.edit).sort(this.compareComments);
-        for (const e of edits) {
-            if (allComments[e.comment.parentId]) {
-
-
-                allComments[e.comment.parentId].history.push(allComments[e.comment.parentId].comment);
-                allComments[e.comment.parentId] = e;
-
-            }
         }
     }
 
@@ -659,21 +702,19 @@ export class ReviewManager {
                     domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
                     domNode.className = `reviewComment ${isActive ? 'active' : ' inactive'}`;
 
-                    const author = document.createElement('span') as HTMLSpanElement;
-                    author.className = 'reviewComment author'
-                    author.innerText = `${item.state.comment.author || ' '} at `;
+                    const createElement = (text, className) => {
+                        const span = document.createElement('span') as HTMLSpanElement;
+                        span.className = className;
+                        span.innerText = text;
+                        return span;
+                    }
 
-                    const dt = document.createElement('span') as HTMLSpanElement;
-                    dt.className = 'reviewComment dt'
-                    dt.innerText = this.formatDate(item.state.comment.dt);
+                    domNode.appendChild(createElement(`${item.state.comment.id}`, 'reviewComment id'))
+                    domNode.appendChild(createElement(`${item.state.history.length}`, 'reviewComment history'))
+                    domNode.appendChild(createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
+                    domNode.appendChild(createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
+                    domNode.appendChild(createElement(`${item.state.comment.text} by `, 'reviewComment text'))
 
-                    const text = document.createElement('span') as HTMLSpanElement;
-                    text.className = 'reviewComment text'
-                    text.innerText = `${item.state.comment.text} by `;
-
-                    domNode.appendChild(text);
-                    domNode.appendChild(author);
-                    domNode.appendChild(dt);
 
                     item.state.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
@@ -728,7 +769,7 @@ export class ReviewManager {
             contextMenuOrder: 0,
 
             run: () => {
-                this.setEditorMode(EditorMode.editComment);
+                this.setEditorMode(EditorMode.insertComment);
             }
         });
 

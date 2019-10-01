@@ -1,4 +1,4 @@
-import { ReviewComment, createReviewManager, ReviewManager } from "./index";
+import { ReviewComment, createReviewManager, ReviewManager, ReviewCommentStatus } from "./index";
 import * as moment from "moment";
 
 
@@ -162,7 +162,7 @@ function generateDifferentComments() {
 function createRandomComments(): ReviewComment[] {
     const firstLine = Math.floor(Math.random() * 10);
 
-    return [
+    const result: ReviewComment[] = [
         {
             id: "id-0",
             lineNumber: firstLine + 10,
@@ -175,6 +175,15 @@ function createRandomComments(): ReviewComment[] {
                 endColumn: 10,
                 endLineNumber: firstLine + 10
             }
+        },
+        {
+            id: "id-2-edit",
+            parentId:"id-2",
+            status:ReviewCommentStatus.edit,
+            lineNumber: firstLine + 5,
+            author: "another reviewer",
+            dt: '2019-06-01T00:00:00.000Z',
+            text: "id-2: EDIT EDIT at start"
         },
         {
             id: "id-1",
@@ -212,10 +221,9 @@ function createRandomComments(): ReviewComment[] {
             author: "original author",
             dt: new Date(),
             text: "I think you will find it is good enough",
-
         }
-
-    ]
+    ];
+    return result;
 }
 
 function renderComments(comments: ReviewComment[]) {
@@ -224,8 +232,10 @@ function renderComments(comments: ReviewComment[]) {
     document.getElementById("summaryEditor").innerHTML = Object.values(reviewManager.commentState).map(cs => cs.comment)
         .map(
             comment =>
-                `<div style="display:flex;height:16px;text-decoration:${comment.status && comment.status === 2 ? 'line-through' : 'normal'}">
+                `<div style="display:flex;height:16px;text-decoration:${comment.status && comment.status === ReviewCommentStatus.deleted ? 'line-through' : 'normal'}">
                     <div style="width:100px;overflow:hidden;">${comment.id}</div>
+                    <div style="width:100px;overflow:hidden;">${comment.parentId || ''}</div>
+                    <div style="width:100px;overflow:hidden;">${ {undefined:'active', 1:'active', 2:'deleted', 3:'edit'}[comment.status]}</div>
                     <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
                     <div style="width:100px;overflow:hidden;">${comment.author}</div> 
                     <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
