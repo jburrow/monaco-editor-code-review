@@ -1,4 +1,4 @@
-import { ReviewComment, processComments, createReviewManager, ReviewManager, ReviewCommentStatus } from "./index";
+import { ReviewComment, Action, createReviewManager, ReviewManager, ReviewCommentStatus } from "./index";
 import * as moment from "moment";
 
 
@@ -11,6 +11,7 @@ interface WindowDoc {
     generateDifferentContents: () => void;
     toggleTheme: () => void;
     clearComments: () => void;
+    setCurrentUser: () => void;
 }
 
 const win = (window as any) as WindowDoc;
@@ -139,13 +140,13 @@ function initReviewManager(editor: any) {
         "mr reviewer",
         createRandomComments(),
         updatedComments => renderComments(updatedComments),
-        {            
+        {
             editButtonEnableRemove: true,
-            formatDate: (dt: Date | string) => moment(dt).format('YY-MM-DD HH:mm')
+            formatDate: (createdAt: Date | string) => moment(createdAt).format('YY-MM-DD HH:mm')
         }
     );
 
-    renderComments(reviewManager.comments);
+    renderComments(reviewManager.actions);
 }
 
 function toggleTheme() {
@@ -155,18 +156,24 @@ function toggleTheme() {
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
-    renderComments(reviewManager.comments);
+    renderComments(reviewManager.actions);
 }
 
-function createRandomComments(): ReviewComment[] {
+function setCurrentUser() {
+    const select = document.body.getElementsByTagName('select')[0] as HTMLSelectElement;
+    console.warn(select.value);
+}
+
+function createRandomComments(): Action[] {
     const firstLine = Math.floor(Math.random() * 10);
 
-    const result: ReviewComment[] = [
+    const result: Action[] = [
         {
+            type: "create",
             id: "id-0",
             lineNumber: firstLine + 10,
-            author: "another reviewer",
-            dt: '2019-01-01T00:00:00.000',
+            createdBy: "another reviewer",
+            createdAt: '2019-01-01T00:00:00.000',
             text: "id-0: Near the start",
             selection: {
                 startColumn: 5,
@@ -177,102 +184,89 @@ function createRandomComments(): ReviewComment[] {
         },
         {
             id: "id-2-edit",
-            parentId: "id-2",
-            status: ReviewCommentStatus.edit,
-            lineNumber: firstLine + 5,
-            author: "another reviewer",
-            dt: '2019-06-01T00:00:00.000Z',
+            targetId: "id-2",
+            type: "edit",
+            createdBy: "another reviewer",
+            createdAt: '2019-06-01T00:00:00.000Z',
             text: "id-2: EDIT EDIT at start"
         },
         {
             id: "id-1",
+            type: "create",
             lineNumber: firstLine + 5,
-            author: "another reviewer",
-            dt: '2019-06-01T00:00:00.000Z',
+            createdBy: "another reviewer",
+            createdAt: '2019-06-01T00:00:00.000Z',
             text: "id-1: at start"
         },
         {
             id: "id-2",
-            parentId: "id-1",
+            type: "create",
+            targetId: "id-1",
             lineNumber: firstLine + 5,
-            author: "another reviewer",
-            dt: '2019-12-01T00:00:00.000Z',
+            createdBy: "another reviewer",
+            createdAt: '2019-12-01T00:00:00.000Z',
             text: "id-2: this code isn't very good",
         },
         {
             id: "id-3",
-            parentId: "id-2",
+            type: "create",
+            targetId: "id-2",
             lineNumber: firstLine + 5,
-            author: "original author",
-            dt: '2019-06-01T00:00:00.000Z',
+            createdBy: "original author",
+            createdAt: '2019-06-01T00:00:00.000Z',
             text: "id-3: I think you will find it is good enough"
         },
         {
-            parentId: "id-3",
+            targetId: "id-3",
+            type: "create",
             lineNumber: firstLine + 5,
-            author: "original author",
-            dt: new Date(),
+            createdBy: "original author",
+            createdAt: new Date(),
             text: "I think you will find it is good enough",
         },
         {
-            parentId: "id-3",
+            targetId: "id-3",
+            type: "create",
             lineNumber: firstLine + 5,
-            author: "original author",
-            dt: new Date(),
+            createdBy: "original author",
+            createdAt: new Date(),
             text: "I think you will find it is good enough",
         }
     ];
     return result;
 }
 
-function renderComments(comments: ReviewComment[]) {
-    console.log('Render Comments #', comments.length, comments);
+function renderComments(actions: Action[]) {
+    console.log('Render Comments #', actions.length, actions);
 
-    comments = comments || [];
-
-    const header = {
-        author: "Author",
-        dt: "Created At",
+    actions = actions || [];
+    const rawHeader = {
+        type: "Type",
         id: "Id",
-        parentId: "ParentId",
-        lineNumber: "Line Number",
-        selection: "",
-        status: "Status",
-        text: "Text"
+        createdBy: "Author",
+        createdAt: "Created At",
     }
-console.log('Raw Comments', comments);
-    const rawHtml = [header as any].concat(comments as any[])
+
+    console.log('Events', actions);
+    const rawHtml = [rawHeader as any].concat(actions as any[])
         .map(
             comment => {
-                let textDecoration = 'normal';
-                if (comment.status && comment.status===ReviewCommentStatus.deleted) {
-                    textDecoration = 'line-through';
-                } else if (comment.status && comment.status===ReviewCommentStatus.edit) {
-                    textDecoration = 'underline';
-                }
-
-
-                return `<div style="text-align:left;display:flex;height:16px;text-decoration:${textDecoration}">
+                return `<div style="text-align:left;display:flex;height:16px">
+                    <div style="width:100px;overflow:hidden;">${comment.type || '&nbsp;'}</div>
                     <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.parentId || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${ { undefined: 'active', 1: 'active', 2: 'deleted', 3: 'edit' }[comment.status] || comment.status}</div>
-                    <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.author}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
-                    <div style="width:auto;overflow:hidden;">${comment.text}</div>                    
-                    <div style="width:auto;overflow:hidden;">${comment.selection && JSON.stringify(comment.selection) || '&nbsp;'}</div>                    
+                    <div style="width:100px;overflow:hidden;">${comment.createdBy}</div> 
+                    <div style="width:100px;overflow:hidden;">${comment.createdAt}</div>                     
+                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment) || '&nbsp;'}</div>                    
                 </div>`
             }
         )
         .join("");
 
-    const pcr = processComments(comments);
-    const activeComments = Object.values(pcr.commentState).map(cs => cs.comment)
-
+    const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
     const activeHtml = activeComments
         .map(
             comment =>
-                `<div style="text-align:left;display:flex;height:16px;text-decoration:${comment.status && comment.status === ReviewCommentStatus.deleted ? 'line-through' : 'normal'}">
+                `<div style="text-align:left;display:flex;height:16px;">
                     <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>                                     
                     <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
                     <div style="width:100px;overflow:hidden;">${comment.author}</div> 
@@ -297,5 +291,6 @@ win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.toggleTheme = toggleTheme;
 win.clearComments = clearComments;
+win.setCurrentUser = setCurrentUser;
 init();
 

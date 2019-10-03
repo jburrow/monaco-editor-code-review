@@ -1,8 +1,6 @@
 import * as uuid from "uuid/v4";
 import * as monacoEditor from "monaco-editor";
 
-
-
 interface MonacoWindow {
     monaco: any;
 }
@@ -62,14 +60,14 @@ class ReviewCommentState {
         this.viewZoneId = null;
         this.comment = comment;
         this.numberOfLines = numberOfLines;
-        this.history = []
+        this.history = [comment];
     }
 }
 
-export function createReviewManager(editor: any, currentUser: string, comments?: ReviewComment[], onChange?: OnCommentsChanged, config?: ReviewManagerConfig): ReviewManager {
+export function createReviewManager(editor: any, currentUser: string, actions?: Action[], onChange?: OnActionsChanged, config?: ReviewManagerConfig): ReviewManager {
     //For Debug: (window as any).editor = editor;
     const rm = new ReviewManager(editor, currentUser, onChange, config);
-    rm.load(comments || []);
+    rm.load(actions || []);
     return rm;
 }
 
@@ -79,8 +77,8 @@ interface ReviewCommentIterItem {
     state: ReviewCommentState
 }
 
-interface OnCommentsChanged {
-    (comments: ReviewComment[]): void
+interface OnActionsChanged {
+    (actions: Action[]): void
 }
 
 export interface ReviewManagerConfig {
@@ -150,72 +148,121 @@ interface InlineToolbarElements {
     edit: HTMLSpanElement;
 }
 
+function compareComments(a: ReviewComment, b: ReviewComment) {
+    return a.dt > b.dt ? 1 : -1;
+}
 
-//TODO ...
-//TODO - type - TODO, QUESTION
+type CommonFields = {
+    id?: string,
+    targetId?: string,
+    createdBy?: string,
+    createdAt?: Date | string
+};
 
-export function processComments(comments: ReviewComment[], commentState: { [reviewCommentId: string]: ReviewCommentState } = null) {
-    commentState = commentState || comments.reduce((acc, cur) => { acc[cur.id] = new ReviewCommentState(cur, 0); return acc; }, {});
 
-    const updates = comments.filter(c => c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted)//TODO.sort(this.compareComments);    
-    const viewZoneIdsToDelete: string[] = []
+export type Action =
+    { type: 'create', lineNumber: number, text: string, selection?: CodeSelection } & CommonFields |
+    { type: 'edit', text: string } & CommonFields |
+    { type: 'delete' } & CommonFields;
 
-    for (const c of updates) {
-        const parent = commentState[c.parentId];
-        if (parent) {
-            if (parent.history.length === 0) {
-                parent.history.push(parent.comment);
+interface CommentState {
+    comments: { [reviewCommentId: string]: ReviewCommentState };
+    viewZoneIdsToDelete: string[];
+};
+
+
+export function commentReducer(action: Action, state: CommentState) {
+    const dirtyLineNumbers = new Set<number>();
+    switch (action.type) {
+        case "edit":
+            const parent = state.comments[action.targetId];
+            if(!parent)break;
+
+            parent.comment = { ...parent.comment, author: action.createdBy, dt: action.createdAt, text: action.text };
+            parent.history.push(parent.comment);
+            parent.numberOfLines = calculateNumberOfLines(action.text);
+            dirtyLineNumbers.add(parent.comment.lineNumber);
+            console.log('edit', action);
+            break;
+
+        case "delete":
+            const selected = state.comments[action.targetId];
+            delete state.comments[action.targetId];
+            if (selected.viewZoneId) {
+                state.viewZoneIdsToDelete.push(selected.viewZoneId);
             }
+            dirtyLineNumbers.add(selected.comment.lineNumber);
+            console.log('delete', action);
+            break;
 
-            parent.history.push(c);
-
-            switch (c.status) {
-                case ReviewCommentStatus.edit:
-                    //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
-                    parent.comment = { ...parent.comment, text: c.text, author: c.author };
-                    break;
-                case ReviewCommentStatus.deleted:
-                    delete commentState[parent.comment.id];
-                    viewZoneIdsToDelete.push(parent.viewZoneId);
-
-                    break;
+        case "create":
+            if (!state.comments[action.id]) {
+                state.comments[action.id] = new ReviewCommentState({
+                    author: action.createdBy,
+                    dt: action.createdAt, 
+                    id: action.id, 
+                    lineNumber: action.lineNumber, 
+                    text: action.text,
+                    parentId: action.targetId
+                }, calculateNumberOfLines(action.text));
+                console.log('insert', action);
+                dirtyLineNumbers.add(action.lineNumber);
             }
-        }
-        console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
-        delete commentState[c.id]; //mutation of state - removal of comment as it is processed.            
+            break;
     }
 
-    console.log('Processed', updates.length, 'modified comments');
+    if (dirtyLineNumbers.size) {
+        for (const cs of Object.values(state.comments)) {
+            if (dirtyLineNumbers.has(cs.comment.lineNumber)) {
+                cs.renderStatus = ReviewCommentRenderState.dirty;
+            }
+        }
+    }
 
-    return { commentState, viewZoneIdsToDelete };
+    return state;
+}
+
+function calculateNumberOfLines(text: string): number {
+    return text ? text.split(/\r*\n/).length + 1 : 1;
+}
+
+
+export function reduceComments(actions: Action[], state: CommentState = null) {
+    state = state || { comments: {}, viewZoneIdsToDelete: [] };
+
+    for (const a of actions) {
+        if (!a.id) {
+            a.id = uuid();
+        }
+        state = commentReducer(a, state);
+    }
+    return state;
 }
 
 export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
     editorConfig: monacoEditor.editor.InternalEditorOptions;
-    commentState: { [reviewCommentId: string]: ReviewCommentState };
-    comments: ReviewComment[];
+    actions: Action[];
+    store: CommentState;
     activeComment?: ReviewComment;
     widgetInlineToolbar: monacoEditor.editor.IContentWidget;
     widgetInlineCommentEditor: monacoEditor.editor.IContentWidget;
-    onChange: OnCommentsChanged;
+    onChange: OnActionsChanged;
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
     currentLineDecorations: string[];
     currentCommentDecorations: string[];
     currentLineDecorationLineNumber?: number;
-    viewZoneIdsToDelete: string[];
 
     editorElements: EditorElements;
     inlineToolbarElements: InlineToolbarElements;
     verbose: boolean;
 
-    constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
+    constructor(editor: any, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig) {
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null;
-        this.commentState = {};
         this.widgetInlineToolbar = null;
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
@@ -224,8 +271,9 @@ export class ReviewManager {
         this.currentLineDecorations = [];
         this.currentCommentDecorations = []
         this.currentLineDecorationLineNumber = null;
-        this.comments = [];
-        this.viewZoneIdsToDelete = []
+        this.actions = [];
+        this.store = { comments: {}, viewZoneIdsToDelete: [] };
+
         this.verbose = false;
 
         this.editorConfig = this.editor.getConfiguration();
@@ -241,45 +289,21 @@ export class ReviewManager {
         }
     }
 
-    load(comments: ReviewComment[]): void {
+    load(actions: Action[]): void {
         this.editor.changeViewZones((changeAccessor) => {
             // Remove all the existing comments     
-            for (const viewState of Object.values(this.commentState)) {
+            for (const viewState of Object.values(this.store.comments)) {
                 if (viewState.viewZoneId !== null) {
                     changeAccessor.removeZone(viewState.viewZoneId);
                 }
             }
 
-            this.commentState = {};
-
-            // Check all comments that they have unique and present id's
-            for (const comment of comments) {
-                const originalId = comment.id;
-                let changedId = false;
-
-                while (!comment.id || this.commentState[comment.id]) {
-                    comment.id = uuid();
-                    changedId = true;
-                }
-
-                if (changedId) {
-                    console.warn('Comment.Id Assigned: ', originalId, ' changed to to ', comment.id, ' due to collision');
-                }
-
-                this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(comment.text));
-            }
-            this.comments = comments;
-            const pcr = processComments(comments, this.commentState);
-            this.viewZoneIdsToDelete = this.viewZoneIdsToDelete.concat(pcr.viewZoneIdsToDelete);
-
+            this.actions = actions;
+            this.store = reduceComments(actions);
             this.refreshComments();
 
-            console.debug('Comments Loaded:', comments.length, 'Active:', Object.values(this.commentState).length);
+            console.debug('Comments Loaded:', actions.length, 'Active:', Object.values(this.store.comments).length);
         })
-    }
-
-    calculateNumberOfLines(text: string): number {
-        return text ? text.split(/\r*\n/).length + 1 : 1;
     }
 
     getThemedColor(name: string): string {
@@ -481,13 +505,13 @@ export class ReviewManager {
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
             this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-                this.commentState[comment.id].renderStatus = ReviewCommentRenderState.dirty;
+                this.store.comments[comment.id].renderStatus = ReviewCommentRenderState.dirty;
             });
         }
     }
 
     filterAndMapComments(lineNumbers: number[], fn: { (comment: ReviewComment): void }) {
-        for (const cs of Object.values(this.commentState)) {
+        for (const cs of Object.values(this.store.comments)) {
             if (lineNumbers.indexOf(cs.comment.lineNumber) > -1) {
                 fn(cs.comment);
             }
@@ -521,8 +545,8 @@ export class ReviewManager {
             let activeComment: ReviewComment = null;
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
-                for (const comment of Object.values(this.commentState).map(c => c.comment)) {
-                    const viewState = this.commentState[comment.id];
+                for (const comment of Object.values(this.store.comments).map(c => c.comment)) {
+                    const viewState = this.store.comments[comment.id];
                     if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = comment;
                         break;
@@ -544,7 +568,7 @@ export class ReviewManager {
             for (var item of this.iterateComments()) {
                 if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
                     (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
-                    count += this.calculateNumberOfLines(item.state.comment.text);
+                    count += calculateNumberOfLines(item.state.comment.text);
                 }
 
                 if (item.state.comment == this.activeComment) {
@@ -614,12 +638,8 @@ export class ReviewManager {
         return new Date();
     }
 
-    private compareComments(a: ReviewCommentState, b: ReviewCommentState) {
-        return a.comment.dt > b.comment.dt ? 1 : -1;
-    }
-
     private recurseComments(allComments: { [key: string]: ReviewCommentState }, filterFn: { (c: ReviewCommentState): boolean }, depth: number, results: ReviewCommentIterItem[]) {
-        const comments = Object.values(allComments).filter(filterFn).sort(this.compareComments);
+        const comments = Object.values(allComments).filter(filterFn)//TODO.sort(compareComments);
         for (const cs of comments) {
             const comment = cs.comment;
             delete allComments[comment.id];
@@ -639,49 +659,36 @@ export class ReviewManager {
         if (!filterFn) {
             filterFn = (cs: ReviewCommentState) => !cs.comment.parentId;
         }
-        const copyCommentState = { ...this.commentState };
+        const copyCommentState = { ...this.store.comments };
         const results: ReviewCommentIterItem[] = [];
         this.recurseComments(copyCommentState, filterFn, 0, results);
         return results;
     }
 
-    removeComment(comment: ReviewComment): ReviewComment {
+    removeComment(comment: ReviewComment) {
         if (comment) {
-            return this.createNewComment(ReviewCommentStatus.deleted, null, null, null, comment);
+            return this.createAction({ type: "delete", targetId: comment.id });
         }
         return null
     }
 
-    addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewComment {
-        const status = this.editorMode === EditorMode.editComment ? ReviewCommentStatus.edit : ReviewCommentStatus.active
-        return this.createNewComment(status, text, lineNumber, selection, this.activeComment);
+    addComment(lineNumber: number, text: string, selection?: CodeSelection) {
+        const action: Action = this.editorMode === EditorMode.editComment ?
+            { type: "edit", text, targetId: this.activeComment.id }
+            : { type: "create", text, lineNumber, selection, targetId: this.activeComment && this.activeComment.id };
+
+        return this.createAction(action);
     }
 
-    private createNewComment(status: ReviewCommentStatus, text: string, lineNumber?: number, selection?: CodeSelection, activeComment?: ReviewComment): ReviewComment {
-        const ln = activeComment ? activeComment.lineNumber : lineNumber;
-        const comment: ReviewComment = {
-            id: uuid(),
-            lineNumber: ln,
-            author: this.currentUser,
-            dt: this.getDateTimeNow(),
-            text,
-            status,
-            selection,
-            parentId: activeComment ? activeComment.id : null,
-        };
+    private createAction(action: Action) {
+        action.createdBy = this.currentUser;
+        action.createdAt = this.getDateTimeNow();
+        action.id = uuid();
 
-        this.comments.push(comment);
-        this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
+        this.actions.push(action);
+        this.store = commentReducer(action, this.store);
 
-        const pcr = processComments([comment], this.commentState);
-        this.viewZoneIdsToDelete = this.viewZoneIdsToDelete.concat(pcr.viewZoneIdsToDelete);
-
-        // Make all comments for this line as dirty.
-        this.filterAndMapComments([ln], (c) => {
-            this.commentState[c.id].renderStatus = ReviewCommentRenderState.dirty;
-        });
-
-        if (this.activeComment && !this.commentState[this.activeComment.id]) {
+        if (this.activeComment && !this.store.comments[this.activeComment.id]) {
             this.setActiveComment(null);
         } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
             this.setActiveComment(null);
@@ -692,12 +699,11 @@ export class ReviewManager {
         this.layoutInlineToolbar();
 
         if (this.onChange) {
-            this.onChange(this.comments);
+            this.onChange(this.actions);
         }
 
-        return comment;
+        return action;
     }
-
 
     private formatDate(dt: Date | string) {
         if (this.config.formatDate) {
@@ -723,8 +729,8 @@ export class ReviewManager {
         }) => {
             const lineNumbers: { [key: number]: CodeSelection } = {};
 
-            while (this.viewZoneIdsToDelete.length > 0) {
-                const viewZoneId = this.viewZoneIdsToDelete.pop();
+            while (this.store.viewZoneIdsToDelete.length > 0) {
+                const viewZoneId = this.store.viewZoneIdsToDelete.pop();
                 changeAccessor.removeZone(viewZoneId);
                 this.verbose && console.debug('Zone.Delete', viewZoneId);
             }
@@ -764,7 +770,7 @@ export class ReviewManager {
 
                     domNode.appendChild(this.createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
                     domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
-                    if (item.state.history.length) {
+                    if (item.state.history.length>1) {
                         domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, 'reviewComment history'))
                     }
                     domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'))
@@ -867,7 +873,7 @@ export class ReviewManager {
             currentLine = this.editor.getPosition().lineNumber;
         }
 
-        const comments = Object.values(this.commentState).map(cs => cs.comment).filter((c) => {
+        const comments = Object.values(this.store.comments).map(cs => cs.comment).filter((c) => {
             if (!c.parentId) {
                 if (direction === NavigationDirection.next) {
                     return c.lineNumber > currentLine;
