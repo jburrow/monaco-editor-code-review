@@ -29,16 +29,14 @@
 
 .reviewComment {
   font-size: 12px;
-  
-}
-/*
-.reviewComment.active {
-   background-color: orangered; 
 }
 
-.reviewComment.inactive {
-   background-color: #FF1111; 
+.reviewComment.text { 
+  background-color: rgba(0,0,200,0.2);
+  overflow:hidden;
 }
+
+/*
 
 .reviewComment.author {
   background-color: #FF3333;
@@ -48,19 +46,17 @@
   background-color: #FF5555;
 }
 
-.reviewComment.text { 
-  background-color: #FF7777;
-}
-
 .reviewComment.id { 
   background-color: #FF9999;
   color:black;
 }
-
-.reviewComment.history { 
-  background-color: #FF0AAA;  
-}
 */
+.reviewComment.history { 
+  /* background-color: #FF0AAA;   */
+  padding-left:10px;
+  font-style:italic;
+}
+
 
 .reviewComment.selection {
   border-bottom: 2px dotted darkorange; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/

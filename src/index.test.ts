@@ -119,24 +119,26 @@ test('Remove a comment via the widgets', () => {
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     const comment = rm.addComment(1, '');
-    console.log('##1', comment);
-    console.log('##2', rm.commentState);
-
     const viewZoneId = rm.commentState[comment.id].viewZoneId;
+    expect(Object.keys(editor._zones).length).toBe(1);
 
     // Simulate a click on the comment
     rm.handleMouseDown({
         target: {
             element: { className: "", hasAttribute: () => false },
-            detail: { viewZoneId: viewZoneId }
+            detail: { viewZoneId }
         }
     })
     expect(rm.activeComment).toBe(comment);
     expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber-1);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
-    rm.removeComment(comment);
-    expect(comment.status).toBe(2);
+    const deletedComment = rm.removeComment(comment);
+    expect(deletedComment.parentId).toBe(comment.id);
+    expect(deletedComment.status).toBe(ReviewCommentStatus.deleted);
+    expect(Object.values(rm.commentState).length).toBe(0);
+    expect(rm.viewZoneIdsToDelete.length).toBe(0);
+    expect(Object.keys(editor._zones).length).toBe(0);
     expect(rm.activeComment).toBe(null);
     expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
@@ -165,6 +167,9 @@ test('Edited Comments', () => {
 
     const comments = Object.values(rm.commentState);
     expect(comments.length).toBe(1);
+    expect(comments[0].comment.author).toBe("current.user")
+    // expect(comments[0].comment).toStrictEqual(expectedEdittedComment);
+
     expect(comments[0].comment).toStrictEqual(expectedEdittedComment);
     expect(comments[0].history.length).toBe(2);
 });

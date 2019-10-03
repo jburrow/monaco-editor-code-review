@@ -154,7 +154,9 @@ export class ReviewManager {
     currentLineDecorations: string[];
     currentCommentDecorations: string[];
     currentLineDecorationLineNumber?: number;
+    viewZoneIdsToDelete: string[];
 
+    verbose: boolean;
 
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
         this.currentUser = currentUser;
@@ -170,6 +172,8 @@ export class ReviewManager {
         this.currentCommentDecorations = []
         this.currentLineDecorationLineNumber = null;
         this.comments = [];
+        this.viewZoneIdsToDelete = []
+        this.verbose = false;
 
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
@@ -212,7 +216,7 @@ export class ReviewManager {
                 this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(comment.text));
             }
             this.comments = comments;
-            this.processEdits(comments);
+            this.processUpdates(comments);
 
             this.refreshComments();
 
@@ -223,10 +227,10 @@ export class ReviewManager {
     //TODO ...
     //TODO - type - TODO, QUESTION
 
-    private processEdits(comments: ReviewComment[]) {
-        const edits = comments.filter(c => c.status === ReviewCommentStatus.edit)//.sort(this.compareComments);
+    private processUpdates(comments: ReviewComment[]) {
+        const updates = comments.filter(c => c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted)//TODO.sort(this.compareComments);
 
-        for (const c of edits) {            
+        for (const c of updates) {
             const parent = this.commentState[c.parentId];
             if (parent) {
                 if (parent.history.length === 0) {
@@ -234,19 +238,26 @@ export class ReviewManager {
                 }
 
                 parent.history.push(c);
-                
-                //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
-                parent.comment = { ...parent.comment, text: c.text, author: c.author };                
+
+                switch (c.status) {
+                    case ReviewCommentStatus.edit:
+                        //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
+                        parent.comment = { ...parent.comment, text: c.text, author: c.author };
+                        break;
+                    case ReviewCommentStatus.deleted:                        
+                        delete this.commentState[parent.comment.id];
+                        this.viewZoneIdsToDelete.push(parent.viewZoneId);
+                        break;
+                }
             }
-            console.log('Removing ', c.id, ' from comments because it has been processed as a edit')
-            delete this.commentState[c.id]; //mutation of state - removal of comment as it is edit.            
+            console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
+            delete this.commentState[c.id]; //mutation of state - removal of comment as it is processed.            
         }
-        console.log('Processed', edits.length, 'editted comments');
+        this.verbose && console.log('Processed', updates.length, 'editted comments');
     }
 
-
     calculateNumberOfLines(text: string): number {
-        return text.split(/\r*\n/).length + 1;
+        return text ? text.split(/\r*\n/).length + 1 : 1;
     }
 
     getThemedColor(name: string): string {
@@ -387,10 +398,10 @@ export class ReviewManager {
                 return buttonsElement;
             },
             getPosition: () => {
-                if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {
+                if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {                    
                     return {
                         position: {
-                            lineNumber: this_.activeComment.lineNumber - 1,
+                            lineNumber: this_.activeComment.lineNumber,
                             column: 1
                         },
                         preference: [POSITION_BELOW]
@@ -498,32 +509,32 @@ export class ReviewManager {
         }
     }
 
-    private calculateMarginTopOffset(): number {
-        let idx = 0;
+    private calculateMarginTopOffset(includeActiveCommentHeight:boolean): number {        
         let count = 0;
         let marginTop = 0;
         const lineHeight = this.editorConfig.fontInfo.lineHeight;
 
         if (this.activeComment) {
-            for (var item of this.iterateComments()) {
-                if (item.state.comment.lineNumber == this.activeComment.lineNumber) {
-                    count++;
+            for (var item of this.iterateComments()) {                
+                if (item.state.comment.lineNumber === this.activeComment.lineNumber && 
+                    (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
+                    count+=this.calculateNumberOfLines(item.state.comment.text);
                 }
 
-                if (item.state.comment == this.activeComment) {
-                    idx = count + 0;
+                if(item.state.comment == this.activeComment){
+                    break;
                 }
             }
-            marginTop = idx * lineHeight;
+            marginTop = count * lineHeight;
         }
-
-        return marginTop + this.config.verticalOffset;
+        const result = marginTop + this.config.verticalOffset;        
+        return result;
     }
 
     layoutInlineToolbar() {
         const root = this.widgetInlineToolbar.getDomNode() as HTMLElement;
         root.style.backgroundColor = this.getThemedColor("editor.background");
-        root.style.marginTop = `${this.calculateMarginTopOffset()}px`;
+        root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
 
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
@@ -542,7 +553,7 @@ export class ReviewManager {
                 button.style.color = this.getThemedColor("button.foreground");
             });
 
-        root.style.marginTop = `${this.calculateMarginTopOffset()}px`;
+        root.style.marginTop = `${this.calculateMarginTopOffset(true)}px`;
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
 
@@ -567,39 +578,6 @@ export class ReviewManager {
 
     getDateTimeNow() {
         return new Date();
-    }
-
-    addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewComment {
-        const ln = this.activeComment ? this.activeComment.lineNumber : lineNumber;
-        const comment: ReviewComment = {
-            id: uuid(),
-            lineNumber: ln,
-            author: this.currentUser,
-            dt: this.getDateTimeNow(),
-            text: text,
-            status: this.editorMode === EditorMode.editComment ? ReviewCommentStatus.edit : ReviewCommentStatus.active,
-            selection: selection,
-            parentId: this.activeComment ? this.activeComment.id : null,
-        };
-
-        this.comments.push(comment);
-        this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
-
-        this.processEdits([comment]);
-
-        // Make all comments for this line as dirty.
-        this.filterAndMapComments([ln], (comment) => {
-            this.commentState[comment.id].renderStatus = ReviewCommentRenderState.dirty;
-        });
-
-        this.refreshComments()
-        this.layoutInlineToolbar();
-
-        if (this.onChange) {
-            this.onChange(this.comments);
-        }
-
-        return comment;
     }
 
     private compareComments(a: ReviewCommentState, b: ReviewCommentState) {
@@ -633,20 +611,58 @@ export class ReviewManager {
         return results;
     }
 
-    removeComment(comment: ReviewComment) {
-        for (const item of this.iterateComments((cs) => cs.comment.id === comment.id)) {
-            item.state.comment.status = ReviewCommentStatus.deleted; //WRONG - We are mutating the comment - we should be creating a new one ...
+    removeComment(comment: ReviewComment): ReviewComment {
+        if (comment) {
+            return this.createNewComment(ReviewCommentStatus.deleted, null, null, null, comment);
         }
-        if (this.activeComment == comment) {
+        return null
+    }
+
+    addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewComment {
+        const status = this.editorMode === EditorMode.editComment ? ReviewCommentStatus.edit : ReviewCommentStatus.active
+        return this.createNewComment(status, text, lineNumber, selection, this.activeComment);
+    }
+
+    private createNewComment(status: ReviewCommentStatus, text: string, lineNumber?: number, selection?: CodeSelection, activeComment?: ReviewComment): ReviewComment {
+        const ln = activeComment ? activeComment.lineNumber : lineNumber;
+        const comment: ReviewComment = {
+            id: uuid(),
+            lineNumber: ln,
+            author: this.currentUser,
+            dt: this.getDateTimeNow(),
+            text,
+            status,
+            selection,
+            parentId: activeComment ? activeComment.id : null,
+        };
+
+        this.comments.push(comment);
+        this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
+
+        this.processUpdates([comment]);
+
+        // Make all comments for this line as dirty.
+        this.filterAndMapComments([ln], (c) => {
+            this.commentState[c.id].renderStatus = ReviewCommentRenderState.dirty;
+        });
+
+        if(this.activeComment && !this.commentState[this.activeComment.id]){
             this.setActiveComment(null);
-            this.layoutInlineToolbar();
+        } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
+            this.setActiveComment(null);
+            console.log('Clearing active comment');
         }
 
-        this.refreshComments();
+        this.refreshComments()
+        this.layoutInlineToolbar();
+
         if (this.onChange) {
             this.onChange(this.comments);
         }
+
+        return comment;
     }
+
 
     private formatDate(dt: Date | string) {
         if (this.config.formatDate) {
@@ -672,16 +688,15 @@ export class ReviewManager {
         }) => {
             const lineNumbers: { [key: number]: CodeSelection } = {};
 
+            while (this.viewZoneIdsToDelete.length > 0) {
+                const viewZoneId = this.viewZoneIdsToDelete.pop();
+                changeAccessor.removeZone(viewZoneId);
+                this.verbose && console.debug('Zone.Delete', viewZoneId);
+            }
+
             for (const item of this.iterateComments()) {
-                if (item.state.comment.status && item.state.comment.status === ReviewCommentStatus.deleted) {
-                    console.debug('Zone.Delete', item.state.comment.id);
-
-                    changeAccessor.removeZone(item.state.viewZoneId);
-                    continue;
-                }
-
                 if (item.state.renderStatus === ReviewCommentRenderState.hidden) {
-                    console.debug('Zone.Hidden', item.state.comment.id);
+                    this.verbose && console.debug('Zone.Hidden', item.state.comment.id);
 
                     changeAccessor.removeZone(item.state.viewZoneId);
                     item.state.viewZoneId = null;
@@ -690,7 +705,7 @@ export class ReviewManager {
                 }
 
                 if (item.state.renderStatus === ReviewCommentRenderState.dirty) {
-                    console.debug('Zone.Dirty', item.state.comment.id);
+                    this.verbose && console.debug('Zone.Dirty', item.state.comment.id);
 
                     changeAccessor.removeZone(item.state.viewZoneId);
                     item.state.viewZoneId = null;
@@ -702,7 +717,7 @@ export class ReviewManager {
                 }
 
                 if (item.state.viewZoneId == null) {
-                    console.debug('Zone.Create', item.state.comment.id);
+                    this.verbose && console.debug('Zone.Create', item.state.comment.id);
 
                     const isActive = this.activeComment == item.state.comment;
 
@@ -715,10 +730,9 @@ export class ReviewManager {
                     domNode.appendChild(this.createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
                     domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
                     if (item.state.history.length) {
-                        domNode.appendChild(this.createElement(`Edited #${item.state.history.length} Times`, 'reviewComment history'))
+                        domNode.appendChild(this.createElement(`(Edited ${item.state.history.length} times)`, 'reviewComment history'))
                     }
                     domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'))
-
 
                     item.state.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
@@ -819,7 +833,7 @@ export class ReviewManager {
         }
 
         const comments = Object.values(this.commentState).map(cs => cs.comment).filter((c) => {
-            if (c.status !== ReviewCommentStatus.deleted && !c.parentId) {
+            if (!c.parentId) {
                 if (direction === NavigationDirection.next) {
                     return c.lineNumber > currentLine;
                 } else if (direction === NavigationDirection.prev) {
