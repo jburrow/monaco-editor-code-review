@@ -16,14 +16,14 @@
 .reviewCommentEditor.save {
   /* background-color: blue; */
   margin: 0 5px 5px 0;
-  width: 100px;
+  width: 150px;
   border: 0px;
 }
 
 .reviewCommentEditor.cancel {
   /* background-color: rebeccapurple; */
   margin: 5px 5px 5px 0;
-  width: 100px;
+  width: 150px;
   border: 0px;
 }
 

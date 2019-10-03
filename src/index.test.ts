@@ -130,7 +130,7 @@ test('Remove a comment via the widgets', () => {
         }
     })
     expect(rm.activeComment).toBe(comment);
-    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber-1);
+    expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     const deletedComment = rm.removeComment(comment);
@@ -179,9 +179,9 @@ test('Enter Comment Widgets', () => {
     const editor = getMockEditor();
     const rm = createReviewManager(editor, 'current.user');
 
-    rm.textarea.value = 'xxxx'
+    rm.editorElements.textarea.value = 'xxxx'
     rm.setEditorMode(EditorMode.insertComment); // Edit Mode    
-    expect(rm.textarea.value).toBe(""); //Toolbar
+    expect(rm.editorElements.textarea.value).toBe(""); //Toolbar
     rm.handleTextAreaKeyDown(({ code: 'Escape', ctrlKey: false, preventDefault:()=>null } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 
@@ -189,7 +189,7 @@ test('Enter Comment Widgets', () => {
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
     rm.setEditorMode(EditorMode.insertComment);
-    rm.textarea.value = '#5';
+    rm.editorElements.textarea.value = '#5';
 
     rm.handleTextAreaKeyDown(({ code: 'Enter', ctrlKey: true, preventDefault:()=>null } as any) as KeyboardEvent);
     expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar    

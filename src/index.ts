@@ -136,6 +136,19 @@ const CONTROL_ATTR_NAME = 'ReviewManagerControl';
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
 
 
+interface EditorElements {
+    confirm: HTMLButtonElement;
+    cancel: HTMLButtonElement;
+    root: HTMLSpanElement
+    textarea: HTMLTextAreaElement;
+}
+
+interface InlineToolbarElements {
+    root: HTMLDivElement;
+    add: HTMLSpanElement;
+    remove: HTMLSpanElement;
+    edit: HTMLSpanElement;
+}
 
 export class ReviewManager {
     currentUser: string;
@@ -149,13 +162,13 @@ export class ReviewManager {
     onChange: OnCommentsChanged;
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
-
-    textarea: HTMLTextAreaElement;
     currentLineDecorations: string[];
     currentCommentDecorations: string[];
     currentLineDecorationLineNumber?: number;
     viewZoneIdsToDelete: string[];
 
+    editorElements: EditorElements;
+    inlineToolbarElements: InlineToolbarElements;
     verbose: boolean;
 
     constructor(editor: any, currentUser: string, onChange: OnCommentsChanged, config?: ReviewManagerConfig) {
@@ -179,8 +192,8 @@ export class ReviewManager {
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
 
-        this.createInlineToolbarWidget();
-        this.createInlineEditorWidget();
+        this.inlineToolbarElements = this.createInlineToolbarWidget();
+        this.editorElements = this.createInlineEditorWidget();
         this.addActions();
 
         if (this.config.showAddCommentGlyph) {
@@ -229,7 +242,7 @@ export class ReviewManager {
 
     private processUpdates(comments: ReviewComment[]) {
         const updates = comments.filter(c => c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted)//TODO.sort(this.compareComments);
-
+        const deletedIds: string[] = [];
         for (const c of updates) {
             const parent = this.commentState[c.parentId];
             if (parent) {
@@ -244,15 +257,17 @@ export class ReviewManager {
                         //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
                         parent.comment = { ...parent.comment, text: c.text, author: c.author };
                         break;
-                    case ReviewCommentStatus.deleted:                        
+                    case ReviewCommentStatus.deleted:
                         delete this.commentState[parent.comment.id];
                         this.viewZoneIdsToDelete.push(parent.viewZoneId);
+                        deletedIds.push(parent.comment.id);
                         break;
                 }
             }
             console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
             delete this.commentState[c.id]; //mutation of state - removal of comment as it is processed.            
         }
+
         this.verbose && console.log('Processed', updates.length, 'editted comments');
     }
 
@@ -287,7 +302,7 @@ export class ReviewManager {
         return value;
     }
 
-    createInlineEditButtonsElement() {
+    createInlineEditButtonsElement(): InlineToolbarElements {
         var root = document.createElement('div') as HTMLDivElement;
         root.className = 'editButtonsContainer'
         root.style.marginLeft = this.config.editButtonOffset;
@@ -299,12 +314,15 @@ export class ReviewManager {
         add.onclick = () => this.setEditorMode(EditorMode.insertComment);
         root.appendChild(add);
 
+        let remove = null;
+        let edit = null;
+
         if (this.config.editButtonEnableRemove) {
             const spacer = document.createElement('div') as HTMLDivElement;
             spacer.innerText = ' '
             root.appendChild(spacer);
 
-            const remove = document.createElement('span') as HTMLSpanElement;
+            remove = document.createElement('span') as HTMLSpanElement;
             remove.setAttribute(CONTROL_ATTR_NAME, '');
             remove.innerText = this.config.editButtonRemoveText;
             remove.className = 'editButton remove'
@@ -317,7 +335,7 @@ export class ReviewManager {
             spacer.innerText = ' '
             root.appendChild(spacer);
 
-            const edit = document.createElement('span') as HTMLSpanElement;
+            edit = document.createElement('span') as HTMLSpanElement;
             edit.setAttribute(CONTROL_ATTR_NAME, '');
             edit.innerText = this.config.editButtonEditText;
             edit.className = 'editButton edit'
@@ -325,8 +343,7 @@ export class ReviewManager {
             root.appendChild(edit);
         }
 
-
-        return root;
+        return { root, add, remove, edit };
     }
 
     handleCancel() {
@@ -336,7 +353,7 @@ export class ReviewManager {
 
     handleAddComment() {
         const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
-        const text = this.textarea.value;
+        const text = this.editorElements.textarea.value;
         const selection = this.activeComment ? null : this.editor.getSelection() as CodeSelection;
         this.addComment(lineNumber, text, selection);
         this.setEditorMode(EditorMode.toolbar);
@@ -353,7 +370,7 @@ export class ReviewManager {
         }
     }
 
-    createInlineEditorElement() {
+    createInlineEditorElement(): EditorElements {
         var root = document.createElement('span') as HTMLSpanElement;
         root.className = "reviewCommentEditor"
 
@@ -361,15 +378,16 @@ export class ReviewManager {
         textarea.setAttribute(CONTROL_ATTR_NAME, '');
         textarea.className = "reviewCommentEditor text";
         textarea.innerText = '';
+        textarea.style.resize = "none";
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
-        const add = document.createElement('button') as HTMLButtonElement;
-        add.setAttribute(CONTROL_ATTR_NAME, '');
-        add.className = "reviewCommentEditor save";
-        add.style.fontFamily = "Consolas";
-        add.innerText = 'Add Comment';
-        add.onclick = this.handleAddComment.bind(this);
+        const confirm = document.createElement('button') as HTMLButtonElement;
+        confirm.setAttribute(CONTROL_ATTR_NAME, '');
+        confirm.className = "reviewCommentEditor save";
+        confirm.style.fontFamily = "Consolas";
+        confirm.innerText = 'Add Comment';
+        confirm.onclick = this.handleAddComment.bind(this);
 
         const cancel = document.createElement('button') as HTMLButtonElement;
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
@@ -378,11 +396,10 @@ export class ReviewManager {
         cancel.onclick = this.handleCancel.bind(this);
 
         root.appendChild(textarea);
-        root.appendChild(add);
         root.appendChild(cancel);
+        root.appendChild(confirm);
 
-        this.textarea = textarea;
-        return root
+        return { root, confirm, cancel, textarea };
     }
 
     createInlineToolbarWidget() {
@@ -395,10 +412,10 @@ export class ReviewManager {
                 return 'widgetInlineToolbar';
             },
             getDomNode: () => {
-                return buttonsElement;
+                return buttonsElement.root;
             },
             getPosition: () => {
-                if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {                    
+                if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
                             lineNumber: this_.activeComment.lineNumber,
@@ -411,9 +428,10 @@ export class ReviewManager {
         };
 
         this.editor.addContentWidget(this.widgetInlineToolbar);
+        return buttonsElement;
     }
 
-    createInlineEditorWidget() {
+    createInlineEditorWidget(): EditorElements {
         // doesn't re-theme when
         const editorElement = this.createInlineEditorElement();
 
@@ -423,7 +441,7 @@ export class ReviewManager {
                 return 'widgetInlineEditor';
             },
             getDomNode: () => {
-                return editorElement;
+                return editorElement.root;
             },
             getPosition: () => {
                 if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
@@ -439,6 +457,7 @@ export class ReviewManager {
         };
 
         this.editor.addContentWidget(this.widgetInlineCommentEditor);
+        return editorElement;
     }
 
     setActiveComment(comment: ReviewComment) {
@@ -509,32 +528,38 @@ export class ReviewManager {
         }
     }
 
-    private calculateMarginTopOffset(includeActiveCommentHeight:boolean): number {        
+    private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
         let count = 0;
         let marginTop = 0;
         const lineHeight = this.editorConfig.fontInfo.lineHeight;
 
         if (this.activeComment) {
-            for (var item of this.iterateComments()) {                
-                if (item.state.comment.lineNumber === this.activeComment.lineNumber && 
+            for (var item of this.iterateComments()) {
+                if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
                     (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
-                    count+=this.calculateNumberOfLines(item.state.comment.text);
+                    count += this.calculateNumberOfLines(item.state.comment.text);
                 }
 
-                if(item.state.comment == this.activeComment){
+                if (item.state.comment == this.activeComment) {
                     break;
                 }
             }
             marginTop = count * lineHeight;
         }
-        const result = marginTop + this.config.verticalOffset;        
+        const result = marginTop + this.config.verticalOffset;
         return result;
     }
 
     layoutInlineToolbar() {
-        const root = this.widgetInlineToolbar.getDomNode() as HTMLElement;
-        root.style.backgroundColor = this.getThemedColor("editor.background");
-        root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
+        this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
+        this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
+
+        if (this.inlineToolbarElements.remove) {
+            const hasChildren = this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment.id).length > 1
+            const isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
+            this.inlineToolbarElements.remove.style.display = hasChildren ? 'none' : '';
+            this.inlineToolbarElements.edit.style.display = hasChildren || !isSameUser ? 'none' : '';
+        }
 
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
@@ -553,6 +578,8 @@ export class ReviewManager {
                 button.style.color = this.getThemedColor("button.foreground");
             });
 
+        this.editorElements.confirm.innerText = this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
+
         root.style.marginTop = `${this.calculateMarginTopOffset(true)}px`;
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
@@ -567,12 +594,12 @@ export class ReviewManager {
 
         if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
             if (mode == EditorMode.insertComment) {
-                this.textarea.value = "";
+                this.editorElements.textarea.value = "";
             } else if (mode == EditorMode.editComment) {
-                this.textarea.value = this.activeComment.text;
+                this.editorElements.textarea.value = this.activeComment.text;
             }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
-            setTimeout(() => this.textarea.focus(), 100);//TODO - make configurable
+            setTimeout(() => this.editorElements.textarea.focus(), 100);//TODO - make configurable
         }
     }
 
@@ -646,7 +673,7 @@ export class ReviewManager {
             this.commentState[c.id].renderStatus = ReviewCommentRenderState.dirty;
         });
 
-        if(this.activeComment && !this.commentState[this.activeComment.id]){
+        if (this.activeComment && !this.commentState[this.activeComment.id]) {
             this.setActiveComment(null);
         } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
             this.setActiveComment(null);
@@ -730,7 +757,7 @@ export class ReviewManager {
                     domNode.appendChild(this.createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
                     domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
                     if (item.state.history.length) {
-                        domNode.appendChild(this.createElement(`(Edited ${item.state.history.length} times)`, 'reviewComment history'))
+                        domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, 'reviewComment history'))
                     }
                     domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'))
 

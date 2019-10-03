@@ -18228,8 +18228,8 @@ var ReviewManager = /** @class */ (function () {
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        this.createInlineToolbarWidget();
-        this.createInlineEditorWidget();
+        this.inlineToolbarElements = this.createInlineToolbarWidget();
+        this.editorElements = this.createInlineEditorWidget();
         this.addActions();
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
@@ -18270,6 +18270,7 @@ var ReviewManager = /** @class */ (function () {
     //TODO - type - TODO, QUESTION
     ReviewManager.prototype.processUpdates = function (comments) {
         var updates = comments.filter(function (c) { return c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted; }); //TODO.sort(this.compareComments);
+        var deletedIds = [];
         for (var _i = 0, updates_1 = updates; _i < updates_1.length; _i++) {
             var c = updates_1[_i];
             var parent_1 = this.commentState[c.parentId];
@@ -18286,6 +18287,7 @@ var ReviewManager = /** @class */ (function () {
                     case ReviewCommentStatus.deleted:
                         delete this.commentState[parent_1.comment.id];
                         this.viewZoneIdsToDelete.push(parent_1.viewZoneId);
+                        deletedIds.push(parent_1.comment.id);
                         break;
                 }
             }
@@ -18333,11 +18335,13 @@ var ReviewManager = /** @class */ (function () {
         add.setAttribute(CONTROL_ATTR_NAME, '');
         add.onclick = function () { return _this.setEditorMode(EditorMode.insertComment); };
         root.appendChild(add);
+        var remove = null;
+        var edit = null;
         if (this.config.editButtonEnableRemove) {
             var spacer = document.createElement('div');
             spacer.innerText = ' ';
             root.appendChild(spacer);
-            var remove = document.createElement('span');
+            remove = document.createElement('span');
             remove.setAttribute(CONTROL_ATTR_NAME, '');
             remove.innerText = this.config.editButtonRemoveText;
             remove.className = 'editButton remove';
@@ -18348,14 +18352,14 @@ var ReviewManager = /** @class */ (function () {
             var spacer = document.createElement('div');
             spacer.innerText = ' ';
             root.appendChild(spacer);
-            var edit = document.createElement('span');
+            edit = document.createElement('span');
             edit.setAttribute(CONTROL_ATTR_NAME, '');
             edit.innerText = this.config.editButtonEditText;
             edit.className = 'editButton edit';
             edit.onclick = function () { return _this.setEditorMode(EditorMode.editComment); };
             root.appendChild(edit);
         }
-        return root;
+        return { root: root, add: add, remove: remove, edit: edit };
     };
     ReviewManager.prototype.handleCancel = function () {
         this.setEditorMode(EditorMode.toolbar);
@@ -18363,7 +18367,7 @@ var ReviewManager = /** @class */ (function () {
     };
     ReviewManager.prototype.handleAddComment = function () {
         var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
-        var text = this.textarea.value;
+        var text = this.editorElements.textarea.value;
         var selection = this.activeComment ? null : this.editor.getSelection();
         this.addComment(lineNumber, text, selection);
         this.setEditorMode(EditorMode.toolbar);
@@ -18386,24 +18390,24 @@ var ReviewManager = /** @class */ (function () {
         textarea.setAttribute(CONTROL_ATTR_NAME, '');
         textarea.className = "reviewCommentEditor text";
         textarea.innerText = '';
+        textarea.style.resize = "none";
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
-        var add = document.createElement('button');
-        add.setAttribute(CONTROL_ATTR_NAME, '');
-        add.className = "reviewCommentEditor save";
-        add.style.fontFamily = "Consolas";
-        add.innerText = 'Add Comment';
-        add.onclick = this.handleAddComment.bind(this);
+        var confirm = document.createElement('button');
+        confirm.setAttribute(CONTROL_ATTR_NAME, '');
+        confirm.className = "reviewCommentEditor save";
+        confirm.style.fontFamily = "Consolas";
+        confirm.innerText = 'Add Comment';
+        confirm.onclick = this.handleAddComment.bind(this);
         var cancel = document.createElement('button');
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
         cancel.className = "reviewCommentEditor cancel";
         cancel.innerText = 'Cancel';
         cancel.onclick = this.handleCancel.bind(this);
         root.appendChild(textarea);
-        root.appendChild(add);
         root.appendChild(cancel);
-        this.textarea = textarea;
-        return root;
+        root.appendChild(confirm);
+        return { root: root, confirm: confirm, cancel: cancel, textarea: textarea };
     };
     ReviewManager.prototype.createInlineToolbarWidget = function () {
         var buttonsElement = this.createInlineEditButtonsElement();
@@ -18414,7 +18418,7 @@ var ReviewManager = /** @class */ (function () {
                 return 'widgetInlineToolbar';
             },
             getDomNode: function () {
-                return buttonsElement;
+                return buttonsElement.root;
             },
             getPosition: function () {
                 if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {
@@ -18429,6 +18433,7 @@ var ReviewManager = /** @class */ (function () {
             }
         };
         this.editor.addContentWidget(this.widgetInlineToolbar);
+        return buttonsElement;
     };
     ReviewManager.prototype.createInlineEditorWidget = function () {
         var _this = this;
@@ -18440,7 +18445,7 @@ var ReviewManager = /** @class */ (function () {
                 return 'widgetInlineEditor';
             },
             getDomNode: function () {
-                return editorElement;
+                return editorElement.root;
             },
             getPosition: function () {
                 if (_this.editorMode == EditorMode.insertComment || _this.editorMode == EditorMode.editComment) {
@@ -18455,6 +18460,7 @@ var ReviewManager = /** @class */ (function () {
             }
         };
         this.editor.addContentWidget(this.widgetInlineCommentEditor);
+        return editorElement;
     };
     ReviewManager.prototype.setActiveComment = function (comment) {
         var _this = this;
@@ -18542,9 +18548,15 @@ var ReviewManager = /** @class */ (function () {
         return result;
     };
     ReviewManager.prototype.layoutInlineToolbar = function () {
-        var root = this.widgetInlineToolbar.getDomNode();
-        root.style.backgroundColor = this.getThemedColor("editor.background");
-        root.style.marginTop = this.calculateMarginTopOffset(false) + "px";
+        var _this = this;
+        this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
+        this.inlineToolbarElements.root.style.marginTop = this.calculateMarginTopOffset(false) + "px";
+        if (this.inlineToolbarElements.remove) {
+            var hasChildren = this.activeComment && this.iterateComments(function (c) { return c.comment.id === _this.activeComment.id; }).length > 1;
+            var isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
+            this.inlineToolbarElements.remove.style.display = hasChildren ? 'none' : '';
+            this.inlineToolbarElements.edit.style.display = hasChildren || !isSameUser ? 'none' : '';
+        }
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     };
     ReviewManager.prototype.layoutInlineCommentEditor = function () {
@@ -18559,6 +18571,7 @@ var ReviewManager = /** @class */ (function () {
             button.style.backgroundColor = _this.getThemedColor("button.background");
             button.style.color = _this.getThemedColor("button.foreground");
         });
+        this.editorElements.confirm.innerText = this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
         root.style.marginTop = this.calculateMarginTopOffset(true) + "px";
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     };
@@ -18570,13 +18583,13 @@ var ReviewManager = /** @class */ (function () {
         this.layoutInlineToolbar();
         if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
             if (mode == EditorMode.insertComment) {
-                this.textarea.value = "";
+                this.editorElements.textarea.value = "";
             }
             else if (mode == EditorMode.editComment) {
-                this.textarea.value = this.activeComment.text;
+                this.editorElements.textarea.value = this.activeComment.text;
             }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
-            setTimeout(function () { return _this.textarea.focus(); }, 100); //TODO - make configurable
+            setTimeout(function () { return _this.editorElements.textarea.focus(); }, 100); //TODO - make configurable
         }
     };
     ReviewManager.prototype.getDateTimeNow = function () {
@@ -18709,7 +18722,7 @@ var ReviewManager = /** @class */ (function () {
                     domNode.appendChild(_this.createElement((item.state.comment.author || ' ') + " at ", 'reviewComment author'));
                     domNode.appendChild(_this.createElement(_this.formatDate(item.state.comment.dt), 'reviewComment dt'));
                     if (item.state.history.length) {
-                        domNode.appendChild(_this.createElement("(Edited " + item.state.history.length + " times)", 'reviewComment history'));
+                        domNode.appendChild(_this.createElement("(Edited " + (item.state.history.length - 1) + " times)", 'reviewComment history'));
                     }
                     domNode.appendChild(_this.createElement("" + item.state.comment.text, 'reviewComment text', 'div'));
                     item.state.viewZoneId = changeAccessor.addZone({
