@@ -29,12 +29,14 @@
       }
       .summary {
         height: auto;
-        max-height: 100px;
-        min-height: 100px;
+        max-height: 300px;
+        min-height: 300px;
         padding: 10px;
         overflow: auto;
         font-size: 12px;
         text-overflow: clip;
+        display: flex;
+        flex-direction: row;
       }
 
       .btn{
@@ -66,8 +68,10 @@
       Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
     </h5>
     <div class="editor" id="containerEditor"></div>
-    <h5>Comments</h5>
+    
     <div class="summary" id="summaryEditor"></div>
+    
+    
   </body>
 </html>
 

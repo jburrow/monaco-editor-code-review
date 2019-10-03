@@ -150,6 +150,46 @@ interface InlineToolbarElements {
     edit: HTMLSpanElement;
 }
 
+
+//TODO ...
+//TODO - type - TODO, QUESTION
+
+export function processComments(comments: ReviewComment[], commentState: { [reviewCommentId: string]: ReviewCommentState } = null) {
+    commentState = commentState || comments.reduce((acc, cur) => { acc[cur.id] = new ReviewCommentState(cur, 0); return acc; }, {});
+
+    const updates = comments.filter(c => c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted)//TODO.sort(this.compareComments);    
+    const viewZoneIdsToDelete: string[] = []
+
+    for (const c of updates) {
+        const parent = commentState[c.parentId];
+        if (parent) {
+            if (parent.history.length === 0) {
+                parent.history.push(parent.comment);
+            }
+
+            parent.history.push(c);
+
+            switch (c.status) {
+                case ReviewCommentStatus.edit:
+                    //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
+                    parent.comment = { ...parent.comment, text: c.text, author: c.author };
+                    break;
+                case ReviewCommentStatus.deleted:
+                    delete commentState[parent.comment.id];
+                    viewZoneIdsToDelete.push(parent.viewZoneId);
+
+                    break;
+            }
+        }
+        console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
+        delete commentState[c.id]; //mutation of state - removal of comment as it is processed.            
+    }
+
+    console.log('Processed', updates.length, 'modified comments');
+
+    return { commentState, viewZoneIdsToDelete };
+}
+
 export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
@@ -229,46 +269,13 @@ export class ReviewManager {
                 this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(comment.text));
             }
             this.comments = comments;
-            this.processUpdates(comments);
+            const pcr = processComments(comments, this.commentState);
+            this.viewZoneIdsToDelete = this.viewZoneIdsToDelete.concat(pcr.viewZoneIdsToDelete);
 
             this.refreshComments();
 
-            console.debug('Comments Loaded: ', Object.values(this.commentState).length);
+            console.debug('Comments Loaded:', comments.length, 'Active:', Object.values(this.commentState).length);
         })
-    }
-
-    //TODO ...
-    //TODO - type - TODO, QUESTION
-
-    private processUpdates(comments: ReviewComment[]) {
-        const updates = comments.filter(c => c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted)//TODO.sort(this.compareComments);
-        const deletedIds: string[] = [];
-        for (const c of updates) {
-            const parent = this.commentState[c.parentId];
-            if (parent) {
-                if (parent.history.length === 0) {
-                    parent.history.push(parent.comment);
-                }
-
-                parent.history.push(c);
-
-                switch (c.status) {
-                    case ReviewCommentStatus.edit:
-                        //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
-                        parent.comment = { ...parent.comment, text: c.text, author: c.author };
-                        break;
-                    case ReviewCommentStatus.deleted:
-                        delete this.commentState[parent.comment.id];
-                        this.viewZoneIdsToDelete.push(parent.viewZoneId);
-                        deletedIds.push(parent.comment.id);
-                        break;
-                }
-            }
-            console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
-            delete this.commentState[c.id]; //mutation of state - removal of comment as it is processed.            
-        }
-
-        this.verbose && console.log('Processed', updates.length, 'editted comments');
     }
 
     calculateNumberOfLines(text: string): number {
@@ -666,7 +673,8 @@ export class ReviewManager {
         this.comments.push(comment);
         this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
 
-        this.processUpdates([comment]);
+        const pcr = processComments([comment], this.commentState);
+        this.viewZoneIdsToDelete = this.viewZoneIdsToDelete.concat(pcr.viewZoneIdsToDelete);
 
         // Make all comments for this line as dirty.
         this.filterAndMapComments([ln], (c) => {

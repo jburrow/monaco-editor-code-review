@@ -1,4 +1,4 @@
-import { ReviewComment, createReviewManager, ReviewManager, ReviewCommentStatus } from "./index";
+import { ReviewComment, processComments, createReviewManager, ReviewManager, ReviewCommentStatus } from "./index";
 import * as moment from "moment";
 
 
@@ -139,13 +139,13 @@ function initReviewManager(editor: any) {
         "mr reviewer",
         createRandomComments(),
         updatedComments => renderComments(updatedComments),
-        {
+        {            
             editButtonEnableRemove: true,
             formatDate: (dt: Date | string) => moment(dt).format('YY-MM-DD HH:mm')
         }
     );
 
-    renderComments(Object.values(reviewManager.commentState).map(cs => cs.comment));
+    renderComments(reviewManager.comments);
 }
 
 function toggleTheme() {
@@ -155,7 +155,7 @@ function toggleTheme() {
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
-    renderComments(Object.values(reviewManager.commentState).map(cs => cs.comment));
+    renderComments(reviewManager.comments);
 }
 
 function createRandomComments(): ReviewComment[] {
@@ -227,7 +227,7 @@ function createRandomComments(): ReviewComment[] {
 
 function renderComments(comments: ReviewComment[]) {
     console.log('Render Comments #', comments.length, comments);
-    
+
     comments = comments || [];
 
     const header = {
@@ -240,11 +240,19 @@ function renderComments(comments: ReviewComment[]) {
         status: "Status",
         text: "Text"
     }
-
-    document.getElementById("summaryEditor").innerHTML = [header as any].concat(comments as any[])
+console.log('Raw Comments', comments);
+    const rawHtml = [header as any].concat(comments as any[])
         .map(
-            comment =>
-                `<div style="text-align:left;display:flex;height:16px;text-decoration:${comment.status && comment.status === ReviewCommentStatus.deleted ? 'line-through' : 'normal'}">
+            comment => {
+                let textDecoration = 'normal';
+                if (comment.status && comment.status===ReviewCommentStatus.deleted) {
+                    textDecoration = 'line-through';
+                } else if (comment.status && comment.status===ReviewCommentStatus.edit) {
+                    textDecoration = 'underline';
+                }
+
+
+                return `<div style="text-align:left;display:flex;height:16px;text-decoration:${textDecoration}">
                     <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>
                     <div style="width:100px;overflow:hidden;">${comment.parentId || '&nbsp;'}</div>
                     <div style="width:100px;overflow:hidden;">${ { undefined: 'active', 1: 'active', 2: 'deleted', 3: 'edit' }[comment.status] || comment.status}</div>
@@ -254,9 +262,27 @@ function renderComments(comments: ReviewComment[]) {
                     <div style="width:auto;overflow:hidden;">${comment.text}</div>                    
                     <div style="width:auto;overflow:hidden;">${comment.selection && JSON.stringify(comment.selection) || '&nbsp;'}</div>                    
                 </div>`
+            }
         )
         .join("");
 
+    const pcr = processComments(comments);
+    const activeComments = Object.values(pcr.commentState).map(cs => cs.comment)
+
+    const activeHtml = activeComments
+        .map(
+            comment =>
+                `<div style="text-align:left;display:flex;height:16px;text-decoration:${comment.status && comment.status === ReviewCommentStatus.deleted ? 'line-through' : 'normal'}">
+                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>                                     
+                    <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
+                    <div style="width:100px;overflow:hidden;">${comment.author}</div> 
+                    <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
+                    <div style="width:auto;overflow:hidden;">${comment.text}</div>                                        
+                </div>`
+        )
+        .join("");
+
+    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Raw Comments</h5>${rawHtml}</div>`;
 }
 
 function clearComments() {

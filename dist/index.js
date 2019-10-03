@@ -288,6 +288,39 @@ var defaultReviewManagerConfig = {
 };
 var CONTROL_ATTR_NAME = 'ReviewManagerControl';
 var POSITION_BELOW = 2; //above=1, below=2, exact=0
+//TODO ...
+//TODO - type - TODO, QUESTION
+function processComments(comments, commentState) {
+    if (commentState === void 0) { commentState = null; }
+    commentState = commentState || comments.reduce(function (acc, cur) { acc[cur.id] = new ReviewCommentState(cur, 0); return acc; }, {});
+    var updates = comments.filter(function (c) { return c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted; }); //TODO.sort(this.compareComments);    
+    var viewZoneIdsToDelete = [];
+    for (var _i = 0, updates_1 = updates; _i < updates_1.length; _i++) {
+        var c = updates_1[_i];
+        var parent_1 = commentState[c.parentId];
+        if (parent_1) {
+            if (parent_1.history.length === 0) {
+                parent_1.history.push(parent_1.comment);
+            }
+            parent_1.history.push(c);
+            switch (c.status) {
+                case ReviewCommentStatus.edit:
+                    //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
+                    parent_1.comment = __assign(__assign({}, parent_1.comment), { text: c.text, author: c.author });
+                    break;
+                case ReviewCommentStatus.deleted:
+                    delete commentState[parent_1.comment.id];
+                    viewZoneIdsToDelete.push(parent_1.viewZoneId);
+                    break;
+            }
+        }
+        console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
+        delete commentState[c.id]; //mutation of state - removal of comment as it is processed.            
+    }
+    console.log('Processed', updates.length, 'modified comments');
+    return { commentState: commentState, viewZoneIdsToDelete: viewZoneIdsToDelete };
+}
+exports.processComments = processComments;
 var ReviewManager = /** @class */ (function () {
     function ReviewManager(editor, currentUser, onChange, config) {
         var _this = this;
@@ -342,40 +375,11 @@ var ReviewManager = /** @class */ (function () {
                 _this.commentState[comment.id] = new ReviewCommentState(comment, _this.calculateNumberOfLines(comment.text));
             }
             _this.comments = comments;
-            _this.processUpdates(comments);
+            var pcr = processComments(comments, _this.commentState);
+            _this.viewZoneIdsToDelete = _this.viewZoneIdsToDelete.concat(pcr.viewZoneIdsToDelete);
             _this.refreshComments();
-            console.debug('Comments Loaded: ', Object.values(_this.commentState).length);
+            console.debug('Comments Loaded:', comments.length, 'Active:', Object.values(_this.commentState).length);
         });
-    };
-    //TODO ...
-    //TODO - type - TODO, QUESTION
-    ReviewManager.prototype.processUpdates = function (comments) {
-        var updates = comments.filter(function (c) { return c.status === ReviewCommentStatus.edit || c.status === ReviewCommentStatus.deleted; }); //TODO.sort(this.compareComments);
-        var deletedIds = [];
-        for (var _i = 0, updates_1 = updates; _i < updates_1.length; _i++) {
-            var c = updates_1[_i];
-            var parent_1 = this.commentState[c.parentId];
-            if (parent_1) {
-                if (parent_1.history.length === 0) {
-                    parent_1.history.push(parent_1.comment);
-                }
-                parent_1.history.push(c);
-                switch (c.status) {
-                    case ReviewCommentStatus.edit:
-                        //Copy the text + author onto new comment -  preserve id, parentId, and dt from the original
-                        parent_1.comment = __assign(__assign({}, parent_1.comment), { text: c.text, author: c.author });
-                        break;
-                    case ReviewCommentStatus.deleted:
-                        delete this.commentState[parent_1.comment.id];
-                        this.viewZoneIdsToDelete.push(parent_1.viewZoneId);
-                        deletedIds.push(parent_1.comment.id);
-                        break;
-                }
-            }
-            console.log('Removing', c.id, 'from comments because it has been processed as a', ReviewCommentStatus[c.status]);
-            delete this.commentState[c.id]; //mutation of state - removal of comment as it is processed.            
-        }
-        this.verbose && console.log('Processed', updates.length, 'editted comments');
     };
     ReviewManager.prototype.calculateNumberOfLines = function (text) {
         return text ? text.split(/\r*\n/).length + 1 : 1;
@@ -730,7 +734,8 @@ var ReviewManager = /** @class */ (function () {
         };
         this.comments.push(comment);
         this.commentState[comment.id] = new ReviewCommentState(comment, this.calculateNumberOfLines(text));
-        this.processUpdates([comment]);
+        var pcr = processComments([comment], this.commentState);
+        this.viewZoneIdsToDelete = this.viewZoneIdsToDelete.concat(pcr.viewZoneIdsToDelete);
         // Make all comments for this line as dirty.
         this.filterAndMapComments([ln], function (c) {
             _this.commentState[c.id].renderStatus = ReviewCommentRenderState.dirty;
