@@ -104,13 +104,13 @@ test('createReviewManager to editor and add comments', () => {
     expect(Object.keys(editor._zones).length).toBe(2);
 
     rm.setActiveComment(rm.store.comments[num2.id].comment);
-    
+
     const num3 = rm.addComment(null, "#2.2");
     expect(num3.targetId).toBe(num2.id);
     expect(Object.keys(rm.store.comments).length).toBe(3);
     expect(Object.keys(editor._zones).length).toBe(3);
-    
-    rm.setActiveComment(null);    
+
+    rm.setActiveComment(null);
     const num4 = rm.addComment(4, "#4");
     expect(num4.targetId).toBe(null);
     expect(Object.keys(editor._zones).length).toBe(4);
@@ -130,7 +130,7 @@ test('load clears the comments', () => {
 
 test('Remove a comment via the widgets', () => {
     const editor = getMockEditor();
-    const rm = createReviewManager(editor, 'current.user');
+    const rm = createReviewManager(editor, 'current.user', null, null, null, true);
 
     expect(rm.activeComment).toBe(null);
     expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
@@ -151,7 +151,7 @@ test('Remove a comment via the widgets', () => {
     //TODO - expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber);
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
-    const deletedComment = rm.removeComment(rm.store.comments[comment.id].comment);
+    const deletedComment = rm.removeComment(comment.id);
     expect(deletedComment.targetId).toBe(comment.id);
     expect(Object.values(rm.store.comments).length).toBe(0);
     expect(rm.store.viewZoneIdsToDelete.length).toBe(0);
@@ -228,8 +228,8 @@ test('Navigation - Forward and Back', () => {
     rm.setActiveComment(rm.store.comments[c1.id].comment);
     const c1_1 = rm.addComment(1, "1.1");
 
-    rm.removeComment(rm.store.comments[c2.id].comment);
-    rm.removeComment(rm.store.comments[c4.id].comment);
+    rm.removeComment(c2.id);
+    rm.removeComment(c4.id);
 
     rm.setActiveComment(rm.store.comments[c3.id].comment);
 

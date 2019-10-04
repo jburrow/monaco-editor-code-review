@@ -62,9 +62,9 @@
       <button onclick="clearComments()" class="btn btn-secondary">
         Clear Comments
       </button>
-      <select onchange="setCurrentUser()">
-        <option value="1" selected>User 1</option>
-        <option value="2">User 2</option>
+      <select id="selectUser" onchange="setCurrentUser()">
+        <option value="foo.user" selected>Foo User</option>
+        <option value="bar.user">Bar User</option>
       </select>
     </div>
     <h5>

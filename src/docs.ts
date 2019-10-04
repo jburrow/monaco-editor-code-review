@@ -1,5 +1,6 @@
-import { ReviewComment, Action, createReviewManager, ReviewManager, ReviewCommentStatus } from "./index";
+import { createReviewManager, ReviewManager } from "./index";
 import * as moment from "moment";
+import { ReviewCommentEvent } from "./events-reducers";
 
 
 
@@ -121,8 +122,8 @@ async function init() {
     await fetchSourceCode("../src/index.test.ts");
 
     const response = await fetch("../dist/timestamp.json");
-    const tsobj = await response.json();
-    console.log("Compiled at:", tsobj.date);
+    const tsobj = await response.text();
+    console.log("Compiled at:", tsobj);
 
     win.require.config({
         paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
@@ -146,7 +147,9 @@ function initReviewManager(editor: any) {
         }
     );
 
-    renderComments(reviewManager.actions);
+    setCurrentUser();
+
+    renderComments(reviewManager.events);
 }
 
 function toggleTheme() {
@@ -156,18 +159,18 @@ function toggleTheme() {
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
-    renderComments(reviewManager.actions);
+    renderComments(reviewManager.events);
 }
 
 function setCurrentUser() {
-    const select = document.body.getElementsByTagName('select')[0] as HTMLSelectElement;
-    console.warn(select.value);
+    const select = document.getElementById('selectUser') as HTMLSelectElement;
+    reviewManager.currentUser = select.value;
 }
 
-function createRandomComments(): Action[] {
+function createRandomComments(): ReviewCommentEvent[] {
     const firstLine = Math.floor(Math.random() * 10);
 
-    const result: Action[] = [
+    const result: ReviewCommentEvent[] = [
         {
             type: "create",
             id: "id-0",
@@ -236,19 +239,18 @@ function createRandomComments(): Action[] {
     return result;
 }
 
-function renderComments(actions: Action[]) {
-    console.log('Render Comments #', actions.length, actions);
+function renderComments(events: ReviewCommentEvent[]) {
+    events = events || [];    
+    console.log('Events #', events.length, events);
 
-    actions = actions || [];
     const rawHeader = {
         type: "Type",
         id: "Id",
         createdBy: "Author",
         createdAt: "Created At",
     }
-
-    console.log('Events', actions);
-    const rawHtml = [rawHeader as any].concat(actions as any[])
+    
+    const rawHtml = [rawHeader as any].concat(events as any[])
         .map(
             comment => {
                 return `<div style="text-align:left;display:flex;height:16px">

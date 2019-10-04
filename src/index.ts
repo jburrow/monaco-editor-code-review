@@ -1,28 +1,12 @@
-import * as uuid from "uuid/v4";
 import * as monacoEditor from "monaco-editor";
+import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-reducers";
+import * as uuid from "uuid/v4";
 
 interface MonacoWindow {
     monaco: any;
 }
 
 const monacoWindow = (window as any) as MonacoWindow;
-
-export interface ReviewComment {
-    id?: string;
-    parentId?: string;
-    author: string;
-    dt: Date | string;
-    lineNumber: number;
-    text: string;
-    selection?: CodeSelection;
-    status?: ReviewCommentStatus;
-}
-
-export enum ReviewCommentStatus {
-    active = 1,
-    deleted = 2,
-    edit = 3,
-}
 
 enum NavigationDirection {
     next = 1,
@@ -35,38 +19,10 @@ export enum EditorMode {
     toolbar = 3
 }
 
-enum ReviewCommentRenderState {
-    dirty = 1,
-    hidden = 2,
-    normal = 3
-}
 
-interface CodeSelection {
-    startColumn: number,
-    endColumn: number,
-    startLineNumber: number,
-    endLineNumber: number
-}
-
-class ReviewCommentState {
-    viewZoneId: string;
-    renderStatus: ReviewCommentRenderState;
-    numberOfLines: number;
-    comment: ReviewComment;
-    history: ReviewComment[];
-
-    constructor(comment: ReviewComment, numberOfLines: number) {
-        this.renderStatus = ReviewCommentRenderState.normal;
-        this.viewZoneId = null;
-        this.comment = comment;
-        this.numberOfLines = numberOfLines;
-        this.history = [comment];
-    }
-}
-
-export function createReviewManager(editor: any, currentUser: string, actions?: Action[], onChange?: OnActionsChanged, config?: ReviewManagerConfig): ReviewManager {
+export function createReviewManager(editor: any, currentUser: string, actions?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager {
     //For Debug: (window as any).editor = editor;
-    const rm = new ReviewManager(editor, currentUser, onChange, config);
+    const rm = new ReviewManager(editor, currentUser, onChange, config, verbose);
     rm.load(actions || []);
     return rm;
 }
@@ -78,7 +34,7 @@ interface ReviewCommentIterItem {
 }
 
 interface OnActionsChanged {
-    (actions: Action[]): void
+    (actions: ReviewCommentEvent[]): void
 }
 
 export interface ReviewManagerConfig {
@@ -148,103 +104,12 @@ interface InlineToolbarElements {
     edit: HTMLSpanElement;
 }
 
-function compareComments(a: ReviewComment, b: ReviewComment) {
-    return a.dt > b.dt ? 1 : -1;
-}
-
-type CommonFields = {
-    id?: string,
-    targetId?: string,
-    createdBy?: string,
-    createdAt?: Date | string
-};
-
-
-export type Action =
-    { type: 'create', lineNumber: number, text: string, selection?: CodeSelection } & CommonFields |
-    { type: 'edit', text: string } & CommonFields |
-    { type: 'delete' } & CommonFields;
-
-interface CommentState {
-    comments: { [reviewCommentId: string]: ReviewCommentState };
-    viewZoneIdsToDelete: string[];
-};
-
-
-export function commentReducer(action: Action, state: CommentState) {
-    const dirtyLineNumbers = new Set<number>();
-    switch (action.type) {
-        case "edit":
-            const parent = state.comments[action.targetId];
-            if(!parent)break;
-
-            parent.comment = { ...parent.comment, author: action.createdBy, dt: action.createdAt, text: action.text };
-            parent.history.push(parent.comment);
-            parent.numberOfLines = calculateNumberOfLines(action.text);
-            dirtyLineNumbers.add(parent.comment.lineNumber);
-            console.log('edit', action);
-            break;
-
-        case "delete":
-            const selected = state.comments[action.targetId];
-            delete state.comments[action.targetId];
-            if (selected.viewZoneId) {
-                state.viewZoneIdsToDelete.push(selected.viewZoneId);
-            }
-            dirtyLineNumbers.add(selected.comment.lineNumber);
-            console.log('delete', action);
-            break;
-
-        case "create":
-            if (!state.comments[action.id]) {
-                state.comments[action.id] = new ReviewCommentState({
-                    author: action.createdBy,
-                    dt: action.createdAt, 
-                    id: action.id, 
-                    lineNumber: action.lineNumber, 
-                    text: action.text,
-                    parentId: action.targetId
-                }, calculateNumberOfLines(action.text));
-                console.log('insert', action);
-                dirtyLineNumbers.add(action.lineNumber);
-            }
-            break;
-    }
-
-    if (dirtyLineNumbers.size) {
-        for (const cs of Object.values(state.comments)) {
-            if (dirtyLineNumbers.has(cs.comment.lineNumber)) {
-                cs.renderStatus = ReviewCommentRenderState.dirty;
-            }
-        }
-    }
-
-    return state;
-}
-
-function calculateNumberOfLines(text: string): number {
-    return text ? text.split(/\r*\n/).length + 1 : 1;
-}
-
-
-export function reduceComments(actions: Action[], state: CommentState = null) {
-    state = state || { comments: {}, viewZoneIdsToDelete: [] };
-
-    for (const a of actions) {
-        if (!a.id) {
-            a.id = uuid();
-        }
-        state = commentReducer(a, state);
-    }
-    return state;
-}
-
 export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
     editorConfig: monacoEditor.editor.InternalEditorOptions;
-    actions: Action[];
-    store: CommentState;
+    events: ReviewCommentEvent[];
+    store: ReviewCommentStore;
     activeComment?: ReviewComment;
     widgetInlineToolbar: monacoEditor.editor.IContentWidget;
     widgetInlineCommentEditor: monacoEditor.editor.IContentWidget;
@@ -259,10 +124,10 @@ export class ReviewManager {
     inlineToolbarElements: InlineToolbarElements;
     verbose: boolean;
 
-    constructor(editor: any, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig) {
+    constructor(editor: any, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean) {
         this.currentUser = currentUser;
         this.editor = editor;
-        this.activeComment = null;
+        this.activeComment = null; //TODO - consider moving onto the store
         this.widgetInlineToolbar = null;
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
@@ -271,10 +136,10 @@ export class ReviewManager {
         this.currentLineDecorations = [];
         this.currentCommentDecorations = []
         this.currentLineDecorationLineNumber = null;
-        this.actions = [];
+        this.events = [];
         this.store = { comments: {}, viewZoneIdsToDelete: [] };
 
-        this.verbose = false;
+        this.verbose = verbose;
 
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
@@ -289,7 +154,7 @@ export class ReviewManager {
         }
     }
 
-    load(actions: Action[]): void {
+    load(events: ReviewCommentEvent[]): void {
         this.editor.changeViewZones((changeAccessor) => {
             // Remove all the existing comments     
             for (const viewState of Object.values(this.store.comments)) {
@@ -298,11 +163,11 @@ export class ReviewManager {
                 }
             }
 
-            this.actions = actions;
-            this.store = reduceComments(actions);
+            this.events = events;
+            this.store = reduceComments(events);
             this.refreshComments();
 
-            console.debug('Comments Loaded:', actions.length, 'Active:', Object.values(this.store.comments).length);
+            this.verbose && console.debug('Events Loaded:', events.length, 'Review Comments:', Object.values(this.store.comments).length);
         })
     }
 
@@ -347,23 +212,24 @@ export class ReviewManager {
 
         let remove = null;
         let edit = null;
+        let spacer = null;
 
         if (this.config.editButtonEnableRemove) {
-            const spacer = document.createElement('div') as HTMLDivElement;
-            spacer.innerText = ' '
+            spacer = document.createElement('div') as HTMLDivElement;
+            spacer.innerText = '&nbsp;'
             root.appendChild(spacer);
 
             remove = document.createElement('span') as HTMLSpanElement;
             remove.setAttribute(CONTROL_ATTR_NAME, '');
             remove.innerText = this.config.editButtonRemoveText;
             remove.className = 'editButton remove'
-            remove.onclick = () => this.removeComment(this.activeComment);
+            remove.onclick = () => this.activeComment && this.removeComment(this.activeComment.id);
             root.appendChild(remove);
         }
 
         if (this.config.editButtonEnableEdit) {
-            const spacer = document.createElement('div') as HTMLDivElement;
-            spacer.innerText = ' '
+            spacer = document.createElement('div') as HTMLDivElement;
+            spacer.innerText = '&nbsp;'
             root.appendChild(spacer);
 
             edit = document.createElement('span') as HTMLSpanElement;
@@ -395,9 +261,11 @@ export class ReviewManager {
         if (e.code === "Escape") {
             this.handleCancel();
             e.preventDefault();
+            console.info('preventDefault: Escape Key');
         } else if (e.code === "Enter" && e.ctrlKey) {
             this.handleAddComment();
             e.preventDefault();
+            console.info('preventDefault: ctrl+Enter');
         }
     }
 
@@ -492,7 +360,7 @@ export class ReviewManager {
     }
 
     setActiveComment(comment: ReviewComment) {
-        console.debug('setActiveComment', comment);
+        this.verbose && console.debug('setActiveComment', comment);
 
         const lineNumbersToMakeDirty = [];
         if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
@@ -518,7 +386,7 @@ export class ReviewManager {
         }
     }
 
-    handleMouseMove(ev) {
+    handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent) {
         if (ev.target && ev.target.position && ev.target.position.lineNumber) {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
             this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
@@ -596,22 +464,20 @@ export class ReviewManager {
     }
 
     layoutInlineCommentEditor() {
-        const root = this.widgetInlineCommentEditor.getDomNode() as HTMLElement;
-
-        Array.prototype.slice.call(root.getElementsByTagName('textarea')).concat([root]).forEach(e => {
+        [this.editorElements.root, this.editorElements.textarea].forEach(e => {
             e.style.backgroundColor = this.getThemedColor("editor.background");
             e.style.color = this.getThemedColor("editor.foreground");
-        })
+        });
 
-        Array.prototype.slice.call(root.getElementsByTagName('button'))
+        [this.editorElements.confirm, this.editorElements.cancel]
             .forEach((button) => {
                 button.style.backgroundColor = this.getThemedColor("button.background");
                 button.style.color = this.getThemedColor("button.foreground");
             });
 
         this.editorElements.confirm.innerText = this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
+        this.editorElements.root.style.marginTop = `${this.calculateMarginTopOffset(true)}px`;
 
-        root.style.marginTop = `${this.calculateMarginTopOffset(true)}px`;
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
 
@@ -639,7 +505,7 @@ export class ReviewManager {
     }
 
     private recurseComments(allComments: { [key: string]: ReviewCommentState }, filterFn: { (c: ReviewCommentState): boolean }, depth: number, results: ReviewCommentIterItem[]) {
-        const comments = Object.values(allComments).filter(filterFn)//TODO.sort(compareComments);
+        const comments = Object.values(allComments).filter(filterFn);
         for (const cs of comments) {
             const comment = cs.comment;
             delete allComments[comment.id];
@@ -665,28 +531,25 @@ export class ReviewManager {
         return results;
     }
 
-    removeComment(comment: ReviewComment) {
-        if (comment) {
-            return this.createAction({ type: "delete", targetId: comment.id });
-        }
-        return null
+    removeComment(id: string) {
+        return this.addEvent({ type: "delete", targetId: id });
     }
 
     addComment(lineNumber: number, text: string, selection?: CodeSelection) {
-        const action: Action = this.editorMode === EditorMode.editComment ?
+        const event: ReviewCommentEvent = this.editorMode === EditorMode.editComment ?
             { type: "edit", text, targetId: this.activeComment.id }
             : { type: "create", text, lineNumber, selection, targetId: this.activeComment && this.activeComment.id };
 
-        return this.createAction(action);
+        return this.addEvent(event);
     }
 
-    private createAction(action: Action) {
-        action.createdBy = this.currentUser;
-        action.createdAt = this.getDateTimeNow();
-        action.id = uuid();
+    private addEvent(event: ReviewCommentEvent) {
+        event.createdBy = this.currentUser;
+        event.createdAt = this.getDateTimeNow();
+        event.id = uuid();
 
-        this.actions.push(action);
-        this.store = commentReducer(action, this.store);
+        this.events.push(event);
+        this.store = commentReducer(event, this.store);
 
         if (this.activeComment && !this.store.comments[this.activeComment.id]) {
             this.setActiveComment(null);
@@ -699,10 +562,10 @@ export class ReviewManager {
         this.layoutInlineToolbar();
 
         if (this.onChange) {
-            this.onChange(this.actions);
+            this.onChange(this.events);
         }
 
-        return action;
+        return event;
     }
 
     private formatDate(dt: Date | string) {
@@ -770,7 +633,7 @@ export class ReviewManager {
 
                     domNode.appendChild(this.createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
                     domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'))
-                    if (item.state.history.length>1) {
+                    if (item.state.history.length > 1) {
                         domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, 'reviewComment history'))
                     }
                     domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'))

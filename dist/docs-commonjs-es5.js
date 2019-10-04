@@ -1,4 +1,3 @@
-var MonacoEditorCodeReview =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -17854,22 +17853,58 @@ module.exports = function(module) {
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __webpack_require__(/*! ./index */ "./src/index.ts");
-const moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-const win = window;
-let reviewManager = null;
-let currentMode = '';
-let currentEditor = null;
-let theme = 'vs-dark';
+var index_1 = __webpack_require__(/*! ./index */ "./src/index.ts");
+var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+var win = window;
+var reviewManager = null;
+var currentMode = '';
+var currentEditor = null;
+var theme = 'vs-dark';
 function ensureMonacoIsAvailable() {
-    return new Promise(resolve => {
+    return new Promise(function (resolve) {
         if (!win.require) {
             console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
             var prefix = "https://microsoft.github.io/monaco-editor";
-            const scriptTag = document.createElement("script");
+            var scriptTag = document.createElement("script");
             scriptTag.src = prefix + "/node_modules/monaco-editor/min/vs/loader.js";
-            scriptTag.onload = () => {
+            scriptTag.onload = function () {
                 console.debug("Monaco loader is initialized");
                 resolve(prefix);
             };
@@ -17884,7 +17919,7 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 function setView(mode) {
-    const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
+    var idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
     currentMode = mode;
     document.getElementById("containerEditor").innerHTML = "";
     if (mode.startsWith("standard")) {
@@ -17902,7 +17937,7 @@ function setView(mode) {
     else {
         var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
         var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
-        const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), { renderSideBySide: mode !== "inline" });
+        var e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), { renderSideBySide: mode !== "inline" });
         e.setModel({
             original: originalModel,
             modified: modifiedModel
@@ -17912,43 +17947,75 @@ function setView(mode) {
     }
 }
 function generateDifferentContents() {
-    const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
+    var idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
     if (currentMode.startsWith("standard")) {
         (currentEditor).setValue(exampleSourceCode[idx]);
     }
     else {
-        const e = (currentEditor);
+        var e = (currentEditor);
         e.getModel().modified.setValue(exampleSourceCode[idx]);
         e.getModel().modified.setValue(exampleSourceCode[idx + 1]);
     }
 }
-const exampleSourceCode = [];
-async function fetchSourceCode(url) {
-    const response = await fetch(url);
-    const exampleText = await response.text();
-    const modifiedText = exampleText.replace(new RegExp("string", "g"), "string /* String!*/");
-    exampleSourceCode.push(url + '\n' + exampleText);
-    exampleSourceCode.push(url + '\n' + modifiedText);
-}
-async function init() {
-    var prefix = await ensureMonacoIsAvailable();
-    await fetchSourceCode("../src/index.ts");
-    await fetchSourceCode("../src/docs.ts");
-    await fetchSourceCode("../src/index.test.ts");
-    const response = await fetch("../dist/timestamp.json");
-    const tsobj = await response.text();
-    console.log("Compiled at:", tsobj);
-    win.require.config({
-        paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
+var exampleSourceCode = [];
+function fetchSourceCode(url) {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, exampleText, modifiedText;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fetch(url)];
+                case 1:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.text()];
+                case 2:
+                    exampleText = _a.sent();
+                    modifiedText = exampleText.replace(new RegExp("string", "g"), "string /* String!*/");
+                    exampleSourceCode.push(url + '\n' + exampleText);
+                    exampleSourceCode.push(url + '\n' + modifiedText);
+                    return [2 /*return*/];
+            }
+        });
     });
-    win.require(["vs/editor/editor.main"], function () {
-        setView("standard");
+}
+function init() {
+    return __awaiter(this, void 0, void 0, function () {
+        var prefix, response, tsobj;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, ensureMonacoIsAvailable()];
+                case 1:
+                    prefix = _a.sent();
+                    return [4 /*yield*/, fetchSourceCode("../src/index.ts")];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, fetchSourceCode("../src/docs.ts")];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, fetchSourceCode("../src/index.test.ts")];
+                case 4:
+                    _a.sent();
+                    return [4 /*yield*/, fetch("../dist/timestamp.json")];
+                case 5:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.text()];
+                case 6:
+                    tsobj = _a.sent();
+                    console.log("Compiled at:", tsobj);
+                    win.require.config({
+                        paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
+                    });
+                    win.require(["vs/editor/editor.main"], function () {
+                        setView("standard");
+                    });
+                    return [2 /*return*/];
+            }
+        });
     });
 }
 function initReviewManager(editor) {
-    reviewManager = index_1.createReviewManager(editor, "mr reviewer", createRandomComments(), updatedComments => renderComments(updatedComments), {
+    reviewManager = index_1.createReviewManager(editor, "mr reviewer", createRandomComments(), function (updatedComments) { return renderComments(updatedComments); }, {
         editButtonEnableRemove: true,
-        formatDate: (createdAt) => moment(createdAt).format('YY-MM-DD HH:mm')
+        formatDate: function (createdAt) { return moment(createdAt).format('YY-MM-DD HH:mm'); }
     });
     setCurrentUser();
     renderComments(reviewManager.events);
@@ -17962,12 +18029,12 @@ function generateDifferentComments() {
     renderComments(reviewManager.events);
 }
 function setCurrentUser() {
-    const select = document.getElementById('selectUser');
+    var select = document.getElementById('selectUser');
     reviewManager.currentUser = select.value;
 }
 function createRandomComments() {
-    const firstLine = Math.floor(Math.random() * 10);
-    const result = [
+    var firstLine = Math.floor(Math.random() * 10);
+    var result = [
         {
             type: "create",
             id: "id-0",
@@ -18038,34 +18105,24 @@ function createRandomComments() {
 function renderComments(events) {
     events = events || [];
     console.log('Events #', events.length, events);
-    const rawHeader = {
+    var rawHeader = {
         type: "Type",
         id: "Id",
         createdBy: "Author",
         createdAt: "Created At",
     };
-    const rawHtml = [rawHeader].concat(events)
-        .map(comment => {
-        return `<div style="text-align:left;display:flex;height:16px">
-                    <div style="width:100px;overflow:hidden;">${comment.type || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.createdBy}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.createdAt}</div>                     
-                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment) || '&nbsp;'}</div>                    
-                </div>`;
+    var rawHtml = [rawHeader].concat(events)
+        .map(function (comment) {
+        return "<div style=\"text-align:left;display:flex;height:16px\">\n                    <div style=\"width:100px;overflow:hidden;\">" + (comment.type || '&nbsp;') + "</div>\n                    <div style=\"width:100px;overflow:hidden;\">" + (comment.id || '&nbsp;') + "</div>\n                    <div style=\"width:100px;overflow:hidden;\">" + comment.createdBy + "</div> \n                    <div style=\"width:100px;overflow:hidden;\">" + comment.createdAt + "</div>                     \n                    <div style=\"width:auto;overflow:hidden;\">" + (JSON.stringify(comment) || '&nbsp;') + "</div>                    \n                </div>";
     })
         .join("");
-    const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
-    const activeHtml = activeComments
-        .map(comment => `<div style="text-align:left;display:flex;height:16px;">
-                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>                                     
-                    <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.author}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
-                    <div style="width:auto;overflow:hidden;">${comment.text}</div>                                        
-                </div>`)
+    var activeComments = Object.values(reviewManager.store.comments).map(function (cs) { return cs.comment; });
+    var activeHtml = activeComments
+        .map(function (comment) {
+        return "<div style=\"text-align:left;display:flex;height:16px;\">\n                    <div style=\"width:100px;overflow:hidden;\">" + (comment.id || '&nbsp;') + "</div>                                     \n                    <div style=\"width:50px;overflow:hidden;\">" + comment.lineNumber + "</div>\n                    <div style=\"width:100px;overflow:hidden;\">" + comment.author + "</div> \n                    <div style=\"width:100px;overflow:hidden;\">" + comment.dt + "</div> \n                    <div style=\"width:auto;overflow:hidden;\">" + comment.text + "</div>                                        \n                </div>";
+    })
         .join("");
-    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Raw Comments</h5>${rawHtml}</div>`;
+    document.getElementById("summaryEditor").innerHTML = "<div><h5>Active Comments</h5>" + activeHtml + "</div><div><h5>Raw Comments</h5>" + rawHtml + "</div>";
 }
 function clearComments() {
     reviewManager.load([]);
@@ -18091,24 +18148,35 @@ init();
 
 "use strict";
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+var uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
 ;
 function commentReducer(event, state) {
-    const dirtyLineNumbers = new Set();
+    var dirtyLineNumbers = new Set();
     switch (event.type) {
         case "edit":
-            const parent = state.comments[event.targetId];
-            if (!parent)
+            var parent_1 = state.comments[event.targetId];
+            if (!parent_1)
                 break;
-            parent.comment = Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text });
-            parent.history.push(parent.comment);
-            parent.numberOfLines = calculateNumberOfLines(event.text);
-            dirtyLineNumbers.add(parent.comment.lineNumber);
+            parent_1.comment = __assign(__assign({}, parent_1.comment), { author: event.createdBy, dt: event.createdAt, text: event.text });
+            parent_1.history.push(parent_1.comment);
+            parent_1.numberOfLines = calculateNumberOfLines(event.text);
+            dirtyLineNumbers.add(parent_1.comment.lineNumber);
             console.log('edit', event);
             break;
         case "delete":
-            const selected = state.comments[event.targetId];
+            var selected = state.comments[event.targetId];
             delete state.comments[event.targetId];
             if (selected.viewZoneId) {
                 state.viewZoneIdsToDelete.push(selected.viewZoneId);
@@ -18132,7 +18200,8 @@ function commentReducer(event, state) {
             break;
     }
     if (dirtyLineNumbers.size) {
-        for (const cs of Object.values(state.comments)) {
+        for (var _i = 0, _a = Object.values(state.comments); _i < _a.length; _i++) {
+            var cs = _a[_i];
             if (dirtyLineNumbers.has(cs.comment.lineNumber)) {
                 cs.renderStatus = ReviewCommentRenderState.dirty;
             }
@@ -18145,15 +18214,16 @@ function calculateNumberOfLines(text) {
     return text ? text.split(/\r*\n/).length + 1 : 1;
 }
 exports.calculateNumberOfLines = calculateNumberOfLines;
-class ReviewCommentState {
-    constructor(comment, numberOfLines) {
+var ReviewCommentState = /** @class */ (function () {
+    function ReviewCommentState(comment, numberOfLines) {
         this.renderStatus = ReviewCommentRenderState.normal;
         this.viewZoneId = null;
         this.comment = comment;
         this.numberOfLines = numberOfLines;
         this.history = [comment];
     }
-}
+    return ReviewCommentState;
+}());
 exports.ReviewCommentState = ReviewCommentState;
 var ReviewCommentRenderState;
 (function (ReviewCommentRenderState) {
@@ -18167,9 +18237,11 @@ var ReviewCommentStatus;
     ReviewCommentStatus[ReviewCommentStatus["deleted"] = 2] = "deleted";
     ReviewCommentStatus[ReviewCommentStatus["edit"] = 3] = "edit";
 })(ReviewCommentStatus = exports.ReviewCommentStatus || (exports.ReviewCommentStatus = {}));
-function reduceComments(actions, state = null) {
+function reduceComments(actions, state) {
+    if (state === void 0) { state = null; }
     state = state || { comments: {}, viewZoneIdsToDelete: [] };
-    for (const a of actions) {
+    for (var _i = 0, actions_1 = actions; _i < actions_1.length; _i++) {
+        var a = actions_1[_i];
         if (!a.id) {
             a.id = uuid();
         }
@@ -18191,10 +18263,21 @@ exports.reduceComments = reduceComments;
 
 "use strict";
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const events_reducers_1 = __webpack_require__(/*! ./events-reducers */ "./src/events-reducers.ts");
-const uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
-const monacoWindow = window;
+var events_reducers_1 = __webpack_require__(/*! ./events-reducers */ "./src/events-reducers.ts");
+var uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+var monacoWindow = window;
 var NavigationDirection;
 (function (NavigationDirection) {
     NavigationDirection[NavigationDirection["next"] = 1] = "next";
@@ -18208,12 +18291,12 @@ var EditorMode;
 })(EditorMode = exports.EditorMode || (exports.EditorMode = {}));
 function createReviewManager(editor, currentUser, actions, onChange, config, verbose) {
     //For Debug: (window as any).editor = editor;
-    const rm = new ReviewManager(editor, currentUser, onChange, config, verbose);
+    var rm = new ReviewManager(editor, currentUser, onChange, config, verbose);
     rm.load(actions || []);
     return rm;
 }
 exports.createReviewManager = createReviewManager;
-const defaultReviewManagerConfig = {
+var defaultReviewManagerConfig = {
     verticalOffset: 0,
     editButtonOffset: '-10px',
     editButtonAddText: 'Reply',
@@ -18229,10 +18312,11 @@ const defaultReviewManagerConfig = {
     formatDate: null,
     showAddCommentGlyph: true,
 };
-const CONTROL_ATTR_NAME = 'ReviewManagerControl';
-const POSITION_BELOW = 2; //above=1, below=2, exact=0
-class ReviewManager {
-    constructor(editor, currentUser, onChange, config, verbose) {
+var CONTROL_ATTR_NAME = 'ReviewManagerControl';
+var POSITION_BELOW = 2; //above=1, below=2, exact=0
+var ReviewManager = /** @class */ (function () {
+    function ReviewManager(editor, currentUser, onChange, config, verbose) {
+        var _this = this;
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null; //TODO - consider moving onto the store
@@ -18240,7 +18324,7 @@ class ReviewManager {
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
-        this.config = Object.assign(Object.assign({}, defaultReviewManagerConfig), (config || {}));
+        this.config = __assign(__assign({}, defaultReviewManagerConfig), (config || {}));
         this.currentLineDecorations = [];
         this.currentCommentDecorations = [];
         this.currentLineDecorationLineNumber = null;
@@ -18248,7 +18332,7 @@ class ReviewManager {
         this.store = { comments: {}, viewZoneIdsToDelete: [] };
         this.verbose = verbose;
         this.editorConfig = this.editor.getConfiguration();
-        this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
+        this.editor.onDidChangeConfiguration(function () { return _this.editorConfig = _this.editor.getConfiguration(); });
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
         this.inlineToolbarElements = this.createInlineToolbarWidget();
         this.editorElements = this.createInlineEditorWidget();
@@ -18257,31 +18341,33 @@ class ReviewManager {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
         }
     }
-    load(events) {
-        this.editor.changeViewZones((changeAccessor) => {
+    ReviewManager.prototype.load = function (events) {
+        var _this = this;
+        this.editor.changeViewZones(function (changeAccessor) {
             // Remove all the existing comments     
-            for (const viewState of Object.values(this.store.comments)) {
+            for (var _i = 0, _a = Object.values(_this.store.comments); _i < _a.length; _i++) {
+                var viewState = _a[_i];
                 if (viewState.viewZoneId !== null) {
                     changeAccessor.removeZone(viewState.viewZoneId);
                 }
             }
-            this.events = events;
-            this.store = events_reducers_1.reduceComments(events);
-            this.refreshComments();
-            this.verbose && console.debug('Events Loaded:', events.length, 'Review Comments:', Object.values(this.store.comments).length);
+            _this.events = events;
+            _this.store = events_reducers_1.reduceComments(events);
+            _this.refreshComments();
+            _this.verbose && console.debug('Events Loaded:', events.length, 'Review Comments:', Object.values(_this.store.comments).length);
         });
-    }
-    getThemedColor(name) {
+    };
+    ReviewManager.prototype.getThemedColor = function (name) {
         // editor.background: e {rgba: e}
         // editor.foreground: e {rgba: e}
         // editor.inactiveSelectionBackground: e {rgba: e}
         // editor.selectionHighlightBackground: e {rgba: e}
         // editorIndentGuide.activeBackground: e {rgba: e}
         // editorIndentGuide.background: e {rgba: e}
-        const theme = this.editor._themeService.getTheme();
-        let value = theme.getColor(name);
+        var theme = this.editor._themeService.getTheme();
+        var value = theme.getColor(name);
         // HACK - Buttons themes are not in monaco ... so just hack in theme for dark
-        const missingThemes = {
+        var missingThemes = {
             'dark': {
                 "button.background": "#0e639c",
                 "button.foreground": "#ffffff",
@@ -18295,20 +18381,21 @@ class ReviewManager {
             value = missingThemes[theme.themeName.indexOf('dark') > -1 ? 'dark' : 'light'][name];
         }
         return value;
-    }
-    createInlineEditButtonsElement() {
+    };
+    ReviewManager.prototype.createInlineEditButtonsElement = function () {
+        var _this = this;
         var root = document.createElement('div');
         root.className = 'editButtonsContainer';
         root.style.marginLeft = this.config.editButtonOffset;
-        const add = document.createElement('span');
+        var add = document.createElement('span');
         add.innerText = this.config.editButtonAddText;
         add.className = 'editButton add';
         add.setAttribute(CONTROL_ATTR_NAME, '');
-        add.onclick = () => this.setEditorMode(EditorMode.insertComment);
+        add.onclick = function () { return _this.setEditorMode(EditorMode.insertComment); };
         root.appendChild(add);
-        let remove = null;
-        let edit = null;
-        let spacer = null;
+        var remove = null;
+        var edit = null;
+        var spacer = null;
         if (this.config.editButtonEnableRemove) {
             spacer = document.createElement('div');
             spacer.innerText = '&nbsp;';
@@ -18317,7 +18404,7 @@ class ReviewManager {
             remove.setAttribute(CONTROL_ATTR_NAME, '');
             remove.innerText = this.config.editButtonRemoveText;
             remove.className = 'editButton remove';
-            remove.onclick = () => this.activeComment && this.removeComment(this.activeComment.id);
+            remove.onclick = function () { return _this.activeComment && _this.removeComment(_this.activeComment.id); };
             root.appendChild(remove);
         }
         if (this.config.editButtonEnableEdit) {
@@ -18328,24 +18415,24 @@ class ReviewManager {
             edit.setAttribute(CONTROL_ATTR_NAME, '');
             edit.innerText = this.config.editButtonEditText;
             edit.className = 'editButton edit';
-            edit.onclick = () => this.setEditorMode(EditorMode.editComment);
+            edit.onclick = function () { return _this.setEditorMode(EditorMode.editComment); };
             root.appendChild(edit);
         }
-        return { root, add, remove, edit };
-    }
-    handleCancel() {
+        return { root: root, add: add, remove: remove, edit: edit };
+    };
+    ReviewManager.prototype.handleCancel = function () {
         this.setEditorMode(EditorMode.toolbar);
         this.editor.focus();
-    }
-    handleAddComment() {
-        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
-        const text = this.editorElements.textarea.value;
-        const selection = this.activeComment ? null : this.editor.getSelection();
+    };
+    ReviewManager.prototype.handleAddComment = function () {
+        var lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
+        var text = this.editorElements.textarea.value;
+        var selection = this.activeComment ? null : this.editor.getSelection();
         this.addComment(lineNumber, text, selection);
         this.setEditorMode(EditorMode.toolbar);
         this.editor.focus();
-    }
-    handleTextAreaKeyDown(e) {
+    };
+    ReviewManager.prototype.handleTextAreaKeyDown = function (e) {
         if (e.code === "Escape") {
             this.handleCancel();
             e.preventDefault();
@@ -18356,24 +18443,24 @@ class ReviewManager {
             e.preventDefault();
             console.info('preventDefault: ctrl+Enter');
         }
-    }
-    createInlineEditorElement() {
+    };
+    ReviewManager.prototype.createInlineEditorElement = function () {
         var root = document.createElement('span');
         root.className = "reviewCommentEditor";
-        const textarea = document.createElement('textarea');
+        var textarea = document.createElement('textarea');
         textarea.setAttribute(CONTROL_ATTR_NAME, '');
         textarea.className = "reviewCommentEditor text";
         textarea.innerText = '';
         textarea.style.resize = "none";
         textarea.name = 'text';
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
-        const confirm = document.createElement('button');
+        var confirm = document.createElement('button');
         confirm.setAttribute(CONTROL_ATTR_NAME, '');
         confirm.className = "reviewCommentEditor save";
         confirm.style.fontFamily = "Consolas";
         confirm.innerText = 'Add Comment';
         confirm.onclick = this.handleAddComment.bind(this);
-        const cancel = document.createElement('button');
+        var cancel = document.createElement('button');
         cancel.setAttribute(CONTROL_ATTR_NAME, '');
         cancel.className = "reviewCommentEditor cancel";
         cancel.innerText = 'Cancel';
@@ -18381,20 +18468,20 @@ class ReviewManager {
         root.appendChild(textarea);
         root.appendChild(cancel);
         root.appendChild(confirm);
-        return { root, confirm, cancel, textarea };
-    }
-    createInlineToolbarWidget() {
-        const buttonsElement = this.createInlineEditButtonsElement();
-        const this_ = this;
+        return { root: root, confirm: confirm, cancel: cancel, textarea: textarea };
+    };
+    ReviewManager.prototype.createInlineToolbarWidget = function () {
+        var buttonsElement = this.createInlineEditButtonsElement();
+        var this_ = this;
         this.widgetInlineToolbar = {
             allowEditorOverflow: true,
-            getId: () => {
+            getId: function () {
                 return 'widgetInlineToolbar';
             },
-            getDomNode: () => {
+            getDomNode: function () {
                 return buttonsElement.root;
             },
-            getPosition: () => {
+            getPosition: function () {
                 if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {
                     return {
                         position: {
@@ -18408,23 +18495,24 @@ class ReviewManager {
         };
         this.editor.addContentWidget(this.widgetInlineToolbar);
         return buttonsElement;
-    }
-    createInlineEditorWidget() {
+    };
+    ReviewManager.prototype.createInlineEditorWidget = function () {
+        var _this = this;
         // doesn't re-theme when
-        const editorElement = this.createInlineEditorElement();
+        var editorElement = this.createInlineEditorElement();
         this.widgetInlineCommentEditor = {
             allowEditorOverflow: true,
-            getId: () => {
+            getId: function () {
                 return 'widgetInlineEditor';
             },
-            getDomNode: () => {
+            getDomNode: function () {
                 return editorElement.root;
             },
-            getPosition: () => {
-                if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
+            getPosition: function () {
+                if (_this.editorMode == EditorMode.insertComment || _this.editorMode == EditorMode.editComment) {
                     return {
                         position: {
-                            lineNumber: this.activeComment ? this.activeComment.lineNumber : this.editor.getPosition().lineNumber + 1,
+                            lineNumber: _this.activeComment ? _this.activeComment.lineNumber : _this.editor.getPosition().lineNumber + 1,
                             column: 1
                         },
                         preference: [POSITION_BELOW]
@@ -18434,10 +18522,11 @@ class ReviewManager {
         };
         this.editor.addContentWidget(this.widgetInlineCommentEditor);
         return editorElement;
-    }
-    setActiveComment(comment) {
+    };
+    ReviewManager.prototype.setActiveComment = function (comment) {
+        var _this = this;
         this.verbose && console.debug('setActiveComment', comment);
-        const lineNumbersToMakeDirty = [];
+        var lineNumbersToMakeDirty = [];
         if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
             lineNumbersToMakeDirty.push(this.activeComment.lineNumber);
         }
@@ -18446,19 +18535,20 @@ class ReviewManager {
         }
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
-            this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-                this.store.comments[comment.id].renderStatus = events_reducers_1.ReviewCommentRenderState.dirty;
+            this.filterAndMapComments(lineNumbersToMakeDirty, function (comment) {
+                _this.store.comments[comment.id].renderStatus = events_reducers_1.ReviewCommentRenderState.dirty;
             });
         }
-    }
-    filterAndMapComments(lineNumbers, fn) {
-        for (const cs of Object.values(this.store.comments)) {
+    };
+    ReviewManager.prototype.filterAndMapComments = function (lineNumbers, fn) {
+        for (var _i = 0, _a = Object.values(this.store.comments); _i < _a.length; _i++) {
+            var cs = _a[_i];
             if (lineNumbers.indexOf(cs.comment.lineNumber) > -1) {
                 fn(cs.comment);
             }
         }
-    }
-    handleMouseMove(ev) {
+    };
+    ReviewManager.prototype.handleMouseMove = function (ev) {
         if (ev.target && ev.target.position && ev.target.position.lineNumber) {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
             this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
@@ -18471,8 +18561,8 @@ class ReviewManager {
                 }
             ]);
         }
-    }
-    handleMouseDown(ev) {
+    };
+    ReviewManager.prototype.handleMouseDown = function (ev) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event        
         if (ev.target.element.className && ev.target.element.className.indexOf('activeLineMarginClass') > -1) {
             this.editor.setPosition({
@@ -18482,10 +18572,11 @@ class ReviewManager {
             this.setEditorMode(EditorMode.insertComment);
         }
         else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
-            let activeComment = null;
+            var activeComment = null;
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
-                for (const comment of Object.values(this.store.comments).map(c => c.comment)) {
-                    const viewState = this.store.comments[comment.id];
+                for (var _i = 0, _a = Object.values(this.store.comments).map(function (c) { return c.comment; }); _i < _a.length; _i++) {
+                    var comment = _a[_i];
+                    var viewState = this.store.comments[comment.id];
                     if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = comment;
                         break;
@@ -18496,13 +18587,14 @@ class ReviewManager {
             this.refreshComments();
             this.setEditorMode(EditorMode.toolbar);
         }
-    }
-    calculateMarginTopOffset(includeActiveCommentHeight) {
-        let count = 0;
-        let marginTop = 0;
-        const lineHeight = this.editorConfig.fontInfo.lineHeight;
+    };
+    ReviewManager.prototype.calculateMarginTopOffset = function (includeActiveCommentHeight) {
+        var count = 0;
+        var marginTop = 0;
+        var lineHeight = this.editorConfig.fontInfo.lineHeight;
         if (this.activeComment) {
-            for (var item of this.iterateComments()) {
+            for (var _i = 0, _a = this.iterateComments(); _i < _a.length; _i++) {
+                var item = _a[_i];
                 if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
                     (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
                     count += events_reducers_1.calculateNumberOfLines(item.state.comment.text);
@@ -18513,35 +18605,38 @@ class ReviewManager {
             }
             marginTop = count * lineHeight;
         }
-        const result = marginTop + this.config.verticalOffset;
+        var result = marginTop + this.config.verticalOffset;
         return result;
-    }
-    layoutInlineToolbar() {
+    };
+    ReviewManager.prototype.layoutInlineToolbar = function () {
+        var _this = this;
         this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
-        this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
+        this.inlineToolbarElements.root.style.marginTop = this.calculateMarginTopOffset(false) + "px";
         if (this.inlineToolbarElements.remove) {
-            const hasChildren = this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment.id).length > 1;
-            const isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
+            var hasChildren = this.activeComment && this.iterateComments(function (c) { return c.comment.id === _this.activeComment.id; }).length > 1;
+            var isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
             this.inlineToolbarElements.remove.style.display = hasChildren ? 'none' : '';
             this.inlineToolbarElements.edit.style.display = hasChildren || !isSameUser ? 'none' : '';
         }
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
-    }
-    layoutInlineCommentEditor() {
-        [this.editorElements.root, this.editorElements.textarea].forEach(e => {
-            e.style.backgroundColor = this.getThemedColor("editor.background");
-            e.style.color = this.getThemedColor("editor.foreground");
+    };
+    ReviewManager.prototype.layoutInlineCommentEditor = function () {
+        var _this = this;
+        [this.editorElements.root, this.editorElements.textarea].forEach(function (e) {
+            e.style.backgroundColor = _this.getThemedColor("editor.background");
+            e.style.color = _this.getThemedColor("editor.foreground");
         });
         [this.editorElements.confirm, this.editorElements.cancel]
-            .forEach((button) => {
-            button.style.backgroundColor = this.getThemedColor("button.background");
-            button.style.color = this.getThemedColor("button.foreground");
+            .forEach(function (button) {
+            button.style.backgroundColor = _this.getThemedColor("button.background");
+            button.style.color = _this.getThemedColor("button.foreground");
         });
         this.editorElements.confirm.innerText = this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
-        this.editorElements.root.style.marginTop = `${this.calculateMarginTopOffset(true)}px`;
+        this.editorElements.root.style.marginTop = this.calculateMarginTopOffset(true) + "px";
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
-    }
-    setEditorMode(mode) {
+    };
+    ReviewManager.prototype.setEditorMode = function (mode) {
+        var _this = this;
         console.debug('setEditorMode', EditorMode[mode], this.activeComment);
         this.editorMode = mode;
         this.layoutInlineCommentEditor();
@@ -18554,43 +18649,48 @@ class ReviewManager {
                 this.editorElements.textarea.value = this.activeComment.text;
             }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
-            setTimeout(() => this.editorElements.textarea.focus(), 100); //TODO - make configurable
+            setTimeout(function () { return _this.editorElements.textarea.focus(); }, 100); //TODO - make configurable
         }
-    }
-    getDateTimeNow() {
+    };
+    ReviewManager.prototype.getDateTimeNow = function () {
         return new Date();
-    }
-    recurseComments(allComments, filterFn, depth, results) {
-        const comments = Object.values(allComments).filter(filterFn);
-        for (const cs of comments) {
-            const comment = cs.comment;
+    };
+    ReviewManager.prototype.recurseComments = function (allComments, filterFn, depth, results) {
+        var comments = Object.values(allComments).filter(filterFn);
+        var _loop_1 = function (cs) {
+            var comment = cs.comment;
             delete allComments[comment.id];
             results.push({
-                depth,
+                depth: depth,
                 state: cs
             });
-            this.recurseComments(allComments, (x) => x.comment.parentId === comment.id, depth + 1, results);
+            this_1.recurseComments(allComments, function (x) { return x.comment.parentId === comment.id; }, depth + 1, results);
+        };
+        var this_1 = this;
+        for (var _i = 0, comments_1 = comments; _i < comments_1.length; _i++) {
+            var cs = comments_1[_i];
+            _loop_1(cs);
         }
-    }
-    iterateComments(filterFn) {
+    };
+    ReviewManager.prototype.iterateComments = function (filterFn) {
         if (!filterFn) {
-            filterFn = (cs) => !cs.comment.parentId;
+            filterFn = function (cs) { return !cs.comment.parentId; };
         }
-        const copyCommentState = Object.assign({}, this.store.comments);
-        const results = [];
+        var copyCommentState = __assign({}, this.store.comments);
+        var results = [];
         this.recurseComments(copyCommentState, filterFn, 0, results);
         return results;
-    }
-    removeComment(id) {
+    };
+    ReviewManager.prototype.removeComment = function (id) {
         return this.addEvent({ type: "delete", targetId: id });
-    }
-    addComment(lineNumber, text, selection) {
-        const event = this.editorMode === EditorMode.editComment ?
-            { type: "edit", text, targetId: this.activeComment.id }
-            : { type: "create", text, lineNumber, selection, targetId: this.activeComment && this.activeComment.id };
+    };
+    ReviewManager.prototype.addComment = function (lineNumber, text, selection) {
+        var event = this.editorMode === EditorMode.editComment ?
+            { type: "edit", text: text, targetId: this.activeComment.id }
+            : { type: "create", text: text, lineNumber: lineNumber, selection: selection, targetId: this.activeComment && this.activeComment.id };
         return this.addEvent(event);
-    }
-    addEvent(event) {
+    };
+    ReviewManager.prototype.addEvent = function (event) {
         event.createdBy = this.currentUser;
         event.createdAt = this.getDateTimeNow();
         event.id = uuid();
@@ -18609,8 +18709,8 @@ class ReviewManager {
             this.onChange(this.events);
         }
         return event;
-    }
-    formatDate(dt) {
+    };
+    ReviewManager.prototype.formatDate = function (dt) {
         if (this.config.formatDate) {
             return this.config.formatDate(dt);
         }
@@ -18620,30 +18720,33 @@ class ReviewManager {
         else {
             return dt;
         }
-    }
-    createElement(text, className, tagName = null) {
-        const span = document.createElement(tagName || 'span');
+    };
+    ReviewManager.prototype.createElement = function (text, className, tagName) {
+        if (tagName === void 0) { tagName = null; }
+        var span = document.createElement(tagName || 'span');
         span.className = className;
         span.innerText = text;
         return span;
-    }
-    refreshComments() {
-        this.editor.changeViewZones((changeAccessor) => {
-            const lineNumbers = {};
-            while (this.store.viewZoneIdsToDelete.length > 0) {
-                const viewZoneId = this.store.viewZoneIdsToDelete.pop();
+    };
+    ReviewManager.prototype.refreshComments = function () {
+        var _this = this;
+        this.editor.changeViewZones(function (changeAccessor) {
+            var lineNumbers = {};
+            while (_this.store.viewZoneIdsToDelete.length > 0) {
+                var viewZoneId = _this.store.viewZoneIdsToDelete.pop();
                 changeAccessor.removeZone(viewZoneId);
-                this.verbose && console.debug('Zone.Delete', viewZoneId);
+                _this.verbose && console.debug('Zone.Delete', viewZoneId);
             }
-            for (const item of this.iterateComments()) {
+            for (var _i = 0, _a = _this.iterateComments(); _i < _a.length; _i++) {
+                var item = _a[_i];
                 if (item.state.renderStatus === events_reducers_1.ReviewCommentRenderState.hidden) {
-                    this.verbose && console.debug('Zone.Hidden', item.state.comment.id);
+                    _this.verbose && console.debug('Zone.Hidden', item.state.comment.id);
                     changeAccessor.removeZone(item.state.viewZoneId);
                     item.state.viewZoneId = null;
                     continue;
                 }
                 if (item.state.renderStatus === events_reducers_1.ReviewCommentRenderState.dirty) {
-                    this.verbose && console.debug('Zone.Dirty', item.state.comment.id);
+                    _this.verbose && console.debug('Zone.Dirty', item.state.comment.id);
                     changeAccessor.removeZone(item.state.viewZoneId);
                     item.state.viewZoneId = null;
                     item.state.renderStatus = events_reducers_1.ReviewCommentRenderState.normal;
@@ -18652,18 +18755,18 @@ class ReviewManager {
                     lineNumbers[item.state.comment.lineNumber] = item.state.comment.selection;
                 }
                 if (item.state.viewZoneId == null) {
-                    this.verbose && console.debug('Zone.Create', item.state.comment.id);
-                    const isActive = this.activeComment == item.state.comment;
-                    const domNode = this.createElement("", `reviewComment ${isActive ? 'active' : ' inactive'}`);
-                    domNode.style.marginLeft = (this.config.commentIndent * (item.depth + 1)) + this.config.commentIndentOffset + "px";
-                    domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+                    _this.verbose && console.debug('Zone.Create', item.state.comment.id);
+                    var isActive = _this.activeComment == item.state.comment;
+                    var domNode = _this.createElement("", "reviewComment " + (isActive ? 'active' : ' inactive'));
+                    domNode.style.marginLeft = (_this.config.commentIndent * (item.depth + 1)) + _this.config.commentIndentOffset + "px";
+                    domNode.style.backgroundColor = _this.getThemedColor("editor.selectionHighlightBackground");
                     // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
-                    domNode.appendChild(this.createElement(`${item.state.comment.author || ' '} at `, 'reviewComment author'));
-                    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), 'reviewComment dt'));
+                    domNode.appendChild(_this.createElement((item.state.comment.author || ' ') + " at ", 'reviewComment author'));
+                    domNode.appendChild(_this.createElement(_this.formatDate(item.state.comment.dt), 'reviewComment dt'));
                     if (item.state.history.length > 1) {
-                        domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, 'reviewComment history'));
+                        domNode.appendChild(_this.createElement("(Edited " + (item.state.history.length - 1) + " times)", 'reviewComment history'));
                     }
-                    domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'));
+                    domNode.appendChild(_this.createElement("" + item.state.comment.text, 'reviewComment text', 'div'));
                     item.state.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
                         heightInLines: item.state.numberOfLines,
@@ -18672,16 +18775,17 @@ class ReviewManager {
                     });
                 }
             }
-            if (this.config.showInRuler) {
-                const decorators = [];
-                for (const [ln, selection] of Object.entries(lineNumbers)) {
+            if (_this.config.showInRuler) {
+                var decorators = [];
+                for (var _b = 0, _c = Object.entries(lineNumbers); _b < _c.length; _b++) {
+                    var _d = _c[_b], ln = _d[0], selection = _d[1];
                     decorators.push({
                         range: new monacoWindow.monaco.Range(ln, 0, ln, 0),
                         options: {
                             isWholeLine: true,
                             overviewRuler: {
-                                color: this.config.rulerMarkerColor,
-                                darkColor: this.config.rulerMarkerDarkColor,
+                                color: _this.config.rulerMarkerColor,
+                                darkColor: _this.config.rulerMarkerDarkColor,
                                 position: 1
                             }
                         }
@@ -18695,11 +18799,12 @@ class ReviewManager {
                         });
                     }
                 }
-                this.currentCommentDecorations = this.editor.deltaDecorations(this.currentCommentDecorations, decorators);
+                _this.currentCommentDecorations = _this.editor.deltaDecorations(_this.currentCommentDecorations, decorators);
             }
         });
-    }
-    addActions() {
+    };
+    ReviewManager.prototype.addActions = function () {
+        var _this = this;
         this.editor.addAction({
             id: 'my-unique-id-add',
             label: 'Add Comment',
@@ -18710,8 +18815,8 @@ class ReviewManager {
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 0,
-            run: () => {
-                this.setEditorMode(EditorMode.insertComment);
+            run: function () {
+                _this.setEditorMode(EditorMode.insertComment);
             }
         });
         this.editor.addAction({
@@ -18724,8 +18829,8 @@ class ReviewManager {
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 0.1,
-            run: () => {
-                this.navigateToComment(NavigationDirection.next);
+            run: function () {
+                _this.navigateToComment(NavigationDirection.next);
             }
         });
         this.editor.addAction({
@@ -18738,20 +18843,20 @@ class ReviewManager {
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 0.1,
-            run: () => {
-                this.navigateToComment(NavigationDirection.prev);
+            run: function () {
+                _this.navigateToComment(NavigationDirection.prev);
             }
         });
-    }
-    navigateToComment(direction) {
-        let currentLine = 0;
+    };
+    ReviewManager.prototype.navigateToComment = function (direction) {
+        var currentLine = 0;
         if (this.activeComment) {
             currentLine = this.activeComment.lineNumber;
         }
         else {
             currentLine = this.editor.getPosition().lineNumber;
         }
-        const comments = Object.values(this.store.comments).map(cs => cs.comment).filter((c) => {
+        var comments = Object.values(this.store.comments).map(function (cs) { return cs.comment; }).filter(function (c) {
             if (!c.parentId) {
                 if (direction === NavigationDirection.next) {
                     return c.lineNumber > currentLine;
@@ -18762,7 +18867,7 @@ class ReviewManager {
             }
         });
         if (comments.length) {
-            comments.sort((a, b) => {
+            comments.sort(function (a, b) {
                 if (direction === NavigationDirection.next) {
                     return a.lineNumber - b.lineNumber;
                 }
@@ -18770,14 +18875,15 @@ class ReviewManager {
                     return b.lineNumber - a.lineNumber;
                 }
             });
-            const comment = comments[0];
+            var comment = comments[0];
             this.setActiveComment(comment);
             this.refreshComments();
             this.layoutInlineToolbar();
             this.editor.revealLineInCenter(comment.lineNumber);
         }
-    }
-}
+    };
+    return ReviewManager;
+}());
 exports.ReviewManager = ReviewManager;
 
 
