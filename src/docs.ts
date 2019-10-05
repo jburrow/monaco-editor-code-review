@@ -177,7 +177,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             lineNumber: firstLine + 10,
             createdBy: "another reviewer",
             createdAt: '2019-01-01T00:00:00.000',
-            text: "id-0: Near the start",
+            text: "Near the start",
             selection: {
                 startColumn: 5,
                 startLineNumber: firstLine + 5,
@@ -191,7 +191,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             type: "edit",
             createdBy: "another reviewer",
             createdAt: '2019-06-01T00:00:00.000Z',
-            text: "id-2: EDIT EDIT at start"
+            text: "EDIT EDIT at start"
         },
         {
             id: "id-1",
@@ -199,7 +199,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             lineNumber: firstLine + 5,
             createdBy: "another reviewer",
             createdAt: '2019-06-01T00:00:00.000Z',
-            text: "id-1: at start"
+            text: "at start"
         },
         {
             id: "id-2",
@@ -208,7 +208,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             lineNumber: firstLine + 5,
             createdBy: "another reviewer",
             createdAt: '2019-12-01T00:00:00.000Z',
-            text: "id-2: this code isn't very good",
+            text: "this code isn't very good",
         },
         {
             id: "id-3",
@@ -217,7 +217,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             lineNumber: firstLine + 5,
             createdBy: "original author",
             createdAt: '2019-06-01T00:00:00.000Z',
-            text: "id-3: I think you will find it is good enough"
+            text: "I think you will find it is good enough"
         },
         {
             targetId: "id-3",
@@ -240,7 +240,7 @@ function createRandomComments(): ReviewCommentEvent[] {
 }
 
 function renderComments(events: ReviewCommentEvent[]) {
-    events = events || [];    
+    events = events || [];
     console.log('Events #', events.length, events);
 
     const rawHeader = {
@@ -248,37 +248,43 @@ function renderComments(events: ReviewCommentEvent[]) {
         id: "Id",
         createdBy: "Author",
         createdAt: "Created At",
-    }
-    
-    const rawHtml = [rawHeader as any].concat(events as any[])
+    };
+
+    const rawHtml = '<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>' + events
         .map(
             comment => {
-                return `<div style="text-align:left;display:flex;height:16px">
-                    <div style="width:100px;overflow:hidden;">${comment.type || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.createdBy}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.createdAt}</div>                     
-                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment) || '&nbsp;'}</div>                    
-                </div>`
+                return `<tr>
+                    <td>${comment.type || '&nbsp;'}</td>
+                    <td>${comment.id || '&nbsp;'}</td>
+                    <td>${comment.createdBy}</td> 
+                    <td>${comment.createdAt}</td>                     
+                    </tr>
+                    <tr>
+                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || '&nbsp;'}</td>                    
+                </tr>`
             }
         )
-        .join("");
+        .join("") + '</table>';
 
+
+        
     const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
-    const activeHtml = activeComments
+    const activeHtml = '<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>' + activeComments
         .map(
             comment =>
-                `<div style="text-align:left;display:flex;height:16px;">
-                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>                                     
-                    <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.author}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
-                    <div style="width:auto;overflow:hidden;">${comment.text}</div>                                        
-                </div>`
+                `<tr>
+                    <td>${comment.id || '&nbsp;'}</td>                                     
+                    <td>${comment.lineNumber}</td>
+                    <td>${comment.author}</td> 
+                    <td>${comment.dt}</td> 
+                </tr>
+                <tr>
+                    <td colspan="4" class="comment_text">${comment.text}</td>                                        
+                </tr>`
         )
-        .join("");
+        .join("") + '</table>';
 
-    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Raw Comments</h5>${rawHtml}</div>`;
+    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Events</h5>${rawHtml}</div>`;
 }
 
 function clearComments() {

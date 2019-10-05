@@ -1,10 +1,10 @@
 const path = require("path");
 const TimestampWebpackPlugin = require("timestamp-webpack-plugin");
 
-const baseConfig = target => {
+const baseConfig = (mode, target) => {
   return {
     entry: { index: "./src/index.ts", docs: "./src/docs.ts" },
-    mode: "development",
+    mode,
     devtool: "none",
     devServer: {
       publicPath: "/dist/"
@@ -44,8 +44,9 @@ const baseConfig = target => {
   };
 };
 
+function getConfigs(mode){
 const libes2017 = {
-  ...baseConfig("es2017"),
+  ...baseConfig(mode,"es2017"),
   output: {
     filename: "[name].js",
     path: path.join(__dirname, "dist"),
@@ -61,7 +62,7 @@ const libes2017 = {
 };
 
 const es5 = {
-  ...baseConfig("es5"),
+  ...baseConfig(mode,"es5"),
   output: {
     filename: "[name]-commonjs-es5.js",
     path: path.join(__dirname, "dist")
@@ -69,11 +70,24 @@ const es5 = {
 };
 
 const es2017 = {
-  ...baseConfig("es2017"),
+  ...baseConfig(mode,"es2017"),
   output: {
     filename: "[name]-commonjs-es2017.js",
     path: path.join(__dirname, "dist")
   }
 };
+return [libes2017,es5,es2017];
+}
 
-module.exports = [libes2017, es5, es2017];
+
+
+module.exports = (env, argv) => {
+  if (!argv.mode || argv.mode === 'development') {
+    return [baseConfig('development','es2019')];
+  }else{
+
+  
+    return getConfigs("production");
+  }
+
+};

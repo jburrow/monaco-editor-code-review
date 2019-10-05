@@ -20,6 +20,7 @@
       .editor {
         flex: auto;
         overflow: hidden;
+        margin: 5px;
       }
 
       h5 {
@@ -33,26 +34,36 @@
         min-height: 300px;
         padding: 10px;
         overflow: auto;
-        font-size: 12px;
-        text-overflow: clip;
         display: flex;
         flex-direction: row;
       }
-
-      .btn{
-        margin-top:5px;
+      .btn {
+        margin-top: 5px;
+      }
+      td {
+        font-size: 12px;
+      }
+      .comment_text {
+        background-color: #222222;
+        color: white;
       }
     </style>
   </head>
 
   <body>
     <div class="buttons">
-      <button onclick="setView('standard')" class="btn btn-primary">Editor</button>
+      <button onclick="setView('standard')" class="btn btn-primary">
+        Editor
+      </button>
       <button onclick="setView('standard-readonly')" class="btn btn-primary">
         Editor - Readonly
       </button>
-      <button onclick="setView('inline')" class="btn btn-primary">Diff - Inline</button>
-      <button onclick="setView('side-by-side')" class="btn btn-primary">Diff - Side-by-Side</button>
+      <button onclick="setView('inline')" class="btn btn-primary">
+        Diff - Inline
+      </button>
+      <button onclick="setView('side-by-side')" class="btn btn-primary">
+        Diff - Side-by-Side
+      </button>
       <button onclick="generateDifferentComments()" class="btn btn-secondary">
         Change Comments (in-place)
       </button>
@@ -71,10 +82,8 @@
       Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
     </h5>
     <div class="editor" id="containerEditor"></div>
-    
+
     <div class="summary" id="summaryEditor"></div>
-    
-    
   </body>
 </html>
 
