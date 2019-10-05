@@ -1,4 +1,3 @@
-var MonacoEditorCodeReview =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -88,10 +87,6 @@ var MonacoEditorCodeReview =
 /******/ ({
 
 /***/ "./node_modules/moment/locale sync recursive ^\\.\\/.*$":
-/*!**************************************************!*\
-  !*** ./node_modules/moment/locale sync ^\.\/.*$ ***!
-  \**************************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
@@ -374,16 +369,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/af.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/af.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -455,16 +446,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar-dz.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ar-dz.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -522,16 +509,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar-kw.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ar-kw.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -589,16 +572,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar-ly.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ar-ly.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -719,16 +698,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar-ma.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ar-ma.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -786,16 +761,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar-sa.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ar-sa.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -898,16 +869,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar-tn.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ar-tn.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -965,16 +932,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ar.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ar.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1108,16 +1071,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/az.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/az.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1221,16 +1180,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/be.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/be.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1361,16 +1316,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/bg.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/bg.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1459,16 +1410,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/bm.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/bm.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1525,16 +1472,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/bn.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/bn.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1652,16 +1595,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/bo.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/bo.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1779,16 +1718,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/br.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/br.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -1895,16 +1830,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/bs.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/bs.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2054,16 +1985,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ca.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ca.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2150,16 +2077,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/cs.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/cs.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2330,16 +2253,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/cv.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/cv.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2401,16 +2320,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/cy.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/cy.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2489,16 +2404,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/da.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/da.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2557,16 +2468,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/de-at.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/de-at.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2641,16 +2548,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/de-ch.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/de-ch.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2725,16 +2628,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/de.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/de.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2809,16 +2708,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/dv.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/dv.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -2916,16 +2811,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/el.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/el.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3024,16 +2915,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-SG.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-SG.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3099,16 +2986,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-au.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-au.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3174,16 +3057,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-ca.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-ca.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3245,16 +3124,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-gb.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-gb.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3320,16 +3195,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-ie.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-ie.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3395,16 +3266,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-il.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-il.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3465,16 +3332,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/en-nz.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/en-nz.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3540,16 +3403,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/eo.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/eo.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3619,16 +3478,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/es-do.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/es-do.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3719,16 +3574,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/es-us.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/es-us.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3819,16 +3670,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/es.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/es.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -3919,16 +3766,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/et.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/et.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4007,16 +3850,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/eu.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/eu.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4081,16 +3920,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fa.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/fa.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4195,16 +4030,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fi.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/fi.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4312,16 +4143,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fo.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/fo.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4380,16 +4207,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fr-ca.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/fr-ca.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4462,16 +4285,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fr-ch.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/fr-ch.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4548,16 +4367,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fr.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/fr.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4639,16 +4454,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/fy.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/fy.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4722,16 +4533,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ga.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ga.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4807,16 +4614,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/gd.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/gd.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4891,16 +4694,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/gl.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/gl.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -4976,16 +4775,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/gom-latn.js":
-/*!************************************************!*\
-  !*** ./node_modules/moment/locale/gom-latn.js ***!
-  \************************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5107,16 +4902,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/gu.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/gu.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5239,16 +5030,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/he.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/he.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5344,16 +5131,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/hi.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/hi.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5476,16 +5259,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/hr.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/hr.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5638,16 +5417,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/hu.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/hu.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5756,16 +5531,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/hy-am.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/hy-am.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5859,16 +5630,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/id.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/id.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -5949,16 +5716,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/is.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/is.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6089,16 +5852,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/it-ch.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/it-ch.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6166,16 +5925,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/it.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/it.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6243,16 +5998,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ja.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ja.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6343,16 +6094,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/jv.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/jv.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6433,16 +6180,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ka.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ka.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6530,16 +6273,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/kk.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/kk.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6625,16 +6364,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/km.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/km.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6743,16 +6478,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/kn.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/kn.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6877,16 +6608,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ko.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ko.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -6966,16 +6693,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ku.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ku.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7093,16 +6816,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ky.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ky.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7188,16 +6907,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/lb.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/lb.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7332,16 +7047,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/lo.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/lo.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7410,16 +7121,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/lt.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/lt.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7536,16 +7243,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/lv.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/lv.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7641,16 +7344,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/me.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/me.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7761,16 +7460,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/mi.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/mi.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7833,16 +7528,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/mk.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/mk.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -7931,16 +7622,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ml.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ml.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8020,16 +7707,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/mn.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/mn.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8132,16 +7815,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/mr.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/mr.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8300,16 +7979,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ms-my.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ms-my.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8390,16 +8065,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ms.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ms.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8480,16 +8151,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/mt.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/mt.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8548,16 +8215,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/my.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/my.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8649,16 +8312,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/nb.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/nb.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8719,16 +8378,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ne.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ne.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8850,16 +8505,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/nl-be.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/nl-be.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -8945,16 +8596,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/nl.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/nl.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9040,16 +8687,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/nn.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/nn.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9108,16 +8751,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/pa-in.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/pa-in.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9240,16 +8879,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/pl.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/pl.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9374,16 +9009,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/pt-br.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/pt-br.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9443,16 +9074,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/pt.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/pt.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9516,16 +9143,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ro.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ro.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9599,16 +9222,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ru.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ru.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9789,16 +9408,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sd.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sd.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9895,16 +9510,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/se.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/se.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -9963,16 +9574,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/si.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/si.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10042,16 +9649,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sk.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sk.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10206,16 +9809,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sl.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sl.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10387,16 +9986,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sq.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sq.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10463,16 +10058,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sr-cyrl.js":
-/*!***********************************************!*\
-  !*** ./node_modules/moment/locale/sr-cyrl.js ***!
-  \***********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10582,16 +10173,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sr.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sr.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10701,16 +10288,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ss.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ss.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10797,16 +10380,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sv.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sv.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10874,16 +10453,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/sw.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/sw.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -10941,16 +10516,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ta.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ta.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11078,16 +10649,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/te.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/te.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11175,16 +10742,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tet.js":
-/*!*******************************************!*\
-  !*** ./node_modules/moment/locale/tet.js ***!
-  \*******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11250,16 +10813,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tg.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/tg.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11374,16 +10933,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/th.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/th.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11449,16 +11004,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tl-ph.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/tl-ph.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11519,16 +11070,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tlh.js":
-/*!*******************************************!*\
-  !*** ./node_modules/moment/locale/tlh.js ***!
-  \*******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11649,15 +11196,11 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tr.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/tr.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11751,16 +11294,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tzl.js":
-/*!*******************************************!*\
-  !*** ./node_modules/moment/locale/tzl.js ***!
-  \*******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11850,16 +11389,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tzm-latn.js":
-/*!************************************************!*\
-  !*** ./node_modules/moment/locale/tzm-latn.js ***!
-  \************************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11916,16 +11451,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/tzm.js":
-/*!*******************************************!*\
-  !*** ./node_modules/moment/locale/tzm.js ***!
-  \*******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -11982,16 +11513,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ug-cn.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/ug-cn.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js language configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12109,16 +11636,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/uk.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/uk.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12271,16 +11794,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/ur.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/ur.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12377,16 +11896,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/uz-latn.js":
-/*!***********************************************!*\
-  !*** ./node_modules/moment/locale/uz-latn.js ***!
-  \***********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12443,16 +11958,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/uz.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/uz.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12509,16 +12020,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/vi.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/vi.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12596,16 +12103,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/x-pseudo.js":
-/*!************************************************!*\
-  !*** ./node_modules/moment/locale/x-pseudo.js ***!
-  \************************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12672,16 +12175,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/yo.js":
-/*!******************************************!*\
-  !*** ./node_modules/moment/locale/yo.js ***!
-  \******************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12740,16 +12239,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/zh-cn.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/zh-cn.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12858,16 +12353,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/zh-hk.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/zh-hk.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -12969,16 +12460,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/locale/zh-tw.js":
-/*!*********************************************!*\
-  !*** ./node_modules/moment/locale/zh-tw.js ***!
-  \*********************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(/*! ../moment */ "./node_modules/moment/moment.js")) :
+    true ? factory(__webpack_require__("./node_modules/moment/moment.js")) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -13080,10 +12567,6 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 /***/ }),
 
 /***/ "./node_modules/moment/moment.js":
-/*!***************************************!*\
-  !*** ./node_modules/moment/moment.js ***!
-  \***************************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var require;//! moment.js
@@ -17688,15 +17171,11 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__("./node_modules/webpack/buildin/module.js")(module)))
 
 /***/ }),
 
 /***/ "./node_modules/uuid/lib/bytesToUuid.js":
-/*!**********************************************!*\
-  !*** ./node_modules/uuid/lib/bytesToUuid.js ***!
-  \**********************************************/
-/*! no static exports found */
 /***/ (function(module, exports) {
 
 /**
@@ -17728,10 +17207,6 @@ module.exports = bytesToUuid;
 /***/ }),
 
 /***/ "./node_modules/uuid/lib/rng-browser.js":
-/*!**********************************************!*\
-  !*** ./node_modules/uuid/lib/rng-browser.js ***!
-  \**********************************************/
-/*! no static exports found */
 /***/ (function(module, exports) {
 
 // Unique ID creation requires a high quality random # generator.  In the
@@ -17773,14 +17248,10 @@ if (getRandomValues) {
 /***/ }),
 
 /***/ "./node_modules/uuid/v4.js":
-/*!*********************************!*\
-  !*** ./node_modules/uuid/v4.js ***!
-  \*********************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(/*! ./lib/rng */ "./node_modules/uuid/lib/rng-browser.js");
-var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "./node_modules/uuid/lib/bytesToUuid.js");
+var rng = __webpack_require__("./node_modules/uuid/lib/rng-browser.js");
+var bytesToUuid = __webpack_require__("./node_modules/uuid/lib/bytesToUuid.js");
 
 function v4(options, buf, offset) {
   var i = buf && offset || 0;
@@ -17813,10 +17284,6 @@ module.exports = v4;
 /***/ }),
 
 /***/ "./node_modules/webpack/buildin/module.js":
-/*!***********************************!*\
-  !*** (webpack)/buildin/module.js ***!
-  \***********************************/
-/*! no static exports found */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17846,17 +17313,13 @@ module.exports = function(module) {
 /***/ }),
 
 /***/ "./src/docs.ts":
-/*!*********************!*\
-  !*** ./src/docs.ts ***!
-  \*********************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __webpack_require__(/*! ./index */ "./src/index.ts");
-const moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+const index_1 = __webpack_require__("./src/index.ts");
+const moment = __webpack_require__("./node_modules/moment/moment.js");
 const win = window;
 let reviewManager = null;
 let currentMode = '';
@@ -17974,7 +17437,7 @@ function createRandomComments() {
             lineNumber: firstLine + 10,
             createdBy: "another reviewer",
             createdAt: '2019-01-01T00:00:00.000',
-            text: "id-0: Near the start",
+            text: "Near the start",
             selection: {
                 startColumn: 5,
                 startLineNumber: firstLine + 5,
@@ -17988,7 +17451,7 @@ function createRandomComments() {
             type: "edit",
             createdBy: "another reviewer",
             createdAt: '2019-06-01T00:00:00.000Z',
-            text: "id-2: EDIT EDIT at start"
+            text: "EDIT EDIT at start"
         },
         {
             id: "id-1",
@@ -17996,7 +17459,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: "another reviewer",
             createdAt: '2019-06-01T00:00:00.000Z',
-            text: "id-1: at start"
+            text: "at start"
         },
         {
             id: "id-2",
@@ -18005,7 +17468,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: "another reviewer",
             createdAt: '2019-12-01T00:00:00.000Z',
-            text: "id-2: this code isn't very good",
+            text: "this code isn't very good",
         },
         {
             id: "id-3",
@@ -18014,7 +17477,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: "original author",
             createdAt: '2019-06-01T00:00:00.000Z',
-            text: "id-3: I think you will find it is good enough"
+            text: "I think you will find it is good enough"
         },
         {
             targetId: "id-3",
@@ -18044,28 +17507,32 @@ function renderComments(events) {
         createdBy: "Author",
         createdAt: "Created At",
     };
-    const rawHtml = [rawHeader].concat(events)
+    const rawHtml = '<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>' + events
         .map(comment => {
-        return `<div style="text-align:left;display:flex;height:16px">
-                    <div style="width:100px;overflow:hidden;">${comment.type || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.createdBy}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.createdAt}</div>                     
-                    <div style="width:auto;overflow:hidden;">${JSON.stringify(comment) || '&nbsp;'}</div>                    
-                </div>`;
+        return `<tr>
+                    <td>${comment.type || '&nbsp;'}</td>
+                    <td>${comment.id || '&nbsp;'}</td>
+                    <td>${comment.createdBy}</td> 
+                    <td>${comment.createdAt}</td>                     
+                    </tr>
+                    <tr>
+                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || '&nbsp;'}</td>                    
+                </tr>`;
     })
-        .join("");
+        .join("") + '</table>';
     const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
-    const activeHtml = activeComments
-        .map(comment => `<div style="text-align:left;display:flex;height:16px;">
-                    <div style="width:100px;overflow:hidden;">${comment.id || '&nbsp;'}</div>                                     
-                    <div style="width:50px;overflow:hidden;">${comment.lineNumber}</div>
-                    <div style="width:100px;overflow:hidden;">${comment.author}</div> 
-                    <div style="width:100px;overflow:hidden;">${comment.dt}</div> 
-                    <div style="width:auto;overflow:hidden;">${comment.text}</div>                                        
-                </div>`)
-        .join("");
-    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Raw Comments</h5>${rawHtml}</div>`;
+    const activeHtml = '<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>' + activeComments
+        .map(comment => `<tr>
+                    <td>${comment.id || '&nbsp;'}</td>                                     
+                    <td>${comment.lineNumber}</td>
+                    <td>${comment.author}</td> 
+                    <td>${comment.dt}</td> 
+                </tr>
+                <tr>
+                    <td colspan="4" class="comment_text">${comment.text}</td>                                        
+                </tr>`)
+        .join("") + '</table>';
+    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Events</h5>${rawHtml}</div>`;
 }
 function clearComments() {
     reviewManager.load([]);
@@ -18083,16 +17550,12 @@ init();
 /***/ }),
 
 /***/ "./src/events-reducers.ts":
-/*!********************************!*\
-  !*** ./src/events-reducers.ts ***!
-  \********************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+const uuid = __webpack_require__("./node_modules/uuid/v4.js");
 ;
 function commentReducer(event, state) {
     const dirtyLineNumbers = new Set();
@@ -18101,7 +17564,7 @@ function commentReducer(event, state) {
             const parent = state.comments[event.targetId];
             if (!parent)
                 break;
-            parent.comment = Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text });
+            parent.comment = { ...parent.comment, author: event.createdBy, dt: event.createdAt, text: event.text };
             parent.history.push(parent.comment);
             parent.numberOfLines = calculateNumberOfLines(event.text);
             dirtyLineNumbers.add(parent.comment.lineNumber);
@@ -18183,17 +17646,13 @@ exports.reduceComments = reduceComments;
 /***/ }),
 
 /***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const events_reducers_1 = __webpack_require__(/*! ./events-reducers */ "./src/events-reducers.ts");
-const uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+const events_reducers_1 = __webpack_require__("./src/events-reducers.ts");
+const uuid = __webpack_require__("./node_modules/uuid/v4.js");
 const monacoWindow = window;
 var NavigationDirection;
 (function (NavigationDirection) {
@@ -18240,7 +17699,7 @@ class ReviewManager {
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
-        this.config = Object.assign(Object.assign({}, defaultReviewManagerConfig), (config || {}));
+        this.config = { ...defaultReviewManagerConfig, ...(config || {}) };
         this.currentLineDecorations = [];
         this.currentCommentDecorations = [];
         this.currentLineDecorationLineNumber = null;
@@ -18576,7 +18035,7 @@ class ReviewManager {
         if (!filterFn) {
             filterFn = (cs) => !cs.comment.parentId;
         }
-        const copyCommentState = Object.assign({}, this.store.comments);
+        const copyCommentState = { ...this.store.comments };
         const results = [];
         this.recurseComments(copyCommentState, filterFn, 0, results);
         return results;

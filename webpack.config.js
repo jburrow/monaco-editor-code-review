@@ -44,50 +44,45 @@ const baseConfig = (mode, target) => {
   };
 };
 
-function getConfigs(mode){
-const libes2017 = {
-  ...baseConfig(mode,"es2017"),
-  output: {
-    filename: "[name].js",
-    path: path.join(__dirname, "dist"),
-    libraryTarget: "var",
-    library: "MonacoEditorCodeReview"
-  },
-  plugins: [
-    new TimestampWebpackPlugin({
+function getConfigs(mode) {
+  const libes2017 = {
+    ...baseConfig(mode, "es2017"),
+    output: {
+      filename: "[name].js",
       path: path.join(__dirname, "dist"),
-      filename: "timestamp.json"
-    })
-  ]
-};
+      libraryTarget: "var",
+      library: "MonacoEditorCodeReview"
+    },
+    plugins: [
+      new TimestampWebpackPlugin({
+        path: path.join(__dirname, "dist"),
+        filename: "timestamp.json"
+      })
+    ]
+  };
 
-const es5 = {
-  ...baseConfig(mode,"es5"),
-  output: {
-    filename: "[name]-commonjs-es5.js",
-    path: path.join(__dirname, "dist")
-  }
-};
+  const es5 = {
+    ...baseConfig(mode, "es5"),
+    output: {
+      filename: "[name]-commonjs-es5.js",
+      path: path.join(__dirname, "dist")
+    }
+  };
 
-const es2017 = {
-  ...baseConfig(mode,"es2017"),
-  output: {
-    filename: "[name]-commonjs-es2017.js",
-    path: path.join(__dirname, "dist")
-  }
-};
-return [libes2017,es5,es2017];
+  const es2017 = {
+    ...baseConfig(mode, "es2017"),
+    output: {
+      filename: "[name]-commonjs-es2017.js",
+      path: path.join(__dirname, "dist")
+    }
+  };
+  return [libes2017, es5, es2017];
 }
 
-
-
 module.exports = (env, argv) => {
-  if (!argv.mode || argv.mode === 'development') {
-    return [baseConfig('development','es2019')];
-  }else{
-
-  
+  if (!argv.mode || argv.mode === "development") {
+    return [baseConfig("development", "es2019")];
+  } else {
     return getConfigs("production");
   }
-
 };

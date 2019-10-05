@@ -1,4 +1,3 @@
-var MonacoEditorCodeReview =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -88,10 +87,6 @@ var MonacoEditorCodeReview =
 /******/ ({
 
 /***/ "./node_modules/uuid/lib/bytesToUuid.js":
-/*!**********************************************!*\
-  !*** ./node_modules/uuid/lib/bytesToUuid.js ***!
-  \**********************************************/
-/*! no static exports found */
 /***/ (function(module, exports) {
 
 /**
@@ -123,10 +118,6 @@ module.exports = bytesToUuid;
 /***/ }),
 
 /***/ "./node_modules/uuid/lib/rng-browser.js":
-/*!**********************************************!*\
-  !*** ./node_modules/uuid/lib/rng-browser.js ***!
-  \**********************************************/
-/*! no static exports found */
 /***/ (function(module, exports) {
 
 // Unique ID creation requires a high quality random # generator.  In the
@@ -168,14 +159,10 @@ if (getRandomValues) {
 /***/ }),
 
 /***/ "./node_modules/uuid/v4.js":
-/*!*********************************!*\
-  !*** ./node_modules/uuid/v4.js ***!
-  \*********************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(/*! ./lib/rng */ "./node_modules/uuid/lib/rng-browser.js");
-var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "./node_modules/uuid/lib/bytesToUuid.js");
+var rng = __webpack_require__("./node_modules/uuid/lib/rng-browser.js");
+var bytesToUuid = __webpack_require__("./node_modules/uuid/lib/bytesToUuid.js");
 
 function v4(options, buf, offset) {
   var i = buf && offset || 0;
@@ -208,16 +195,12 @@ module.exports = v4;
 /***/ }),
 
 /***/ "./src/events-reducers.ts":
-/*!********************************!*\
-  !*** ./src/events-reducers.ts ***!
-  \********************************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+const uuid = __webpack_require__("./node_modules/uuid/v4.js");
 ;
 function commentReducer(event, state) {
     const dirtyLineNumbers = new Set();
@@ -226,7 +209,7 @@ function commentReducer(event, state) {
             const parent = state.comments[event.targetId];
             if (!parent)
                 break;
-            parent.comment = Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text });
+            parent.comment = { ...parent.comment, author: event.createdBy, dt: event.createdAt, text: event.text };
             parent.history.push(parent.comment);
             parent.numberOfLines = calculateNumberOfLines(event.text);
             dirtyLineNumbers.add(parent.comment.lineNumber);
@@ -308,17 +291,13 @@ exports.reduceComments = reduceComments;
 /***/ }),
 
 /***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-/*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const events_reducers_1 = __webpack_require__(/*! ./events-reducers */ "./src/events-reducers.ts");
-const uuid = __webpack_require__(/*! uuid/v4 */ "./node_modules/uuid/v4.js");
+const events_reducers_1 = __webpack_require__("./src/events-reducers.ts");
+const uuid = __webpack_require__("./node_modules/uuid/v4.js");
 const monacoWindow = window;
 var NavigationDirection;
 (function (NavigationDirection) {
@@ -365,7 +344,7 @@ class ReviewManager {
         this.widgetInlineCommentEditor = null;
         this.onChange = onChange;
         this.editorMode = EditorMode.toolbar;
-        this.config = Object.assign(Object.assign({}, defaultReviewManagerConfig), (config || {}));
+        this.config = { ...defaultReviewManagerConfig, ...(config || {}) };
         this.currentLineDecorations = [];
         this.currentCommentDecorations = [];
         this.currentLineDecorationLineNumber = null;
@@ -701,7 +680,7 @@ class ReviewManager {
         if (!filterFn) {
             filterFn = (cs) => !cs.comment.parentId;
         }
-        const copyCommentState = Object.assign({}, this.store.comments);
+        const copyCommentState = { ...this.store.comments };
         const results = [];
         this.recurseComments(copyCommentState, filterFn, 0, results);
         return results;

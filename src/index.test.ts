@@ -1,4 +1,5 @@
-import { Action, ReviewComment, reduceComments, createReviewManager, EditorMode, ReviewCommentStatus } from "./index";
+import { createReviewManager, EditorMode } from "./index";
+import { ReviewCommentEvent, reduceComments } from "./events-reducers";
 
 interface MonacoWindow {
     monaco: any;
@@ -54,16 +55,16 @@ function getMockEditor() {
 }
 
 test('reduceComments', () => {
-    const actions: Action[] = [{ type: 'create', id: '1', text: 't1', lineNumber: 1 }];
+    const actions: ReviewCommentEvent[] = [{ type: 'create', id: '1', text: 't1', lineNumber: 1 }];
 
     let store = reduceComments(actions);
     expect(Object.keys(store.comments)).toStrictEqual(['1']);
-    expect(store.comments['1'].comment).toStrictEqual({ "author": undefined, "dt": undefined, "id": "1", "lineNumber": 1, "text": "t1" });
+    expect(store.comments['1'].comment).toStrictEqual({ author: undefined, dt: undefined, id: "1", lineNumber: 1, text: "t1", parentId:undefined });
 
     actions.push({ type: 'edit', id: '2', targetId: '1', text: 't2' });
     store = reduceComments(actions);
     expect(Object.keys(store.comments)).toStrictEqual(['1']);
-    expect(store.comments['1'].comment).toStrictEqual({ "author": undefined, "dt": undefined, "id": "1", "lineNumber": 1, "text": "t2" });
+    expect(store.comments['1'].comment).toStrictEqual({ author: undefined, dt: undefined, id: "1", lineNumber: 1, text: "t2", parentId:undefined });
 
     actions.push({ type: 'delete', id: '3', targetId: '1' });
     store = reduceComments(actions);
@@ -89,7 +90,7 @@ test('Widget Coverage', () => {
 
 test('createReviewManager to editor and add comments', () => {
     const editor = getMockEditor();
-    const comment: Action = { type: "create", lineNumber: 1, createdBy: "author", createdAt: new Date("2019-01-01"), text: "#1" };
+    const comment: ReviewCommentEvent = { type: "create", lineNumber: 1, createdBy: "author", createdAt: new Date("2019-01-01"), text: "#1" };
 
     const rm = createReviewManager(editor, 'current.user', [comment], (comments) => { });
 
@@ -119,7 +120,7 @@ test('createReviewManager to editor and add comments', () => {
 
 test('load clears the comments', () => {
     const editor = getMockEditor();
-    const comment: Action = { type: "create", lineNumber: 1, createdBy: "author", createdAt: new Date("2019-01-01"), text: "#1" };
+    const comment: ReviewCommentEvent = { type: "create", lineNumber: 1, createdBy: "author", createdAt: new Date("2019-01-01"), text: "#1" };
 
     const rm = createReviewManager(editor, 'current.user', [comment], (comments) => { });
     rm.load([]);
@@ -180,6 +181,7 @@ test('Edited Comments', () => {
         "id": comment.id,
         "lineNumber": comment.lineNumber,
         "text": "editted", //Copied from edit
+        "parentId": undefined
     }
 
     const comments = Object.values(rm.store.comments);
