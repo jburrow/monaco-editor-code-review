@@ -216,7 +216,7 @@ export class ReviewManager {
 
         if (this.config.editButtonEnableRemove) {
             spacer = document.createElement('div') as HTMLDivElement;
-            spacer.innerText = '&nbsp;'
+            spacer.innerText = ' '
             root.appendChild(spacer);
 
             remove = document.createElement('span') as HTMLSpanElement;
@@ -229,7 +229,7 @@ export class ReviewManager {
 
         if (this.config.editButtonEnableEdit) {
             spacer = document.createElement('div') as HTMLDivElement;
-            spacer.innerText = '&nbsp;'
+            spacer.innerText = ' '
             root.appendChild(spacer);
 
             edit = document.createElement('span') as HTMLSpanElement;
