@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <script src="../dist/index-var-es2017.js"></script>
+  </head>
+  <body>
+    <h4>Checkout exported methods</h4>
+    <div id="output"></div>
+  </body>
+
+  <script>
+    const expected = [
+      "reduceComments",
+      "EditorMode",
+      "createReviewManager",
+      "ReviewManager"
+    ];
+    const exports = Object.keys(window.MonacoEditorCodeReview);
+    document.getElementById(
+      "output"
+    ).innerHTML = `Expected:<pre>${expected}</pre>
+                   Exported:<pre>${exports}</pre>`;
+  </script>
+</html>
