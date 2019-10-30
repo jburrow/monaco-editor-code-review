@@ -2,6 +2,8 @@ import * as monacoEditor from "monaco-editor";
 import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-reducers";
 import * as uuid from "uuid/v4";
 
+export { reduceComments } from "./events-reducers";
+
 interface MonacoWindow {
     monaco: any;
 }

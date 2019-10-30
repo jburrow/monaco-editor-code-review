@@ -45,10 +45,11 @@ const baseConfig = (mode, target) => {
 };
 
 function getConfigs(mode) {
-  const libes2017 = {
+  const ext = mode === 'production'?'js':'min.js';
+  const var_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
-      filename: "[name].js",
+      filename: "[name]-var-es2017." + ext,
       path: path.join(__dirname, "dist"),
       libraryTarget: "var",
       library: "MonacoEditorCodeReview"
@@ -61,28 +62,30 @@ function getConfigs(mode) {
     ]
   };
 
-  const es5 = {
+  const common_es5 = {
     ...baseConfig(mode, "es5"),
     output: {
-      filename: "[name]-commonjs-es5.js",
+      filename: "[name]-commonjs-es5." + ext,
       path: path.join(__dirname, "dist")
     }
   };
 
-  const es2017 = {
+  const common_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
-      filename: "[name]-commonjs-es2017.js",
+      filename: "[name]-commonjs-es2017." + ext,
       path: path.join(__dirname, "dist")
     }
   };
-  return [libes2017, es5, es2017];
+  return [var_es2017, common_es5, common_es2017];
 }
 
 module.exports = (env, argv) => {
+  console.log(argv);
+  console.log(env);
   if (!argv.mode || argv.mode === "development") {
     return [baseConfig("development", "es2019")];
   } else {
-    return getConfigs("production");
+    return getConfigs("development").concat( getConfigs("production"));
   }
 };
