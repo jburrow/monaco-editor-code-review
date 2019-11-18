@@ -19,6 +19,7 @@ function getMockEditor() {
         _actions: [],
         focus: () => null,
         addAction: (action) => editor._actions.push(action),
+        createContextKey:(name)=>{return {set:()=>null}},
         getConfiguration: () => ({ fontInfo: { lineHeight: 19 } }),
         getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
@@ -162,6 +163,24 @@ test('Remove a comment via the widgets', () => {
     expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 });
 
+test('Toggling read-only comments', () => {
+    const now = () => new Date("2010-01-01");
+    const editor = getMockEditor();
+    const rm = createReviewManager(editor, 'current.user', [{ type: 'create', id: 'id1', createdBy: 'original.author', createdAt: now(), lineNumber: 1, text: "text" }]);
+    rm.getDateTimeNow = now
+    
+    rm.setReadOnlyMode(false);
+    rm.setEditorMode(EditorMode.editComment);
+    expect(rm.editorMode).toBe(EditorMode.editComment);
+    expect(rm.config.readOnly).toBe(false);
+    
+    rm.setEditorMode(EditorMode.toolbar);
+    rm.setReadOnlyMode(true);
+    rm.setEditorMode(EditorMode.editComment);
+    expect(rm.editorMode).toBe(EditorMode.toolbar);
+    expect(rm.config.readOnly).toBe(true);
+})
+
 test('Edited Comments', () => {
     const now = () => new Date("2010-01-01");
     const editor = getMockEditor();
@@ -172,7 +191,6 @@ test('Edited Comments', () => {
     const comment = Object.values(rm.store.comments)[0].comment;
     rm.setActiveComment(comment);
     rm.setEditorMode(EditorMode.editComment);
-
     rm.addComment(null, 'editted');
 
     const expectedEdittedComment = {
@@ -185,10 +203,9 @@ test('Edited Comments', () => {
     }
 
     const comments = Object.values(rm.store.comments);
+    console.log(rm.store);
     expect(comments.length).toBe(1);
     expect(comments[0].comment.author).toBe("current.user")
-    // expect(comments[0].comment).toStrictEqual(expectedEdittedComment);
-
     expect(comments[0].comment).toStrictEqual(expectedEdittedComment);
     expect(comments[0].history.length).toBe(2);
 });

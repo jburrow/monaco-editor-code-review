@@ -51,45 +51,28 @@
   </head>
 
   <body>
-    <div class="buttons">
-        <select id="option_editor_mode"><option>editor-mode</option><option>diff-mode</option></select>
-      <select id="option_diff_mode"><option>side-by-side</option><option>inline-diff</option></select>
-      <select id="option_theme"><option>vs-dark</option><option>vs-light</option></select>
+
+    <div class="buttons alert alert-light">
+        Editor Mode:<select id="option_editor_mode"><option>editor-mode</option><option>diff-mode</option></select>
+        Diff Mode:<select id="option_diff_mode"><option>side-by-side</option><option>inline-diff</option></select>
+        User:<select id="option_current_user" onchange="setCurrentUser()">
+          <option selected>foo.user</option>
+          <option>bar.user</option>
+        </select>
+
+      Theme:<select id="option_theme"><option>vs-dark</option><option>vs-light</option></select>
       <input id="option_editor_readonly" type="checkbox"></input>Editor Readonly
-      <input id="option_comments_readonly" type="checkbox"></input>Comments Readonly
+      <input id="option_comments_readonly" type="checkbox"  onchange="handleCommentReadonlyChange()"></input>Comments Readonly
       <button onclick="setView( document.getElementById('option_editor_mode').value,
                                 document.getElementById('option_diff_mode').value,
                                 document.getElementById('option_theme').value,
+                                document.getElementById('option_current_user').value,
                                 document.getElementById('option_editor_readonly').checked,
-                                document.getElementById('option_comments_readonly').checked)">Update Editor</button>
-      <!-- <button onclick="setView('standard')" class="btn btn-primary">
-        Editor
-      </button>
-      <button onclick="setView('standard-readonly')" class="btn btn-primary">
-        Editor - Readonly
-      </button>
-      <button onclick="setView('inline')" class="btn btn-primary">
-        Diff - Inline
-      </button>
-      <button onclick="setView('side-by-side')" class="btn btn-primary">
-        Diff - Side-by-Side
-      </button> -->
-      <button onclick="generateDifferentComments()" class="btn btn-secondary">
-        Change Comments (in-place)
-      </button>
-      <!-- <button onclick="toggleTheme()" class="btn btn-secondary">
-        Toggle Theme
-      </button> -->
-      <!-- <input type="checkbox" onchange="toggleCommentsReadOnly()" class="btn btn-secondary">
-        Toggle Comments ReadOnly
-      </button> -->
+                                document.getElementById('option_comments_readonly').checked)"
+                                class="btn btn-primary">Update Editor</button>      
       <button onclick="clearComments()" class="btn btn-secondary">
         Clear Comments
       </button>
-      <select id="selectUser" onchange="setCurrentUser()">
-        <option value="foo.user" selected>Foo User</option>
-        <option value="bar.user">Bar User</option>
-      </select>
     </div>
     <h5>
       Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment

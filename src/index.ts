@@ -83,7 +83,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
     editButtonOffset: '-10px',
     editButtonRemoveText: 'Remove',
     formatDate: null,
-    readOnly: true,
+    readOnly: false,
     rulerMarkerColor: 'darkorange',
     rulerMarkerDarkColor: 'darkorange',
     showAddCommentGlyph: true,
@@ -499,10 +499,10 @@ export class ReviewManager {
     }
 
     setEditorMode(mode: EditorMode) {
-        
+
 
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-        console.warn('setEditorMode', EditorMode[mode], 'Comment:', this.activeComment, 'ReadOnly:',this.config.readOnly, 'Result:',EditorMode[this.editorMode]);
+        console.warn('setEditorMode', EditorMode[mode], 'Comment:', this.activeComment, 'ReadOnly:', this.config.readOnly, 'Result:', EditorMode[this.editorMode]);
 
         this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
@@ -511,7 +511,7 @@ export class ReviewManager {
             if (mode == EditorMode.insertComment) {
                 this.editorElements.textarea.value = "";
             } else if (mode == EditorMode.editComment) {
-                this.editorElements.textarea.value = this.activeComment.text;
+                this.editorElements.textarea.value = this.activeComment ? this.activeComment.text : '';
             }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...                        
             setTimeout(() => this.editorElements.textarea.focus(), 100);//TODO - make configurable

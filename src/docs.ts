@@ -7,11 +7,14 @@ import { ReviewCommentEvent } from "./events-reducers";
 interface WindowDoc {
     require: any;
     monaco: any;
-    setView: (editorMode: string, diffMode: string, theme: string, editorReadonly: boolean, commentsReadonly: boolean) => void;
+    setView: (editorMode: string, diffMode: string, theme: string, 
+        currentUser: string, editorReadonly: boolean, 
+        commentsReadonly: boolean) => void;
     generateDifferentComments: () => void;
     generateDifferentContents: () => void;
     clearComments: () => void;
     setCurrentUser: () => void;
+    handleCommentReadonlyChange: () => void;
 }
 
 const win = (window as any) as WindowDoc;
@@ -19,8 +22,8 @@ let reviewManager: ReviewManager = null;
 let currentMode: string = '';
 let currentEditor: any = null;
 let theme = 'vs-dark';
-
-
+const fooUser = 'foo.user';
+const barUser = 'bar.user';
 
 function ensureMonacoIsAvailable() {
     return new Promise(resolve => {
@@ -46,7 +49,7 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-function setView(editorMode: string, diffMode: string, theme: string, editorReadonly: boolean, commentsReadonly: boolean) {
+function setView(editorMode: string, diffMode: string, theme: string, currentUser: string, editorReadonly: boolean, commentsReadonly: boolean) {
     console.warn(arguments);
     const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
 
@@ -65,7 +68,7 @@ function setView(editorMode: string, diffMode: string, theme: string, editorRead
                 theme: theme
             }
         );
-        initReviewManager(currentEditor,commentsReadonly);
+        initReviewManager(currentEditor, currentUser, commentsReadonly);
     } else {
         var originalModel = win.monaco.editor.createModel(
             exampleSourceCode[idx],
@@ -94,7 +97,7 @@ function setView(editorMode: string, diffMode: string, theme: string, editorRead
         });
 
         currentEditor = e;
-        initReviewManager(e.modifiedEditor,commentsReadonly);
+        initReviewManager(e.modifiedEditor, currentUser, commentsReadonly);
     }
 }
 
@@ -140,15 +143,14 @@ async function init() {
     });
 
     win.require(["vs/editor/editor.main"], function () {
-        //FIX FIX setView("standard");
+        setView("editor-mode", "", "vs-dark", fooUser, false, false);
     });
 }
 
-function initReviewManager(editor: any, readOnly:boolean) {
-
+function initReviewManager(editor: any, currentUser: string, readOnly: boolean) {
     reviewManager = createReviewManager(
         editor,
-        "mr reviewer",
+        currentUser,
         createRandomComments(),
         updatedComments => renderComments(updatedComments),
         {
@@ -168,9 +170,9 @@ function toggleTheme() {
     win.monaco.editor.setTheme(theme)
 }
 
-// function toggleCommentsReadOnly(){    
-//     reviewManager.setReadOnlyMode((event.srcElement as HTMLInputElement).checked);
-// }
+function handleCommentReadonlyChange(){    
+    reviewManager.setReadOnlyMode((event.srcElement as HTMLInputElement).checked);
+}
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
@@ -178,19 +180,22 @@ function generateDifferentComments() {
 }
 
 function setCurrentUser() {
-    const select = document.getElementById('selectUser') as HTMLSelectElement;
-    reviewManager.currentUser = select.value;
+    if (reviewManager) {
+        reviewManager.currentUser = (event.srcElement as HTMLSelectElement).value;
+    }
 }
 
 function createRandomComments(): ReviewCommentEvent[] {
     const firstLine = Math.floor(Math.random() * 10);
+
+
 
     const result: ReviewCommentEvent[] = [
         {
             type: "create",
             id: "id-0",
             lineNumber: firstLine + 10,
-            createdBy: "another reviewer",
+            createdBy: fooUser,
             createdAt: '2019-01-01T00:00:00.000',
             text: "Near the start",
             selection: {
@@ -204,7 +209,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             id: "id-2-edit",
             targetId: "id-2",
             type: "edit",
-            createdBy: "another reviewer",
+            createdBy: fooUser,
             createdAt: '2019-06-01T00:00:00.000Z',
             text: "EDIT EDIT at start"
         },
@@ -212,7 +217,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             id: "id-1",
             type: "create",
             lineNumber: firstLine + 5,
-            createdBy: "another reviewer",
+            createdBy: fooUser,
             createdAt: '2019-06-01T00:00:00.000Z',
             text: "at start"
         },
@@ -221,7 +226,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             type: "create",
             targetId: "id-1",
             lineNumber: firstLine + 5,
-            createdBy: "another reviewer",
+            createdBy: fooUser,
             createdAt: '2019-12-01T00:00:00.000Z',
             text: "this code isn't very good",
         },
@@ -230,7 +235,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             type: "create",
             targetId: "id-2",
             lineNumber: firstLine + 5,
-            createdBy: "original author",
+            createdBy: barUser,
             createdAt: '2019-06-01T00:00:00.000Z',
             text: "I think you will find it is good enough"
         },
@@ -238,7 +243,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             targetId: "id-3",
             type: "create",
             lineNumber: firstLine + 5,
-            createdBy: "original author",
+            createdBy: barUser,
             createdAt: new Date(),
             text: "I think you will find it is good enough",
         },
@@ -246,7 +251,7 @@ function createRandomComments(): ReviewCommentEvent[] {
             targetId: "id-3",
             type: "create",
             lineNumber: firstLine + 5,
-            createdBy: "original author",
+            createdBy: barUser,
             createdAt: new Date(),
             text: "I think you will find it is good enough",
         }
@@ -303,7 +308,7 @@ function clearComments() {
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
-
+win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
 init();
