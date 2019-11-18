@@ -7,10 +7,9 @@ import { ReviewCommentEvent } from "./events-reducers";
 interface WindowDoc {
     require: any;
     monaco: any;
-    setView: (mode: string) => void;
+    setView: (editorMode: string, diffMode: string, theme: string, editorReadonly: boolean, commentsReadonly: boolean) => void;
     generateDifferentComments: () => void;
     generateDifferentContents: () => void;
-    toggleTheme: () => void;
     clearComments: () => void;
     setCurrentUser: () => void;
 }
@@ -20,6 +19,8 @@ let reviewManager: ReviewManager = null;
 let currentMode: string = '';
 let currentEditor: any = null;
 let theme = 'vs-dark';
+
+
 
 function ensureMonacoIsAvailable() {
     return new Promise(resolve => {
@@ -45,12 +46,13 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-function setView(mode: string) {
+function setView(editorMode: string, diffMode: string, theme: string, editorReadonly: boolean, commentsReadonly: boolean) {
+    console.warn(arguments);
     const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
 
-    currentMode = mode;
+    // currentMode = mode;
     document.getElementById("containerEditor").innerHTML = "";
-    if (mode.startsWith("standard")) {
+    if (editorMode == 'editor-mode') {
         currentEditor = win.monaco.editor.create(
             document.getElementById("containerEditor"),
             {
@@ -59,11 +61,11 @@ function setView(mode: string) {
                 glyphMargin: true,
                 contextmenu: true,
                 automaticLayout: true,
-                readOnly: mode === "standard-readonly",
+                readOnly: editorReadonly,
                 theme: theme
             }
         );
-        initReviewManager(currentEditor);
+        initReviewManager(currentEditor,commentsReadonly);
     } else {
         var originalModel = win.monaco.editor.createModel(
             exampleSourceCode[idx],
@@ -76,7 +78,15 @@ function setView(mode: string) {
 
         const e = win.monaco.editor.createDiffEditor(
             document.getElementById("containerEditor"),
-            { renderSideBySide: mode !== "inline" }
+            {
+                renderSideBySide: diffMode !== "inline-diff",
+                theme: theme,
+                readOnly: editorReadonly,
+                glyphMargin: true,
+                contextmenu: true,
+                automaticLayout: true,
+
+            }
         );
         e.setModel({
             original: originalModel,
@@ -84,7 +94,7 @@ function setView(mode: string) {
         });
 
         currentEditor = e;
-        initReviewManager(e.modifiedEditor);
+        initReviewManager(e.modifiedEditor,commentsReadonly);
     }
 }
 
@@ -130,11 +140,11 @@ async function init() {
     });
 
     win.require(["vs/editor/editor.main"], function () {
-        setView("standard");
+        //FIX FIX setView("standard");
     });
 }
 
-function initReviewManager(editor: any) {
+function initReviewManager(editor: any, readOnly:boolean) {
 
     reviewManager = createReviewManager(
         editor,
@@ -143,7 +153,8 @@ function initReviewManager(editor: any) {
         updatedComments => renderComments(updatedComments),
         {
             editButtonEnableRemove: true,
-            formatDate: (createdAt: Date | string) => moment(createdAt).format('YY-MM-DD HH:mm')
+            formatDate: (createdAt: Date | string) => moment(createdAt).format('YY-MM-DD HH:mm'),
+            readOnly: readOnly
         }
     );
 
@@ -156,6 +167,10 @@ function toggleTheme() {
     theme = theme == 'vs' ? 'vs-dark' : 'vs';
     win.monaco.editor.setTheme(theme)
 }
+
+// function toggleCommentsReadOnly(){    
+//     reviewManager.setReadOnlyMode((event.srcElement as HTMLInputElement).checked);
+// }
 
 function generateDifferentComments() {
     reviewManager.load(createRandomComments());
@@ -243,13 +258,6 @@ function renderComments(events: ReviewCommentEvent[]) {
     events = events || [];
     console.log('Events #', events.length, events);
 
-    const rawHeader = {
-        type: "Type",
-        id: "Id",
-        createdBy: "Author",
-        createdAt: "Created At",
-    };
-
     const rawHtml = '<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>' + events
         .map(
             comment => {
@@ -267,7 +275,7 @@ function renderComments(events: ReviewCommentEvent[]) {
         .join("") + '</table>';
 
 
-        
+
     const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
     const activeHtml = '<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>' + activeComments
         .map(
@@ -292,12 +300,10 @@ function clearComments() {
     renderComments([]);
 }
 
-
-
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
-win.toggleTheme = toggleTheme;
+
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
 init();

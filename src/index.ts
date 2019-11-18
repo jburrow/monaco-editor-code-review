@@ -40,52 +40,55 @@ interface OnActionsChanged {
 }
 
 export interface ReviewManagerConfig {
-    editButtonEnableRemove?: boolean;
     commentIndent?: number;
     commentIndentOffset?: number;
     editButtonAddText?: string;
-    editButtonRemoveText?: string;
+    editButtonEnableRemove?: boolean;
     editButtonOffset?: string;
-    reviewCommentIconSelect?: string;
-    reviewCommentIconActive?: string;
-    showInRuler?: boolean
-    verticalOffset?: number;
+    editButtonRemoveText?: string;
     formatDate?: { (dt: Date): string }
+    readOnly?: boolean;
+    reviewCommentIconActive?: string;
+    reviewCommentIconSelect?: string;
+    showInRuler?: boolean;
+    verticalOffset?: number;
 }
 
 interface ReviewManagerConfigPrivate {
-    rulerMarkerColor: any;
-    rulerMarkerDarkColor: any;
-    editButtonEnableRemove: boolean;
-    editButtonEnableEdit: boolean;
     commentIndent: number;
     commentIndentOffset: number;
     editButtonAddText: string;
-    editButtonRemoveText: string;
     editButtonEditText: string;
+    editButtonEnableEdit: boolean;
+    editButtonEnableRemove: boolean;
     editButtonOffset: string;
-    verticalOffset: number;
-    showInRuler: boolean;
+    editButtonRemoveText: string;
     formatDate?: { (dt: Date | string): string };
+    readOnly: boolean;
+    rulerMarkerColor: any;
+    rulerMarkerDarkColor: any;
     showAddCommentGlyph: boolean
+    showInRuler: boolean;
+    verticalOffset: number;
 }
 
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
-    verticalOffset: 0,
-    editButtonOffset: '-10px',
-    editButtonAddText: 'Reply',
-    editButtonRemoveText: 'Remove',
-    editButtonEditText: 'Edit',
-    editButtonEnableRemove: true,
-    editButtonEnableEdit: true,
     commentIndent: 20,
     commentIndentOffset: 20,
-    showInRuler: true,
+    editButtonAddText: 'Reply',
+    editButtonEditText: 'Edit',
+    editButtonEnableEdit: true,
+    editButtonEnableRemove: true,
+    editButtonOffset: '-10px',
+    editButtonRemoveText: 'Remove',
+    formatDate: null,
+    readOnly: true,
     rulerMarkerColor: 'darkorange',
     rulerMarkerDarkColor: 'darkorange',
-    formatDate: null,
     showAddCommentGlyph: true,
+    showInRuler: true,
+    verticalOffset: 0,
 };
 
 const CONTROL_ATTR_NAME = 'ReviewManagerControl';
@@ -93,17 +96,17 @@ const POSITION_BELOW = 2; //above=1, below=2, exact=0
 
 
 interface EditorElements {
-    confirm: HTMLButtonElement;
     cancel: HTMLButtonElement;
+    confirm: HTMLButtonElement;
     root: HTMLSpanElement
     textarea: HTMLTextAreaElement;
 }
 
 interface InlineToolbarElements {
-    root: HTMLDivElement;
     add: HTMLSpanElement;
-    remove: HTMLSpanElement;
     edit: HTMLSpanElement;
+    remove: HTMLSpanElement;
+    root: HTMLDivElement;
 }
 
 export class ReviewManager {
@@ -125,6 +128,7 @@ export class ReviewManager {
     editorElements: EditorElements;
     inlineToolbarElements: InlineToolbarElements;
     verbose: boolean;
+    canAddCondition: monacoEditor.editor.IContextKey<boolean>;
 
     constructor(editor: any, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean) {
         this.currentUser = currentUser;
@@ -146,7 +150,7 @@ export class ReviewManager {
         this.editorConfig = this.editor.getConfiguration();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-
+        this.canAddCondition = this.editor.createContextKey('add-context-key', this.config.readOnly);
         this.inlineToolbarElements = this.createInlineToolbarWidget();
         this.editorElements = this.createInlineEditorWidget();
         this.addActions();
@@ -156,8 +160,14 @@ export class ReviewManager {
         }
     }
 
+    setReadOnlyMode(value: boolean) {
+        this.config.readOnly = value;
+        this.canAddCondition.set(value);
+        this.renderAddCommentLineDecoration(null);
+    }
+
     load(events: ReviewCommentEvent[]): void {
-        this.editor.changeViewZones((changeAccessor) => {
+        this.editor.changeViewZones((changeAccessor: monacoEditor.editor.IViewZoneChangeAccessor) => {
             // Remove all the existing comments     
             for (const viewState of Object.values(this.store.comments)) {
                 if (viewState.viewZoneId !== null) {
@@ -316,7 +326,7 @@ export class ReviewManager {
                 return buttonsElement.root;
             },
             getPosition: () => {
-                if (this_.activeComment && this_.editorMode == EditorMode.toolbar) {
+                if (this_.activeComment && this_.editorMode == EditorMode.toolbar && !this_.config.readOnly) {
                     return {
                         position: {
                             lineNumber: this_.activeComment.lineNumber,
@@ -391,16 +401,21 @@ export class ReviewManager {
     handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent) {
         if (ev.target && ev.target.position && ev.target.position.lineNumber) {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
-            this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, [
-                {
-                    range: new monacoWindow.monaco.Range(ev.target.position.lineNumber, 0, ev.target.position.lineNumber, 0),
-                    options: {
-                        marginClassName: 'activeLineMarginClass',
-                        zIndex: 100
-                    }
-                }
-            ]);
+            this.renderAddCommentLineDecoration(this.config.readOnly ? null : this.currentLineDecorationLineNumber);
         }
+    }
+
+    renderAddCommentLineDecoration(lineNumber?: number) {
+        const lines = lineNumber ? [
+            {
+                range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
+                options: {
+                    marginClassName: 'activeLineMarginClass',
+                    zIndex: 100
+                }
+            }
+        ] : [];
+        this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, lines);
     }
 
     handleMouseDown(ev: { target: { element: { className: string, hasAttribute: { (string): boolean } }, detail: any } }) {
@@ -484,9 +499,10 @@ export class ReviewManager {
     }
 
     setEditorMode(mode: EditorMode) {
-        console.debug('setEditorMode', EditorMode[mode], this.activeComment);
+        
 
-        this.editorMode = mode;
+        this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
+        console.warn('setEditorMode', EditorMode[mode], 'Comment:', this.activeComment, 'ReadOnly:',this.config.readOnly, 'Result:',EditorMode[this.editorMode]);
 
         this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
@@ -681,13 +697,15 @@ export class ReviewManager {
     }
 
     addActions() {
+
+
         this.editor.addAction({
             id: 'my-unique-id-add',
             label: 'Add Comment',
             keybindings: [
                 monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10,
             ],
-            precondition: null,
+            precondition: 'add-context-key',
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
             contextMenuOrder: 0,

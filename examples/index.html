@@ -52,7 +52,17 @@
 
   <body>
     <div class="buttons">
-      <button onclick="setView('standard')" class="btn btn-primary">
+        <select id="option_editor_mode"><option>editor-mode</option><option>diff-mode</option></select>
+      <select id="option_diff_mode"><option>side-by-side</option><option>inline-diff</option></select>
+      <select id="option_theme"><option>vs-dark</option><option>vs-light</option></select>
+      <input id="option_editor_readonly" type="checkbox"></input>Editor Readonly
+      <input id="option_comments_readonly" type="checkbox"></input>Comments Readonly
+      <button onclick="setView( document.getElementById('option_editor_mode').value,
+                                document.getElementById('option_diff_mode').value,
+                                document.getElementById('option_theme').value,
+                                document.getElementById('option_editor_readonly').checked,
+                                document.getElementById('option_comments_readonly').checked)">Update Editor</button>
+      <!-- <button onclick="setView('standard')" class="btn btn-primary">
         Editor
       </button>
       <button onclick="setView('standard-readonly')" class="btn btn-primary">
@@ -63,13 +73,16 @@
       </button>
       <button onclick="setView('side-by-side')" class="btn btn-primary">
         Diff - Side-by-Side
-      </button>
+      </button> -->
       <button onclick="generateDifferentComments()" class="btn btn-secondary">
         Change Comments (in-place)
       </button>
-      <button onclick="toggleTheme()" class="btn btn-secondary">
+      <!-- <button onclick="toggleTheme()" class="btn btn-secondary">
         Toggle Theme
-      </button>
+      </button> -->
+      <!-- <input type="checkbox" onchange="toggleCommentsReadOnly()" class="btn btn-secondary">
+        Toggle Comments ReadOnly
+      </button> -->
       <button onclick="clearComments()" class="btn btn-secondary">
         Clear Comments
       </button>
@@ -87,4 +100,4 @@
   </body>
 </html>
 
-<script src="../dist/docs-commonjs-es2017.js"></script>
+<script type="module" src="../dist/docs-commonjs-es5.js"></script>

@@ -13,7 +13,6 @@ const baseConfig = (mode, target) => {
       rules: [
         {
           test: /\.tsx?$/,
-
           exclude: [/node_modules/],
           loader: "ts-loader",
           options: {
@@ -45,7 +44,7 @@ const baseConfig = (mode, target) => {
 };
 
 function getConfigs(mode) {
-  const ext = mode === 'production'?'js':'min.js';
+  const ext = mode === 'production'?'min.js':'js';
   const var_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
@@ -81,11 +80,9 @@ function getConfigs(mode) {
 }
 
 module.exports = (env, argv) => {
-  console.log(argv);
-  console.log(env);
   if (!argv.mode || argv.mode === "development") {
-    return [baseConfig("development", "es2019")];
+    return getConfigs("development");
   } else {
-    return getConfigs("development").concat( getConfigs("production"));
+     return getConfigs("development").concat( getConfigs("production"));
   }
 };
