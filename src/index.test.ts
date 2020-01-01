@@ -20,7 +20,7 @@ function getMockEditor() {
         focus: () => null,
         addAction: (action) => editor._actions.push(action),
         createContextKey:(name)=>{return {set:()=>null}},
-        getConfiguration: () => ({ fontInfo: { lineHeight: 19 } }),
+        getRawOptions: () => ({lineHeight: 19 } ),
         getSelection: () => ({ startLineNumber: 15, startColumn: 1, endLineNumber: 18, endColumn: 19, selectionStartLineNumber: 15 }),
         addContentWidget: () => null,
         onMouseDown: () => null,

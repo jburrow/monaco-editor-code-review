@@ -112,7 +112,7 @@ interface InlineToolbarElements {
 export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
-    editorConfig: monacoEditor.editor.InternalEditorOptions;
+    editorConfig: monacoEditor.editor.IEditorOptions;
     events: ReviewCommentEvent[];
     store: ReviewCommentStore;
     activeComment?: ReviewComment;
@@ -147,8 +147,8 @@ export class ReviewManager {
 
         this.verbose = verbose;
 
-        this.editorConfig = this.editor.getConfiguration();
-        this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
+        this.editorConfig = this.editor.getRawOptions();
+        this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getRawOptions());
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
         this.canAddCondition = this.editor.createContextKey('add-context-key', this.config.readOnly);
         this.inlineToolbarElements = this.createInlineToolbarWidget();
@@ -447,7 +447,7 @@ export class ReviewManager {
     private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
         let count = 0;
         let marginTop = 0;
-        const lineHeight = this.editorConfig.fontInfo.lineHeight;
+        const lineHeight = this.editorConfig.lineHeight;
 
         if (this.activeComment) {
             for (var item of this.iterateComments()) {
