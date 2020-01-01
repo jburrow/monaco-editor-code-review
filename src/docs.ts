@@ -180,7 +180,7 @@ function generateDifferentComments() {
 }
 
 function setCurrentUser() {
-    if (reviewManager) {
+    if (reviewManager && event) {
         reviewManager.currentUser = (event.srcElement as HTMLSelectElement).value;
     }
 }
