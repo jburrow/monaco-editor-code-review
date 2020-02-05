@@ -4,7 +4,8 @@ export type CommonFields = {
     id?: string,
     targetId?: string,
     createdBy?: string,
-    createdAt?: Date | string
+    createdAt?: Date | string,
+    // script on here maybe?
 };
 
 

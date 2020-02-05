@@ -6,17 +6,18 @@ export type FileRenameEvent = {
   newFullPath: string;
   text: string;
 };
-type FileEvents = FileEditEvent | FileDeleteEvent | FileRenameEvent;
+export type FileEvents = FileEditEvent | FileDeleteEvent | FileRenameEvent;
 
 export type VersionControlEvent = {
   type: "commit";
+  id:string,
   author: string;
   events: FileEvents[];
 };
 
 export enum FileStateStatus {
-  active=1,
-  deleted=2
+  active = 1,
+  deleted = 2
 }
 
 export type FileState = {
@@ -36,18 +37,18 @@ function createFileState(
   text: string,
   history: VersionControlEvent[],
   status: FileStateStatus
-):FileState {
+): FileState {
   return {
     fullPath: fullPath,
-    status:status,
+    status: status,
     text: text,
     history: [...history, event]
   };
 }
 
 export function versionControlReducer(
-  event: VersionControlEvent,
-  state: VersionControlState
+  
+  state: VersionControlState,event: VersionControlEvent,
 ) {
   switch (event.type) {
     case "commit":
@@ -68,11 +69,10 @@ export function versionControlReducer(
             break;
           case "delete":
             status = FileStateStatus.deleted;
-            
+
             break;
           case "rename":
             status = FileStateStatus.deleted;
-            
 
             updates[e.newFullPath] = createFileState(
               event,
@@ -99,7 +99,6 @@ export function versionControlReducer(
         }
       };
   }
-  return state;
 }
 
 export function reduceVersionControl(
@@ -109,7 +108,7 @@ export function reduceVersionControl(
   state = state || { files: {} };
 
   for (const a of actions) {
-    state = versionControlReducer(a, state);
+    state = versionControlReducer(state,a);
   }
 
   return state;

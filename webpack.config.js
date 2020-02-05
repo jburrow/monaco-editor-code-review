@@ -3,7 +3,11 @@ const TimestampWebpackPlugin = require("timestamp-webpack-plugin");
 
 const baseConfig = (mode, target) => {
   return {
-    entry: { index: "./src/index.ts", docs: "./src/docs.ts" },
+    entry: {
+      index: "./src/index.ts",
+      docs: "./src/docs.ts",
+      hub: "./src/review-hub/main.tsx"
+    },
     mode,
     devtool: "none",
     devServer: {
@@ -44,7 +48,7 @@ const baseConfig = (mode, target) => {
 };
 
 function getConfigs(mode) {
-  const ext = mode === 'production'?'min.js':'js';
+  const ext = mode === 'production' ? 'min.js' : 'js';
   const var_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
@@ -83,6 +87,6 @@ module.exports = (env, argv) => {
   if (!argv.mode || argv.mode === "development") {
     return getConfigs("development");
   } else {
-     return getConfigs("development").concat( getConfigs("production"));
+    return getConfigs("development").concat(getConfigs("production"));
   }
 };
