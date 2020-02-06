@@ -1,50 +1,42 @@
 import { render } from "react-dom";
 import * as React from 'react'
 import * as RGL from "react-grid-layout";
-import { reduceVersionControl, versionControlReducer, VersionControlState, FileEvents, FileState, VersionControlEvent, initialVersionControlState } from "./../events-version-control";
-import { DiffEditor, monaco } from "@monaco-editor/react";
+import { reduceVersionControl, FileEditEvent, versionControlReducer, VersionControlState, FileEvents, FileState, VersionControlEvent, initialVersionControlState } from "./../events-version-control";
+import { DiffEditor, ControlledEditor } from "@monaco-editor/react";
 
 const ReactGridLayout = RGL.WidthProvider(RGL);
 
-// (window as any).require.config({
-// monaco.config(
-//    {urls:{ monacoBase: "../node_modules/monaco-editor/min/vs" }}
-// )
-
-
-const Editor = (props: { fullPath: string, text: string, wsDispatch(e: VersionControlEvent): void }) => {
+const Editor = (props: { view: { fullPath: string, text: string, original?: string }, wsDispatch(e: VersionControlEvent): void }) => {
     const [text, setText] = React.useState<string>("");
-    React.useEffect(() => {
-        console.log('useEffect', props.text);
-        if (props.text) {
-            setText(props.text)
 
-        }
-    }, [props.text, props.fullPath]);
+    return props.view && props.view.fullPath ? <div>
+        <h3>{props.view.fullPath} </h3>
+        {props.view.original ?
+            <DiffEditor editorDidMount={(modified, original, editor) => { console.warn(modified(), original(), editor.getModifiedEditor().getValue()); }}
+                modified={props.view.text}
+                original={props.view.original} /> :
+            <ControlledEditor value={props.view.text}
+                options={{ readOnly:false}}
+                onChange={(e, t) => setText(t)} />}
 
-
-
-    return props.fullPath ? <div>
-        <h3>{props.fullPath} </h3>
-        <input onChange={(e) => setText(e.target.value)} value={text} type="text"></input>
-        {text !== props.text ? <button onClick={() => {
+        {text !== props.view.text ? <button onClick={() => {
             props.wsDispatch({
                 type: 'commit',
                 author: 'interactive!',
-                events: [{ type: 'edit', fullPath: props.fullPath, text: text }]
+                events: [{ type: 'edit', fullPath: props.view.fullPath, text: text }]
             })
         }}>Save</button> : <div>not modified</div>}
     </div> : null;
 };
 
-const History = (props: { script: FileState }) => {
+const History = (props: { script: FileState, appDispatch: AppDispatch }) => {
     const [selected, setSelected] = React.useState<number[]>([]);
- 
-
     const convert = (e: FileEvents) => {
         switch (e.type) {
             case "edit":
                 return `${e.fullPath} : "${e.text.substring(0, 10)} ..."`
+            default:
+                return JSON.stringify(e);
         }
     }
 
@@ -61,18 +53,29 @@ const History = (props: { script: FileState }) => {
         }
 
         return <div>{events.map((h, idx) => (
-        <div key={idx} >
-            <button onClick={() => { 
-                if(selected.indexOf(idx)>-1){
-                    setSelected(selected.filter((i)=>i!==idx));
-                } else{
-                    setSelected(selected.concat(idx));
-                }
-        }}>{selected.indexOf(idx)>-1?'select':'deselect'}</button>
+            <div key={idx} >
+                <button onClick={() => {
+                    if (selected.indexOf(idx) > -1) {
+                        setSelected(selected.filter((i) => i !== idx));
+                    } else {
+                        setSelected(selected.concat(idx));
+                    }
+                }}>{selected.indexOf(idx) > -1 ? 'deselect' : 'select'}</button>
 
-            {selected.indexOf(idx)>-1?'selected':''} {convert(h)}
-        </div>))}
+                <button onClick={() => props.appDispatch({
+                    type: "selectedView",
+                    fullPath: h.fullPath,
+                    text: (h as FileEditEvent).text
+                })}>view</button>
 
+                {convert(h)}
+            </div>))}
+            {selected.length == 2 && <button onClick={() => props.appDispatch({
+                type: "selectedView",
+                fullPath: props.script.fullPath,
+                text: (events[selected[1]] as FileEditEvent).text,
+                original: (events[selected[0]] as FileEditEvent).text
+            })}>diff</button>}
         </div>
     }
     return null;
@@ -80,19 +83,19 @@ const History = (props: { script: FileState }) => {
 
 interface AppState {
     selectedScript?: { fullPath: string, text: string };
-
+    selectedView?: { fullPath: string, text: string, original?: string };
 }
-type AppStateEvents = { type: 'selectScript', fullPath: string, text: string } | { type: 'editScript', fullPath: string, text: string };
+type AppStateEvents = { type: 'selectScript', fullPath: string, text: string } | { type: 'selectedView', fullPath: string, text: string, original?: string };
 
 const reducer = (state: AppState, event: AppStateEvents) => {
     switch (event.type) {
         case "selectScript":
             return { ...state, selectedScript: { fullPath: event.fullPath, text: event.text } }
-
+        case "selectedView":
+            return { ...state, selectedView: { fullPath: event.fullPath, text: event.text, original: event.original } }
     }
     return state;
 }
-
 
 function loadVersionControlStore(): VersionControlState {
     const events: FileEvents[] = [
@@ -103,31 +106,21 @@ function loadVersionControlStore(): VersionControlState {
     const store = reduceVersionControl([{
         type: "commit", author: "james", id: 'id-0',
         events: events
-    },{
+    }, {
         type: "commit", author: "james", id: 'id-1',
         events: [{ fullPath: "/script1.py", text: "version 1.1", type: "edit" }]
-    },{
+    }, {
         type: "commit", author: "james", id: 'id-2',
         events: [{ fullPath: "/script1.py", text: "version 1.2", type: "edit" }]
     }]);
 
-    
-
     return store;
 }
-
-
 
 export const App = () => {
     const [appState, appDispatch] = React.useReducer(reducer, {});
     const [vcStore, vcDispatch] = React.useReducer(versionControlReducer, loadVersionControlStore());
     const [wsStore, wsDispatch] = React.useReducer(versionControlReducer, initialVersionControlState());
-
-    // React.useEffect(() => {
-    //     if (appState.selectedScript) {
-    //         appDispatch({ type: "selectScript", script: vcStore.files[appState.selectedScript.fullPath] })
-    //     }
-    // }, [vcStore])
 
     return (
         <ReactGridLayout
@@ -164,75 +157,52 @@ export const App = () => {
             <div key="0.2" data-grid={{ x: 1, y: 0, w: 1, h: 1, }} style={{ backgroundColor: 'yellow', }} >
                 <h3>Editor</h3>
                 <div className="fish">
-                    <Editor fullPath={appState.selectedScript && appState.selectedScript.fullPath}
-                        text={appState.selectedScript && appState.selectedScript.text}
+
+                    <Editor view={appState.selectedView}
+
                         wsDispatch={wsDispatch} />
                 </div>
             </div>
             <div key="0.3" data-grid={{ x: 2, y: 0, w: 1, h: 1 }} style={{ backgroundColor: 'orange', }}>
                 <h3>History</h3>
                 <div className="fish">
-                <History script={appState.selectedScript && vcStore.files[appState.selectedScript.fullPath]} />
+                    <History script={appState.selectedScript && vcStore.files[appState.selectedScript.fullPath]}
+                        appDispatch={appDispatch}
+                    />
                 </div>
             </div>
             <div key="1.1" data-grid={{ x: 0, y: 1, w: 3, h: 1 }} style={{ backgroundColor: 'cyan', }}>
-
+                <h3>VC History</h3>
+                <div className="fish">
+                    <VCHistory vcStore={vcStore} />
+                </div>
                 {vcStore.version}
             </div>
         </ReactGridLayout>
     );
 }
 
+const VCHistory = (props: { vcStore: VersionControlState }) => {
+    const rows = [];
+    for (const e of props.vcStore.events.reverse()) {
+        if (e.type == 'commit') {
+            rows.push(`commit: ${e.id}`)
+            for (const fe of e.events) {
+                rows.push(JSON.stringify(fe))
+            }
+        }
+    }
+    return <div>
+        {rows.map((r, idx) => <div key={idx}>{r}</div>)}
+    </div>
+}
+type AppDispatch = (event: AppStateEvents) => void;
 
-
-
-const SCM = (props: { vcStore: VersionControlState, appDispatch(event: AppStateEvents): void }) => {
+const SCM = (props: { vcStore: VersionControlState, appDispatch: AppDispatch }) => {
     const items = Object.entries(props.vcStore.files).map(([key, value]) => <li key={key} onClick={() => {
         props.appDispatch({ type: 'selectScript', fullPath: value.fullPath, text: value.text })
     }}>{key}-{value.fullPath}</li>);
     return <ul>{items}</ul>
 }
 
-
-
 render(<App />, document.body);
-
-function useKeyPress(targetKey:string, ctrlKey?:boolean) {
-    // State for keeping track of whether key is pressed
-    const [keyPressed, setKeyPressed] = React.useState(false);
-
-    const testFn = (e:KeyboardEvent)=>{
-        console.log(e.ctrlKey,e.key)
-        const x = targetKey===null || targetKey===e.key;
-        const y = ctrlKey ===null || e.ctrlKey || e.key ==='Control' ===ctrlKey;
-        return x && y
-    }
-  
-    // If pressed key is our target key then set to true
-    function downHandler(e:KeyboardEvent) {
-      if (testFn(e)) {
-        setKeyPressed(true);
-      }
-    }
-  
-    // If released key is our target key then set to false
-    const upHandler = (e:KeyboardEvent) => {
-        
-      if (testFn(e)) {
-        setKeyPressed(false);
-      }
-    };
-  
-    // Add event listeners
-    React.useEffect(() => {
-      window.addEventListener('keydown', downHandler);
-      window.addEventListener('keyup', upHandler);
-      // Remove event listeners on cleanup
-      return () => {
-        window.removeEventListener('keydown', downHandler);
-        window.removeEventListener('keyup', upHandler);
-      };
-    }, []); // Empty array ensures that effect is only run on mount and unmount
-  
-    return keyPressed;
-  }
