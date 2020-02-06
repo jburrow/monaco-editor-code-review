@@ -10,10 +10,13 @@ export type FileEvents = FileEditEvent | FileDeleteEvent | FileRenameEvent;
 
 export type VersionControlEvent = {
   type: "commit";
-  id:string,
+  id?: string,
   author: string;
   events: FileEvents[];
-};
+} | {
+  type: "reset";
+  id?: string;
+}
 
 export enum FileStateStatus {
   active = 1,
@@ -28,7 +31,9 @@ export type FileState = {
 };
 
 export interface VersionControlState {
-  files: { [fullPath: string]: FileState };
+  files: Record<string, FileState>;
+  version: number;
+  events: VersionControlEvent[];
 }
 
 function createFileState(
@@ -46,11 +51,18 @@ function createFileState(
   };
 }
 
+export function initialVersionControlState(): VersionControlState {
+  return { files: {}, version: -1, events: [] };
+}
+
 export function versionControlReducer(
-  
-  state: VersionControlState,event: VersionControlEvent,
+  state: VersionControlState, event: VersionControlEvent,
 ) {
+
   switch (event.type) {
+    case "reset":
+      return initialVersionControlState();
+      
     case "commit":
       const updates: { [fullPath: string]: FileState } = {};
       for (const e of event.events) {
@@ -95,8 +107,10 @@ export function versionControlReducer(
       return {
         files: {
           ...state.files,
-          ...updates
-        }
+          ...updates,
+        },
+        events:[...state.events, event],
+        version: state.version + 1
       };
   }
 }
@@ -105,10 +119,10 @@ export function reduceVersionControl(
   actions: VersionControlEvent[],
   state: VersionControlState = null
 ) {
-  state = state || { files: {} };
+  state = state || initialVersionControlState();
 
   for (const a of actions) {
-    state = versionControlReducer(state,a);
+    state = versionControlReducer(state, a);
   }
 
   return state;
