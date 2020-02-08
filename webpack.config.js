@@ -36,7 +36,7 @@ const baseConfig = (mode, target) => {
           }
         },{
           test: /\.css$/,
-          include: MONACO_DIR,
+          //include: MONACO_DIR,
           use: ['style-loader', 'css-loader'],
         }
       ]
