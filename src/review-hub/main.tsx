@@ -5,16 +5,21 @@ import { reduceVersionControl, FileEditEvent, versionControlReducer, VersionCont
 import { DiffEditor, ControlledEditor } from "@monaco-editor/react";
 import 'react-resizable/css/styles.css';
 import 'react-grid-layout/css/styles.css';
-import 'bootstrap/dist/css/bootstrap.css';
-import { calculateNumberOfLines } from "../events-reducers";
+// import 'bootstrap/dist/css/bootstrap.css';
+
 
 const ReactGridLayout = RGL.WidthProvider(RGL);
 
 const Editor = (props: { view: SelectedView, wsDispatch(e: VersionControlEvent): void }) => {
-    const [text, setText] = React.useState<string>("");
+    const [text, setText] = React.useState<string>(null);
+
+    React.useEffect(() => {
+        if (props.view && props.view.text) {
+            setText(props.view.text);
+        }
+    }, [props.view])
 
     return props.view && props.view.fullPath ? <div>
-        
         {text !== props.view.text ? <button onClick={() => {
             props.wsDispatch({
                 type: 'commit',
@@ -22,17 +27,16 @@ const Editor = (props: { view: SelectedView, wsDispatch(e: VersionControlEvent):
                 events: [{ type: 'edit', fullPath: props.view.fullPath, text: text }]
             })
         }}>Save</button> : <div>not modified</div>}
+
         {props.view.original ?
-            <DiffEditor editorDidMount={(modified, original, editor) => { editor.getModifiedEditor().onDidChangeModelContent(() => setText(editor.getModifiedEditor().getValue())); }}
-                options={{originalEditable:false}}
+            <DiffEditor editorDidMount={(_modified, _original, editor) => { editor.getModifiedEditor().onDidChangeModelContent(() => setText(editor.getModifiedEditor().getValue())); }}
+                options={{ originalEditable: false }}
                 modified={props.view.text}
-                original={props.view.original} 
-                height={300}/> :
+                original={props.view.original}
+            /> :
             <ControlledEditor value={props.view.text}
                 options={{ readOnly: false }}
                 onChange={(e, t) => setText(t)} />}
-
-        
     </div> : null;
 };
 
@@ -120,19 +124,19 @@ const reducer = (state: AppState, event: AppStateEvents) => {
 
 function loadVersionControlStore(): VersionControlState {
     const events: FileEvents[] = [
-        { fullPath: "/script1.py", text: "version 1", type: "edit" },
-        { fullPath: "/script2.py", text: "version 1", type: "edit" },
-        { fullPath: "/script3.py", text: "version 1", type: "edit" }];
+        { fullPath: "/script1.py", text: "version s1.1", type: "edit" },
+        { fullPath: "/script2.py", text: "version s2.1", type: "edit" },
+        { fullPath: "/script3.py", text: "version s3.1", type: "edit" }];
 
     const store = reduceVersionControl([{
         type: "commit", author: "james", id: 'id-0',
         events: events
     }, {
         type: "commit", author: "james", id: 'id-1',
-        events: [{ fullPath: "/script1.py", text: "version 1.1", type: "edit" }]
+        events: [{ fullPath: "/script1.py", text: "version s1.1.1", type: "edit" }]
     }, {
         type: "commit", author: "james", id: 'id-2',
-        events: [{ fullPath: "/script1.py", text: "version 1.2", type: "edit" }]
+        events: [{ fullPath: "/script1.py", text: "version s1.1.2", type: "edit" }]
     }]);
 
     return store;
@@ -176,8 +180,8 @@ export const App = () => {
                 </div>
             </div>
             <div key="0.2" data-grid={{ x: 4, y: 0, w: 4, h: 4, }} style={{ backgroundColor: 'yellow', }} >
-            {appState.selectedView?<h5>Editor - {appState.selectedView.fullPath} - {appState.selectedView.label}</h5>:'Editor'}
-                <div className="fish" style={{height:"calc(100% - 100px)", backgroundColor:'red'}}>
+                {appState.selectedView ? <h5>Editor - {appState.selectedView.fullPath} - {appState.selectedView.label}</h5> : 'Editor'}
+                <div className="fish" style={{ height: "calc(100% - 100px)", backgroundColor: 'red' }}>
 
                     <Editor view={appState.selectedView}
 
