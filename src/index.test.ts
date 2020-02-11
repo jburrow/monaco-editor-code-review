@@ -1,5 +1,5 @@
 import { createReviewManager, EditorMode } from "./index";
-import { ReviewCommentEvent, reduceComments } from "./events-reducers";
+import { ReviewCommentEvent, reduceComments } from "./events-comments-reducers";
 
 interface MonacoWindow {
     monaco: any;

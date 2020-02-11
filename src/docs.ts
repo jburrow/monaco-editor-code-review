@@ -1,6 +1,6 @@
 import { createReviewManager, ReviewManager } from "./index";
 import * as moment from "moment";
-import { ReviewCommentEvent } from "./events-reducers";
+import { ReviewCommentEvent } from "./events-comments-reducers";
 
 
 

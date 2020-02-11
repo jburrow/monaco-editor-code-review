@@ -2,26 +2,27 @@
     border: 1px solid black;
     width: 80%;
     padding: 5px;
-    background-color: white;
+    background-color:cornflowerblue;
     /* vscode fallback order */
     font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
       "Courier New", monospace;
+    z-index: 1000;
   }
   .reviewCommentEditor.text {
-    /* background-color: lightseagreen; */
+    background-color: lightseagreen;
     width: 100%;
     height: 60px;
   }
   
   .reviewCommentEditor.save {
-    /* background-color: blue; */
+    background-color: blue;
     margin: 0 5px 5px 0;
     width: 150px;
     border: 0px;
   }
   
   .reviewCommentEditor.cancel {
-    /* background-color: rebeccapurple; */
+    background-color: rebeccapurple;
     margin: 5px 5px 5px 0;
     width: 150px;
     border: 0px;
@@ -36,7 +37,7 @@
     overflow:hidden;
   }
   
-  /*
+  
   
   .reviewComment.author {
     background-color: #FF3333;
@@ -50,9 +51,9 @@
     background-color: #FF9999;
     color:black;
   }
-  */
+ 
   .reviewComment.history { 
-    /* background-color: #FF0AAA;   */
+    background-color: #FF0AAA;  
     padding-left:10px;
     font-style:italic;
   }

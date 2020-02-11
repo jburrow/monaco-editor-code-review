@@ -1,8 +1,8 @@
 import * as monacoEditor from "monaco-editor";
-import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-reducers";
+import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
 import * as uuid from "uuid/v4";
 
-export { reduceComments } from "./events-reducers";
+export { reduceComments } from "./events-comments-reducers";
 
 interface MonacoWindow {
     monaco: any;
@@ -150,7 +150,7 @@ export class ReviewManager {
         this.editorConfig = this.editor.getRawOptions();
         this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getRawOptions());
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        this.canAddCondition = this.editor.createContextKey('add-context-key', this.config.readOnly);
+        this.canAddCondition = this.editor.createContextKey('add-context-key', !this.config.readOnly);
         this.inlineToolbarElements = this.createInlineToolbarWidget();
         this.editorElements = this.createInlineEditorWidget();
         this.addActions();
@@ -167,7 +167,9 @@ export class ReviewManager {
     }
 
     load(events: ReviewCommentEvent[]): void {
+        //this.editor.zone
         this.editor.changeViewZones((changeAccessor: monacoEditor.editor.IViewZoneChangeAccessor) => {
+            //changeAccessor.
             // Remove all the existing comments     
             for (const viewState of Object.values(this.store.comments)) {
                 if (viewState.viewZoneId !== null) {
@@ -181,6 +183,12 @@ export class ReviewManager {
 
             this.verbose && console.debug('Events Loaded:', events.length, 'Review Comments:', Object.values(this.store.comments).length);
         })
+    }
+
+    loadFromStore(store:ReviewCommentStore){
+        this.events = [];
+        this.store = store || {comments:{}, viewZoneIdsToDelete:[]};
+        this.refreshComments();
     }
 
     getThemedColor(name: string): string {
@@ -499,8 +507,6 @@ export class ReviewManager {
     }
 
     setEditorMode(mode: EditorMode) {
-
-
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
         console.warn('setEditorMode', EditorMode[mode], 'Comment:', this.activeComment, 'ReadOnly:', this.config.readOnly, 'Result:', EditorMode[this.editorMode]);
 

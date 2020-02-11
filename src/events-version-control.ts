@@ -1,12 +1,15 @@
+import { CommentState, ReviewCommentEvent, reduceComments } from "./events-comments-reducers";
+
 export type FileEditEvent = { type: "edit"; fullPath: string; text: string };
 export type FileDeleteEvent = { type: "delete"; fullPath: string, };
+export type FileCommentEvent = { type: "comment"; fullPath: string, commentEvents: ReviewCommentEvent[] };
 export type FileRenameEvent = {
   type: "rename";
   fullPath: string;
   newFullPath: string;
   text: string;
 };
-export type FileEvents = FileEditEvent | FileDeleteEvent | FileRenameEvent;
+export type FileEvents = FileEditEvent | FileDeleteEvent | FileRenameEvent | FileCommentEvent;
 
 export type VersionControlEvent = {
   type: "commit";
@@ -28,6 +31,7 @@ export type FileState = {
   text: string;
   status: FileStateStatus;
   history: VersionControlEvent[];
+  comments: CommentState;
 };
 
 export interface VersionControlState {
@@ -41,13 +45,15 @@ function createFileState(
   fullPath: string,
   text: string,
   history: VersionControlEvent[],
-  status: FileStateStatus
+  status: FileStateStatus,
+  comments: CommentState
 ): FileState {
   return {
     fullPath: fullPath,
     status: status,
     text: text,
-    history: [...history, event]
+    history: [...history, event],
+    comments: comments || { comments: {}, viewZoneIdsToDelete: [] }
   };
 }
 
@@ -62,7 +68,7 @@ export function versionControlReducer(
   switch (event.type) {
     case "reset":
       return initialVersionControlState();
-      
+
     case "commit":
       const updates: { [fullPath: string]: FileState } = {};
       for (const e of event.events) {
@@ -70,17 +76,24 @@ export function versionControlReducer(
           fullPath: null,
           text: null,
           status: FileStateStatus.active,
-          history: []
+          history: [],
+          comments: { viewZoneIdsToDelete: [], comments: {} }
         };
         let status = FileStateStatus.active;
-        let text = null;
+        let text = prev.text;
+        let comments = prev.comments;
 
         switch (e.type) {
+          case "comment":
+            comments = reduceComments(e.commentEvents, comments);
+            console.info('comments', comments)
+            break;
           case "edit":
             text = e.text;
             break;
           case "delete":
             status = FileStateStatus.deleted;
+            text = null;
 
             break;
           case "rename":
@@ -91,7 +104,8 @@ export function versionControlReducer(
               e.newFullPath,
               e.text || prev.text,
               prev.history,
-              status
+              status,
+              comments
             );
             break;
         }
@@ -101,7 +115,8 @@ export function versionControlReducer(
           e.fullPath,
           text,
           prev.history,
-          status
+          status,
+          comments
         );
       }
       return {
@@ -109,7 +124,7 @@ export function versionControlReducer(
           ...state.files,
           ...updates,
         },
-        events:[...state.events, event],
+        events: [...state.events, event],
         version: state.version + 1
       };
   }
