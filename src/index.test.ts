@@ -60,12 +60,12 @@ test('reduceComments', () => {
 
     let store = reduceComments(actions);
     expect(Object.keys(store.comments)).toStrictEqual(['1']);
-    expect(store.comments['1'].comment).toStrictEqual({ author: undefined, dt: undefined, id: "1", lineNumber: 1, text: "t1", parentId:undefined });
+    expect(store.comments['1'].comment).toStrictEqual({ selection:undefined, status:1, author: undefined, dt: undefined, id: "1", lineNumber: 1, text: "t1", parentId:undefined });
 
     actions.push({ type: 'edit', id: '2', targetId: '1', text: 't2' });
     store = reduceComments(actions);
     expect(Object.keys(store.comments)).toStrictEqual(['1']);
-    expect(store.comments['1'].comment).toStrictEqual({ author: undefined, dt: undefined, id: "1", lineNumber: 1, text: "t2", parentId:undefined });
+    expect(store.comments['1'].comment).toStrictEqual({ selection:undefined, status:1, author: undefined, dt: undefined, id: "1", lineNumber: 1, text: "t2", parentId:undefined });
 
     actions.push({ type: 'delete', id: '3', targetId: '1' });
     store = reduceComments(actions);
@@ -75,7 +75,7 @@ test('reduceComments', () => {
 test('Widget Coverage', () => {
     const editor = getMockEditor();
     const rm = createReviewManager(editor, 'current.user', [], (comments) => { });
-    rm.activeComment = { id: 'id.1', author: "", dt: "", text: "", lineNumber: 1 };
+    rm.activeComment = { selection:undefined, status:1, id: 'id.1', author: "", dt: "", text: "", lineNumber: 1 };
     rm.widgetInlineToolbar.getId();
     rm.widgetInlineToolbar.getPosition();
 
@@ -194,6 +194,7 @@ test('Edited Comments', () => {
     rm.addComment(null, 'editted');
 
     const expectedEdittedComment = {
+        selection:undefined, status:1,
         "author": "current.user", //Copied from edit
         "dt": rm.getDateTimeNow(), //Copied from edit
         "id": comment.id,
