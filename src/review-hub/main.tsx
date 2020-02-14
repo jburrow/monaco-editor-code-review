@@ -32,16 +32,7 @@ const Editor = (props: { currentUser: string, view: SelectedView, wsDispatch(e: 
             //mx.editor.createModel()
             const model = ((window as any).monaco).editor.createModel(props.view.text, 'javascript');
             reviewManager.editor.setModel(model)
-
-
-            const cc = {}
-            if (props.view.comments?.comments) {
-                for (const [fn, ccc] of Object.entries(props.view.comments.comments)) {
-                    cc[fn] = { ...ccc, viewZoneId: null, renderStatus: null }
-
-                }
-            }
-            reviewManager.loadFromStore({ comments: cc })
+            reviewManager.loadFromStore(props.view.comments,[])
         }
     }, [reviewManager, props.view]);
 

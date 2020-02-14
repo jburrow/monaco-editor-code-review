@@ -38,28 +38,28 @@
 }
 
 .reviewComment.author {
-  background-color: #FF3333;
+  /* background-color: #FF3333; */
 }
 
 .reviewComment.dt {
-  background-color: #FF5555;
+  /* background-color: #FF5555; */
 }
 
 .reviewComment.id {
-  background-color: #FF9999;
+  /* background-color: #FF9999; */
   color: black;
 }
 
 .reviewComment.history {
-  background-color: #FF0AAA;
+  /* background-color: #FF0AAA; */
   padding-left: 10px;
   font-style: italic;
 }
 
 .reviewComment.selection {
-  border-bottom: 2px solid pink;
+  /* border-bottom: 2px solid pink; */
   /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
-  background-color: yellow;
+  /* background-color: yellow; */
 }
 
 .editButtonsContainer {

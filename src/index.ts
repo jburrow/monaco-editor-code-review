@@ -5,7 +5,7 @@ import {
     ReviewComment, ReviewCommentRenderState
 } from "./events-comments-reducers";
 import * as uuid from "uuid/v4";
-ß
+
 interface MonacoWindow {
     monaco: any;
 }
@@ -175,9 +175,13 @@ export class ReviewManager {
     }
 
     load(events: ReviewCommentEvent[]): void {
-        //this.editor.zone
+        const store = reduceComments(events)
+        this.loadFromStore(store,events);
+    }
+
+    loadFromStore(store: ReviewCommentStore, events: ReviewCommentEvent[]) {
         this.editor.changeViewZones((changeAccessor: monacoEditor.editor.IViewZoneChangeAccessor) => {
-            //changeAccessor.
+           
             // Remove all the existing comments     
             for (const viewState of Object.values(this.store.comments)) {
                 const x = this.getRenderState(viewState.comment.id);
@@ -187,26 +191,15 @@ export class ReviewManager {
             }
 
             this.events = events;
-            this.store = reduceComments(events);
+            this.store = store;
             this.store.deletedCommentIds = null;
             this.store.dirtyCommentIds = null;
             this.renderStore = {};
+
             this.refreshComments();
 
             this.verbose && console.debug('Events Loaded:', events.length, 'Review Comments:', Object.values(this.store.comments).length);
         })
-    }
-
-    loadFromStore(store: ReviewCommentStore) {
-
-        this.editor.changeViewZones(() => {
-            this.events = [];
-            this.store = store || {
-                comments: {},
-                //viewZoneIdsToDelete: []
-            };
-            this.refreshComments();
-        });
     }
 
     getThemedColor(name: string): string {
