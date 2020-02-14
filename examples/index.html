@@ -1,86 +1,99 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="../dist/index.css" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
-    <style>
-      body {
-        height: calc(100% - 20px);
-        display: flex;
-        flex-direction: column;
-        margin: 5px;
-      }
+<head>
+  <script src="../node_modules/monaco-editor/dev/vs/loader.js"></script>
 
-      .editor {
-        flex: auto;
-        overflow: hidden;
-        margin: 5px;
-      }
+  <link rel="stylesheet" type="text/css" href="../dist/index.css" />
+ 
+  <style>
+    body {
+      height: calc(100% - 20px);
+      display: flex;
+      flex-direction: column;
+      margin: 5px;
+    }
 
-      h5 {
-        height: 20px;
-        margin-bottom: 5px;
-        margin-top: 5px;
-      }
-      .summary {
-        height: auto;
-        max-height: 300px;
-        min-height: 300px;
-        padding: 10px;
-        overflow: auto;
-        display: flex;
-        flex-direction: row;
-      }
-      .btn {
-        margin-top: 5px;
-      }
-      td {
-        font-size: 12px;
-      }
-      .comment_text {
-        background-color: #222222;
-        color: white;
-      }
-    </style>
-  </head>
+    .editor {
+      flex: auto;
+      overflow: hidden;
+      margin: 5px;
+      height: 400px;
+    }
 
-  <body>
+    h5 {
+      height: 20px;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
 
-    <div class="buttons alert alert-light">
-        Editor Mode:<select id="option_editor_mode"><option>editor-mode</option><option>diff-mode</option></select>
-        Diff Mode:<select id="option_diff_mode"><option>side-by-side</option><option>inline-diff</option></select>
-        User:<select id="option_current_user" onchange="setCurrentUser()">
-          <option selected>foo.user</option>
-          <option>bar.user</option>
-        </select>
+    .summary {
+      height: auto;
+      max-height: 300px;
+      min-height: 300px;
+      padding: 10px;
+      overflow: auto;
+      display: flex;
+      flex-direction: row;
+    }
 
-      Theme:<select id="option_theme"><option>vs-dark</option><option>vs-light</option></select>
-      <input id="option_editor_readonly" type="checkbox"></input>Editor Readonly
-      <input id="option_comments_readonly" type="checkbox"  onchange="handleCommentReadonlyChange()"></input>Comments Readonly
-      <button onclick="setView( document.getElementById('option_editor_mode').value,
+    .btn {
+      margin-top: 5px;
+    }
+
+    td {
+      font-size: 12px;
+    }
+
+    .comment_text {
+      background-color: #222222;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="buttons alert alert-light">
+    Editor Mode:<select id="option_editor_mode">
+      <option>editor-mode</option>
+      <option>diff-mode</option>
+    </select>
+    Diff Mode:<select id="option_diff_mode">
+      <option>side-by-side</option>
+      <option>inline-diff</option>
+    </select>
+    User:<select id="option_current_user" onchange="setCurrentUser()">
+      <option selected>foo.user</option>
+      <option>bar.user</option>
+    </select>
+
+    Theme:<select id="option_theme">
+      <option>vs-dark</option>
+      <option>vs-light</option>
+    </select>
+    <input id="option_editor_readonly" type="checkbox"></input>Editor Readonly
+    <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()"></input>Comments
+    Readonly
+    <button onclick="setView( document.getElementById('option_editor_mode').value,
                                 document.getElementById('option_diff_mode').value,
                                 document.getElementById('option_theme').value,
                                 document.getElementById('option_current_user').value,
                                 document.getElementById('option_editor_readonly').checked,
                                 document.getElementById('option_comments_readonly').checked)"
-                                class="btn btn-primary">Update Editor</button>      
-      <button onclick="clearComments()" class="btn btn-secondary">
-        Clear Comments
-      </button>
-    </div>
-    <h5>
-      Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
-    </h5>
-    <div class="editor" id="containerEditor"></div>
+      class="btn btn-primary">Update Editor</button>
+    <button onclick="clearComments()" class="btn btn-secondary">
+      Clear Comments
+    </button>
+  </div>
+  <h5>
+    Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment
+  </h5>
+  <div class="editor" id="containerEditor"></div>
 
-    <div class="summary" id="summaryEditor"></div>
-  </body>
+  <div class="summary" id="summaryEditor"></div>
+</body>
+
 </html>
 
 <script type="module" src="../dist/docs-commonjs-es5.js"></script>

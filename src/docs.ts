@@ -1,6 +1,6 @@
 import { createReviewManager, ReviewManager } from "./index";
 import * as moment from "moment";
-import { ReviewCommentEvent } from "./events-reducers";
+import { ReviewCommentEvent } from "./events-comments-reducers";
 
 
 
@@ -180,7 +180,7 @@ function generateDifferentComments() {
 }
 
 function setCurrentUser() {
-    if (reviewManager) {
+    if (reviewManager && event) {
         reviewManager.currentUser = (event.srcElement as HTMLSelectElement).value;
     }
 }

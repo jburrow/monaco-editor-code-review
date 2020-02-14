@@ -1,8 +1,10 @@
 import * as monacoEditor from "monaco-editor";
-import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-reducers";
+import {
+    reduceComments, ReviewCommentStatus, commentReducer, CodeSelection,
+    calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent,
+    ReviewComment, ReviewCommentRenderState
+} from "./events-comments-reducers";
 import * as uuid from "uuid/v4";
-
-export { reduceComments } from "./events-reducers";
 
 interface MonacoWindow {
     monaco: any;
@@ -108,11 +110,14 @@ interface InlineToolbarElements {
     remove: HTMLSpanElement;
     root: HTMLDivElement;
 }
+interface RenderStoreItem {
+    viewZoneId: string, renderStatus: ReviewCommentRenderState
+}
 
 export class ReviewManager {
     currentUser: string;
     editor: monacoEditor.editor.IStandaloneCodeEditor;
-    editorConfig: monacoEditor.editor.InternalEditorOptions;
+    editorConfig: monacoEditor.editor.IEditorOptions;
     events: ReviewCommentEvent[];
     store: ReviewCommentStore;
     activeComment?: ReviewComment;
@@ -130,6 +135,8 @@ export class ReviewManager {
     verbose: boolean;
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
 
+    renderStore: Record<string, RenderStoreItem>
+
     constructor(editor: any, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean) {
         this.currentUser = currentUser;
         this.editor = editor;
@@ -143,14 +150,15 @@ export class ReviewManager {
         this.currentCommentDecorations = []
         this.currentLineDecorationLineNumber = null;
         this.events = [];
-        this.store = { comments: {}, viewZoneIdsToDelete: [] };
+        this.store = { comments: {} };//, viewZoneIdsToDelete: [] };
+        this.renderStore = {};
 
         this.verbose = verbose;
 
-        this.editorConfig = this.editor.getConfiguration();
-        this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getConfiguration());
+        this.editorConfig = this.editor.getRawOptions();
+        this.editor.onDidChangeConfiguration(() => this.editorConfig = this.editor.getRawOptions());
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
-        this.canAddCondition = this.editor.createContextKey('add-context-key', this.config.readOnly);
+        this.canAddCondition = this.editor.createContextKey('add-context-key', !this.config.readOnly);
         this.inlineToolbarElements = this.createInlineToolbarWidget();
         this.editorElements = this.createInlineEditorWidget();
         this.addActions();
@@ -167,16 +175,27 @@ export class ReviewManager {
     }
 
     load(events: ReviewCommentEvent[]): void {
+        const store = reduceComments(events)
+        this.loadFromStore(store,events);
+    }
+
+    loadFromStore(store: ReviewCommentStore, events: ReviewCommentEvent[]) {
         this.editor.changeViewZones((changeAccessor: monacoEditor.editor.IViewZoneChangeAccessor) => {
+           
             // Remove all the existing comments     
             for (const viewState of Object.values(this.store.comments)) {
-                if (viewState.viewZoneId !== null) {
-                    changeAccessor.removeZone(viewState.viewZoneId);
+                const x = this.getRenderState(viewState.comment.id);
+                if (x && x.viewZoneId !== null) {
+                    changeAccessor.removeZone(x.viewZoneId);
                 }
             }
 
             this.events = events;
-            this.store = reduceComments(events);
+            this.store = store;
+            this.store.deletedCommentIds = null;
+            this.store.dirtyCommentIds = null;
+            this.renderStore = {};
+
             this.refreshComments();
 
             this.verbose && console.debug('Events Loaded:', events.length, 'Review Comments:', Object.values(this.store.comments).length);
@@ -385,7 +404,8 @@ export class ReviewManager {
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
             this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-                this.store.comments[comment.id].renderStatus = ReviewCommentRenderState.dirty;
+                this.renderStore[comment.id].renderStatus = ReviewCommentRenderState.dirty
+
             });
         }
     }
@@ -431,8 +451,8 @@ export class ReviewManager {
 
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
                 for (const comment of Object.values(this.store.comments).map(c => c.comment)) {
-                    const viewState = this.store.comments[comment.id];
-                    if (viewState.viewZoneId == ev.target.detail.viewZoneId) {
+                    const x = this.getRenderState(comment.id);
+                    if (x.viewZoneId == ev.target.detail.viewZoneId) {
                         activeComment = comment;
                         break;
                     }
@@ -447,7 +467,7 @@ export class ReviewManager {
     private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
         let count = 0;
         let marginTop = 0;
-        const lineHeight = this.editorConfig.fontInfo.lineHeight;
+        const lineHeight = this.editorConfig.lineHeight;
 
         if (this.activeComment) {
             for (var item of this.iterateComments()) {
@@ -499,10 +519,11 @@ export class ReviewManager {
     }
 
     setEditorMode(mode: EditorMode) {
-
-
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-        console.warn('setEditorMode', EditorMode[mode], 'Comment:', this.activeComment, 'ReadOnly:', this.config.readOnly, 'Result:', EditorMode[this.editorMode]);
+        console.warn('setEditorMode', EditorMode[mode],
+            'Comment:', this.activeComment,
+            'ReadOnly:', this.config.readOnly,
+            'Result:', EditorMode[this.editorMode]);
 
         this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
@@ -573,7 +594,6 @@ export class ReviewManager {
             this.setActiveComment(null);
         } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
             this.setActiveComment(null);
-            console.log('Clearing active comment');
         }
 
         this.refreshComments()
@@ -603,6 +623,13 @@ export class ReviewManager {
         return span;
     }
 
+    getRenderState(commentId: string): RenderStoreItem {
+        if (!this.renderStore[commentId]) {
+            this.renderStore[commentId] = { viewZoneId: null, renderStatus: null };
+        }
+        return this.renderStore[commentId];
+    }
+
     refreshComments() {
         this.editor.changeViewZones((changeAccessor: {
             addZone: { (zone: { afterLineNumber: number, heightInLines: number, domNode: HTMLElement, suppressMouseDown: boolean }): string },
@@ -610,35 +637,43 @@ export class ReviewManager {
         }) => {
             const lineNumbers: { [key: number]: CodeSelection } = {};
 
-            while (this.store.viewZoneIdsToDelete.length > 0) {
-                const viewZoneId = this.store.viewZoneIdsToDelete.pop();
+            for (const cid of Array.from(this.store.deletedCommentIds || [])) {
+                const viewZoneId = this.renderStore[cid]?.viewZoneId;
                 changeAccessor.removeZone(viewZoneId);
                 this.verbose && console.debug('Zone.Delete', viewZoneId);
             }
+            this.store.deletedCommentIds = null;
+
+            for (const cid of Array.from(this.store.dirtyCommentIds || [])) {
+                this.getRenderState(cid).renderStatus = ReviewCommentRenderState.dirty;
+            }
+            this.store.dirtyCommentIds = null;
 
             for (const item of this.iterateComments()) {
-                if (item.state.renderStatus === ReviewCommentRenderState.hidden) {
+                const x = this.getRenderState(item.state.comment.id);
+
+                if (x.renderStatus === ReviewCommentRenderState.hidden) {
                     this.verbose && console.debug('Zone.Hidden', item.state.comment.id);
 
-                    changeAccessor.removeZone(item.state.viewZoneId);
-                    item.state.viewZoneId = null;
+                    changeAccessor.removeZone(x.viewZoneId);
+                    x.viewZoneId = null;
 
                     continue;
                 }
 
-                if (item.state.renderStatus === ReviewCommentRenderState.dirty) {
+                if (x.renderStatus === ReviewCommentRenderState.dirty) {
                     this.verbose && console.debug('Zone.Dirty', item.state.comment.id);
 
-                    changeAccessor.removeZone(item.state.viewZoneId);
-                    item.state.viewZoneId = null;
-                    item.state.renderStatus = ReviewCommentRenderState.normal;
+                    changeAccessor.removeZone(x.viewZoneId);
+                    x.viewZoneId = null;
+                    x.renderStatus = ReviewCommentRenderState.normal;
                 }
 
                 if (!lineNumbers[item.state.comment.lineNumber]) {
                     lineNumbers[item.state.comment.lineNumber] = item.state.comment.selection;
                 }
 
-                if (item.state.viewZoneId == null) {
+                if (x.viewZoneId == null) {
                     this.verbose && console.debug('Zone.Create', item.state.comment.id);
 
                     const isActive = this.activeComment == item.state.comment;
@@ -656,7 +691,7 @@ export class ReviewManager {
                     }
                     domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'))
 
-                    item.state.viewZoneId = changeAccessor.addZone({
+                    x.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
                         heightInLines: item.state.numberOfLines,
                         domNode: domNode,
@@ -682,6 +717,7 @@ export class ReviewManager {
                     })
 
                     if (selection) {
+                        debugger;
                         decorators.push({
                             range: new monacoWindow.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn),
                             options: {
@@ -697,8 +733,6 @@ export class ReviewManager {
     }
 
     addActions() {
-
-
         this.editor.addAction({
             id: 'my-unique-id-add',
             label: 'Add Comment',
@@ -724,7 +758,7 @@ export class ReviewManager {
             precondition: null,
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
-            contextMenuOrder: 0.1,
+            contextMenuOrder: 0.101,
 
             run: () => {
                 this.navigateToComment(NavigationDirection.next);
@@ -740,7 +774,7 @@ export class ReviewManager {
             precondition: null,
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
-            contextMenuOrder: 0.1,
+            contextMenuOrder: 0.102,
 
             run: () => {
                 this.navigateToComment(NavigationDirection.prev);

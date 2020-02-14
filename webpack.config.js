@@ -1,15 +1,28 @@
 const path = require("path");
 const TimestampWebpackPlugin = require("timestamp-webpack-plugin");
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
 
 const baseConfig = (mode, target) => {
   return {
-    entry: { index: "./src/index.ts", docs: "./src/docs.ts" },
+    entry: {
+      index: "./src/index.ts",
+      docs: "./src/docs.ts",
+      hub: "./src/review-hub/main.tsx"
+    },
     mode,
     devtool: "none",
     devServer: {
       publicPath: "/dist/"
     },
+    plugins: [
+      new MonacoWebpackPlugin({
+        // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
+        languages: ['json','javascript']
+      })
+    ],
     module: {
+      
       rules: [
         {
           test: /\.tsx?$/,
@@ -21,6 +34,10 @@ const baseConfig = (mode, target) => {
               target
             }
           }
+        },{
+          test: /\.css$/,
+          //include: MONACO_DIR,
+          use: ['style-loader', 'css-loader'],
         }
       ]
     },
@@ -44,7 +61,7 @@ const baseConfig = (mode, target) => {
 };
 
 function getConfigs(mode) {
-  const ext = mode === 'production'?'min.js':'js';
+  const ext = mode === 'production' ? 'min.js' : 'js';
   const var_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
@@ -83,6 +100,6 @@ module.exports = (env, argv) => {
   if (!argv.mode || argv.mode === "development") {
     return getConfigs("development");
   } else {
-     return getConfigs("development").concat( getConfigs("production"));
+    return getConfigs("development").concat(getConfigs("production"));
   }
 };
