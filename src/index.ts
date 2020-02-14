@@ -185,10 +185,15 @@ export class ReviewManager {
         })
     }
 
-    loadFromStore(store:ReviewCommentStore){
-        this.events = [];
-        this.store = store || {comments:{}, viewZoneIdsToDelete:[]};
-        this.refreshComments();
+    loadFromStore(store: ReviewCommentStore) {
+        this.editor.changeViewZones(() => {
+            this.events = [];
+            this.store = store || {
+                comments: {},
+                viewZoneIdsToDelete: []
+            };
+            this.refreshComments();
+        });
     }
 
     getThemedColor(name: string): string {
@@ -508,7 +513,10 @@ export class ReviewManager {
 
     setEditorMode(mode: EditorMode) {
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-        console.warn('setEditorMode', EditorMode[mode], 'Comment:', this.activeComment, 'ReadOnly:', this.config.readOnly, 'Result:', EditorMode[this.editorMode]);
+        console.warn('setEditorMode', EditorMode[mode],
+            'Comment:', this.activeComment,
+            'ReadOnly:', this.config.readOnly,
+            'Result:', EditorMode[this.editorMode]);
 
         this.layoutInlineCommentEditor();
         this.layoutInlineToolbar();
@@ -579,7 +587,6 @@ export class ReviewManager {
             this.setActiveComment(null);
         } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
             this.setActiveComment(null);
-            console.log('Clearing active comment');
         }
 
         this.refreshComments()
@@ -671,7 +678,7 @@ export class ReviewManager {
                 }
             }
 
-            if (this.config.showInRuler) {
+            if (this.config.showInRuler) {        
                 const decorators = [];
                 for (const [ln, selection] of Object.entries(lineNumbers)) {
 
@@ -688,6 +695,7 @@ export class ReviewManager {
                     })
 
                     if (selection) {
+                        debugger;
                         decorators.push({
                             range: new monacoWindow.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn),
                             options: {
@@ -703,8 +711,6 @@ export class ReviewManager {
     }
 
     addActions() {
-
-
         this.editor.addAction({
             id: 'my-unique-id-add',
             label: 'Add Comment',
@@ -730,7 +736,7 @@ export class ReviewManager {
             precondition: null,
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
-            contextMenuOrder: 0.1,
+            contextMenuOrder: 0.101,
 
             run: () => {
                 this.navigateToComment(NavigationDirection.next);
@@ -746,7 +752,7 @@ export class ReviewManager {
             precondition: null,
             keybindingContext: null,
             contextMenuGroupId: 'navigation',
-            contextMenuOrder: 0.1,
+            contextMenuOrder: 0.102,
 
             run: () => {
                 this.navigateToComment(NavigationDirection.prev);

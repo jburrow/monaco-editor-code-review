@@ -60,7 +60,8 @@
   
   
   .reviewComment.selection {
-    border-bottom: 2px dotted darkorange; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
+    border-bottom: 2px solid pink; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
+    background-color: yellow;
   }
   
   .editButtonsContainer {

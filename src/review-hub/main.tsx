@@ -30,7 +30,7 @@ const Editor = (props: { currentUser: string, view: SelectedView, wsDispatch(e: 
         console.debug('load comments', props.view?.comments?.comments)
         if (reviewManager !== null && props.view) {
             //mx.editor.createModel()
-            const model = ((window as any).monaco).editor.createModel(props.view.text);
+            const model = ((window as any).monaco).editor.createModel(props.view.text,'javascript');
             reviewManager.editor.setModel(model)
             
 
