@@ -53,7 +53,7 @@ function createFileState(
     status: status,
     text: text,
     history: [...history, event],
-    comments: comments || { comments: {}, viewZoneIdsToDelete: [] }
+    comments: comments || { comments: {} }
   };
 }
 

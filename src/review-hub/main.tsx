@@ -30,9 +30,9 @@ const Editor = (props: { currentUser: string, view: SelectedView, wsDispatch(e: 
         console.debug('load comments', props.view?.comments?.comments)
         if (reviewManager !== null && props.view) {
             //mx.editor.createModel()
-            const model = ((window as any).monaco).editor.createModel(props.view.text,'javascript');
+            const model = ((window as any).monaco).editor.createModel(props.view.text, 'javascript');
             reviewManager.editor.setModel(model)
-            
+
 
             const cc = {}
             if (props.view.comments?.comments) {
@@ -41,7 +41,7 @@ const Editor = (props: { currentUser: string, view: SelectedView, wsDispatch(e: 
 
                 }
             }
-            reviewManager.loadFromStore({ comments: cc, viewZoneIdsToDelete: [] })
+            reviewManager.loadFromStore({ comments: cc })
         }
     }, [reviewManager, props.view]);
 

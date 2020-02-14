@@ -16,12 +16,16 @@ export type ReviewCommentEvent =
 
 export interface CommentState {
     comments: { [reviewCommentId: string]: ReviewCommentState };
-    viewZoneIdsToDelete: string[];
+    deletedCommentIds?: Set<string>;
+    dirtyCommentIds?: Set<string>;
 };
 
 
 export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
     const dirtyLineNumbers = new Set<number>();
+    const deletedCommentIds = new Set<string>();
+    const dirtyCommentIds = new Set<string>();
+
     switch (event.type) {
         case "edit":
             const parent = state.comments[event.targetId];
@@ -37,25 +41,23 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
         case "delete":
             const selected = state.comments[event.targetId];
             delete state.comments[event.targetId];
-            if (selected.viewZoneId) {
-                state.viewZoneIdsToDelete.push(selected.viewZoneId);
-            }
+
+            deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
             console.log('delete', event);
             break;
-
+            ß
         case "create":
-        debugger;
             if (!state.comments[event.id]) {
                 state.comments[event.id] = new ReviewCommentState({
                     author: event.createdBy,
                     dt: event.createdAt,
                     id: event.id,
                     lineNumber: event.lineNumber,
-                    selection:event.selection,
+                    selection: event.selection,
                     text: event.text,
                     parentId: event.targetId,
-                    status:ReviewCommentStatus.active
+                    status: ReviewCommentStatus.active
                 }, calculateNumberOfLines(event.text));
                 console.log('insert', event);
                 dirtyLineNumbers.add(event.lineNumber);
@@ -66,12 +68,12 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
     if (dirtyLineNumbers.size) {
         for (const cs of Object.values(state.comments)) {
             if (dirtyLineNumbers.has(cs.comment.lineNumber)) {
-                cs.renderStatus = ReviewCommentRenderState.dirty;
+                dirtyCommentIds.add(cs.comment.id);
             }
         }
     }
 
-    return state;
+    return { ...state, dirtyCommentIds, deletedCommentIds };
 }
 
 export function calculateNumberOfLines(text: string): number {
@@ -79,17 +81,18 @@ export function calculateNumberOfLines(text: string): number {
 }
 
 export class ReviewCommentState {
-    viewZoneId: string;
-    renderStatus: ReviewCommentRenderState;
+    //viewZoneId: string;
+    //renderStatus: ReviewCommentRenderState;
     numberOfLines: number;
     comment: ReviewComment;
     history: ReviewComment[];
 
     constructor(comment: ReviewComment, numberOfLines: number) {
-        this.renderStatus = ReviewCommentRenderState.normal;
-        this.viewZoneId = null;
+        //this.renderStatus = ReviewCommentRenderState.normal;//render stuff
+        //this.viewZoneId = null; //render stuff
+        this.numberOfLines = numberOfLines;//render stuff
+
         this.comment = comment;
-        this.numberOfLines = numberOfLines;
         this.history = [comment];
     }
 }
@@ -126,7 +129,7 @@ export enum ReviewCommentStatus {
 }
 
 export function reduceComments(actions: ReviewCommentEvent[], state: CommentState = null) {
-    state = state || { comments: {}, viewZoneIdsToDelete: [] };
+    state = state || { comments: {} };
 
     for (const a of actions) {
         if (!a.id) {

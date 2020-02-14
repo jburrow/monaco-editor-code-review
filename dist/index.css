@@ -1,89 +1,89 @@
 .reviewCommentEditor {
-    border: 1px solid black;
-    width: 80%;
-    padding: 5px;
-    background-color:cornflowerblue;
-    /* vscode fallback order */
-    font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
-      "Courier New", monospace;
-    z-index: 1000;
-  }
-  .reviewCommentEditor.text {
-    background-color: lightseagreen;
-    width: 100%;
-    height: 60px;
-  }
-  
-  .reviewCommentEditor.save {
-    background-color: blue;
-    margin: 0 5px 5px 0;
-    width: 150px;
-    border: 0px;
-  }
-  
-  .reviewCommentEditor.cancel {
-    background-color: rebeccapurple;
-    margin: 5px 5px 5px 0;
-    width: 150px;
-    border: 0px;
-  }
-  
-  .reviewComment {
-    font-size: 12px;
-  }
-  
-  .reviewComment.text { 
-    background-color: rgba(0,0,200,0.2);
-    overflow:hidden;
-  }
-  
-  
-  
-  .reviewComment.author {
-    background-color: #FF3333;
-  }
-  
-  .reviewComment.dt {
-    background-color: #FF5555;
-  }
-  
-  .reviewComment.id { 
-    background-color: #FF9999;
-    color:black;
-  }
- 
-  .reviewComment.history { 
-    background-color: #FF0AAA;  
-    padding-left:10px;
-    font-style:italic;
-  }
-  
-  
-  .reviewComment.selection {
-    border-bottom: 2px solid pink; /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
-    background-color: yellow;
-  }
-  
-  .editButtonsContainer {
-    font-size: 12px;
-    width: 45px;
-    padding-right: 2px;
-    text-align: right;
-    color: darkorange;
-  }
-  .editButton:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  /*
+  border: 1px solid black;
+  width: 80%;
+  padding: 5px;
+  background-color: cornflowerblue;
+  /* vscode fallback order */
+  font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace;
+  z-index: 1000;
+}
+
+.reviewCommentEditor.text {
+  background-color: lightseagreen;
+  width: 100%;
+  height: 60px;
+}
+
+.reviewCommentEditor.save {
+  background-color: blue;
+  margin: 0 5px 5px 0;
+  width: 150px;
+  border: 0px;
+}
+
+.reviewCommentEditor.cancel {
+  background-color: rebeccapurple;
+  margin: 5px 5px 5px 0;
+  width: 150px;
+  border: 0px;
+}
+
+.reviewComment {
+  font-size: 12px;
+}
+
+.reviewComment.text {
+  background-color: rgba(0, 0, 200, 0.2);
+  overflow: hidden;
+}
+
+.reviewComment.author {
+  background-color: #FF3333;
+}
+
+.reviewComment.dt {
+  background-color: #FF5555;
+}
+
+.reviewComment.id {
+  background-color: #FF9999;
+  color: black;
+}
+
+.reviewComment.history {
+  background-color: #FF0AAA;
+  padding-left: 10px;
+  font-style: italic;
+}
+
+.reviewComment.selection {
+  border-bottom: 2px solid pink;
+  /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = "1px solid blue"*/
+  background-color: yellow;
+}
+
+.editButtonsContainer {
+  font-size: 12px;
+  width: 45px;
+  padding-right: 2px;
+  text-align: right;
+  color: darkorange;
+}
+
+.editButton:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/*
   .editButton.add {
   }
   
   .editButton.remove {
   }
   */
-  
-  /*
+
+/*
   TODO - Work icons and theming - this creates the style below
   
   svg = `
@@ -101,6 +101,7 @@
   }`);
   
   */
-  .activeLineMarginClass {
-    background-image: url("data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=");
-  }
+
+.activeLineMarginClass {
+  background-image: url("data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=");
+}
