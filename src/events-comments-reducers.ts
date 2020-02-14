@@ -46,7 +46,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
             dirtyLineNumbers.add(selected.comment.lineNumber);
             console.log('delete', event);
             break;
-            ß
+            
         case "create":
             if (!state.comments[event.id]) {
                 state.comments[event.id] = new ReviewCommentState({

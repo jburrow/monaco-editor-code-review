@@ -90,6 +90,7 @@
 								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_index_.inlinetoolbarelements.html" class="tsd-kind-icon">Inline<wbr>Toolbar<wbr>Elements</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_index_.monacowindow.html" class="tsd-kind-icon">Monaco<wbr>Window</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_index_.onactionschanged.html" class="tsd-kind-icon">On<wbr>Actions<wbr>Changed</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_index_.renderstoreitem.html" class="tsd-kind-icon">Render<wbr>Store<wbr>Item</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_index_.reviewcommentiteritem.html" class="tsd-kind-icon">Review<wbr>Comment<wbr>Iter<wbr>Item</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module"><a href="../interfaces/_index_.reviewmanagerconfig.html" class="tsd-kind-icon">Review<wbr>Manager<wbr>Config</a></li>
 								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_index_.reviewmanagerconfigprivate.html" class="tsd-kind-icon">Review<wbr>Manager<wbr>Config<wbr>Private</a></li>
@@ -126,7 +127,7 @@
 					<div class="tsd-signature tsd-kind-icon">CONTROL_<wbr>ATTR_<wbr>NAME<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"ReviewManagerControl"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;ReviewManagerControl&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L91">index.ts:91</a></li>
+							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L96">index.ts:96</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -136,7 +137,7 @@
 					<div class="tsd-signature tsd-kind-icon">POSITION_<wbr>BELOW<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">2</span><span class="tsd-signature-symbol"> =&nbsp;2</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L92">index.ts:92</a></li>
+							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L97">index.ts:97</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -146,7 +147,7 @@
 					<div class="tsd-signature tsd-kind-icon">monaco<wbr>Window<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_index_.monacowindow.html" class="tsd-signature-type">MonacoWindow</a><span class="tsd-signature-symbol"> =&nbsp;(window as any) as MonacoWindow</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L11">index.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L13">index.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -157,13 +158,13 @@
 					<a name="createreviewmanager" class="tsd-anchor"></a>
 					<h3>create<wbr>Review<wbr>Manager</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Review<wbr>Manager<span class="tsd-signature-symbol">(</span>editor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, currentUser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, actions<span class="tsd-signature-symbol">?: </span><a href="_events_reducers_.html#reviewcommentevent" class="tsd-signature-type">ReviewCommentEvent</a><span class="tsd-signature-symbol">[]</span>, onChange<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_index_.onactionschanged.html" class="tsd-signature-type">OnActionsChanged</a>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_index_.reviewmanagerconfig.html" class="tsd-signature-type">ReviewManagerConfig</a>, verbose<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../classes/_index_.reviewmanager.html" class="tsd-signature-type">ReviewManager</a></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Review<wbr>Manager<span class="tsd-signature-symbol">(</span>editor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, currentUser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, actions<span class="tsd-signature-symbol">?: </span><a href="_events_comments_reducers_.html#reviewcommentevent" class="tsd-signature-type">ReviewCommentEvent</a><span class="tsd-signature-symbol">[]</span>, onChange<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_index_.onactionschanged.html" class="tsd-signature-type">OnActionsChanged</a>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_index_.reviewmanagerconfig.html" class="tsd-signature-type">ReviewManagerConfig</a>, verbose<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../classes/_index_.reviewmanager.html" class="tsd-signature-type">ReviewManager</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L25">index.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L27">index.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -175,7 +176,7 @@
 									<h5>currentUser: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> actions: <a href="_events_reducers_.html#reviewcommentevent" class="tsd-signature-type">ReviewCommentEvent</a><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> actions: <a href="_events_comments_reducers_.html#reviewcommentevent" class="tsd-signature-type">ReviewCommentEvent</a><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> onChange: <a href="../interfaces/_index_.onactionschanged.html" class="tsd-signature-type">OnActionsChanged</a></h5>
@@ -200,7 +201,7 @@
 					<div class="tsd-signature tsd-kind-icon">default<wbr>Review<wbr>Manager<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L74">index.ts:74</a></li>
+							<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L78">index.ts:78</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
@@ -209,7 +210,7 @@
 						<div class="tsd-signature tsd-kind-icon">comment<wbr>Indent<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;20</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L82">index.ts:82</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L79">index.ts:79</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -219,7 +220,7 @@
 						<div class="tsd-signature tsd-kind-icon">comment<wbr>Indent<wbr>Offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;20</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L83">index.ts:83</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L80">index.ts:80</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -229,7 +230,7 @@
 						<div class="tsd-signature tsd-kind-icon">edit<wbr>Button<wbr>Add<wbr>Text<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;Reply&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L77">index.ts:77</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L81">index.ts:81</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -239,7 +240,7 @@
 						<div class="tsd-signature tsd-kind-icon">edit<wbr>Button<wbr>Edit<wbr>Text<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;Edit&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L79">index.ts:79</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L82">index.ts:82</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -249,7 +250,7 @@
 						<div class="tsd-signature tsd-kind-icon">edit<wbr>Button<wbr>Enable<wbr>Edit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L81">index.ts:81</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L83">index.ts:83</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -259,7 +260,7 @@
 						<div class="tsd-signature tsd-kind-icon">edit<wbr>Button<wbr>Enable<wbr>Remove<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L80">index.ts:80</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L84">index.ts:84</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -269,7 +270,7 @@
 						<div class="tsd-signature tsd-kind-icon">edit<wbr>Button<wbr>Offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;-10px&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L76">index.ts:76</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L85">index.ts:85</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -279,7 +280,7 @@
 						<div class="tsd-signature tsd-kind-icon">edit<wbr>Button<wbr>Remove<wbr>Text<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;Remove&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L78">index.ts:78</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L86">index.ts:86</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -289,7 +290,17 @@
 						<div class="tsd-signature tsd-kind-icon">format<wbr>Date<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> =&nbsp;null</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L87">index.ts:87</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L87">index.ts:87</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
+						<a name="defaultreviewmanagerconfig.readonly" class="tsd-anchor"></a>
+						<h3>read<wbr>Only</h3>
+						<div class="tsd-signature tsd-kind-icon">read<wbr>Only<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L88">index.ts:88</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -299,7 +310,7 @@
 						<div class="tsd-signature tsd-kind-icon">ruler<wbr>Marker<wbr>Color<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;darkorange&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L85">index.ts:85</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L89">index.ts:89</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -309,7 +320,7 @@
 						<div class="tsd-signature tsd-kind-icon">ruler<wbr>Marker<wbr>Dark<wbr>Color<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;darkorange&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L86">index.ts:86</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L90">index.ts:90</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -319,7 +330,7 @@
 						<div class="tsd-signature tsd-kind-icon">show<wbr>Add<wbr>Comment<wbr>Glyph<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L88">index.ts:88</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L91">index.ts:91</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -329,7 +340,7 @@
 						<div class="tsd-signature tsd-kind-icon">show<wbr>InRuler<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L84">index.ts:84</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L92">index.ts:92</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -339,7 +350,7 @@
 						<div class="tsd-signature tsd-kind-icon">vertical<wbr>Offset<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/f09a634/src/index.ts#L75">index.ts:75</a></li>
+								<li>Defined in <a href="https://github.com/jburrow/monaco-editor-code-review/blob/4e91c88/src/index.ts#L93">index.ts:93</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -356,13 +367,13 @@
 						<span>Internals</span>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_index_.html">"index"</a>
+						<a href="_index_.html">&quot;index&quot;</a>
 					</li>
 					<li class="label tsd-is-external">
 						<span>Externals</span>
 					</li>
 					<li class=" tsd-kind-external-module tsd-is-external">
-						<a href="_events_reducers_.html">"events-<wbr>reducers"</a>
+						<a href="_events_comments_reducers_.html">&quot;events-<wbr>comments-<wbr>reducers&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -388,6 +399,9 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="../interfaces/_index_.onactionschanged.html" class="tsd-kind-icon">On<wbr>Actions<wbr>Changed</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../interfaces/_index_.renderstoreitem.html" class="tsd-kind-icon">Render<wbr>Store<wbr>Item</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="../interfaces/_index_.reviewcommentiteritem.html" class="tsd-kind-icon">Review<wbr>Comment<wbr>Iter<wbr>Item</a>
