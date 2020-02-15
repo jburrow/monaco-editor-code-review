@@ -1,14 +1,11 @@
 const path = require("path");
 const TimestampWebpackPlugin = require("timestamp-webpack-plugin");
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
 
 const baseConfig = (mode, target) => {
   return {
     entry: {
       index: "./src/index.ts",
       docs: "./src/docs.ts",
-      hub: "./src/review-hub/main.tsx"
     },
     mode,
     devtool: "none",
@@ -16,13 +13,9 @@ const baseConfig = (mode, target) => {
       publicPath: "/dist/"
     },
     plugins: [
-      new MonacoWebpackPlugin({
-        // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
-        languages: ['json','javascript']
-      })
+
     ],
     module: {
-      
       rules: [
         {
           test: /\.tsx?$/,
@@ -34,10 +27,6 @@ const baseConfig = (mode, target) => {
               target
             }
           }
-        },{
-          test: /\.css$/,
-          //include: MONACO_DIR,
-          use: ['style-loader', 'css-loader'],
         }
       ]
     },
