@@ -716,8 +716,7 @@ export class ReviewManager {
                         }
                     })
 
-                    if (selection) {
-                        debugger;
+                    if (selection) {                        
                         decorators.push({
                             range: new monacoWindow.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn),
                             options: {
