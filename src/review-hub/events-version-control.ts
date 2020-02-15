@@ -1,4 +1,4 @@
-import { CommentState, ReviewCommentEvent, reduceComments } from "./events-comments-reducers";
+import { CommentState, ReviewCommentEvent, reduceComments } from "../events-comments-reducers";
 
 export type FileEditEvent = { type: "edit"; fullPath: string; text: string };
 export type FileDeleteEvent = { type: "delete"; fullPath: string, };

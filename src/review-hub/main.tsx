@@ -1,7 +1,10 @@
 import { render } from "react-dom";
 import * as React from 'react'
 import * as RGL from "react-grid-layout";
-import { reduceVersionControl, FileEditEvent, versionControlReducer, VersionControlState, FileEvents, FileState, VersionControlEvent, initialVersionControlState } from "./../events-version-control";
+import {
+    reduceVersionControl, FileEditEvent, versionControlReducer, VersionControlState,
+    FileEvents, FileState, VersionControlEvent, initialVersionControlState
+} from "./events-version-control";
 import { DiffEditor, ControlledEditor, monaco } from "@monaco-editor/react";
 import * as mx from "monaco-editor";
 import 'react-resizable/css/styles.css';
@@ -32,7 +35,7 @@ const Editor = (props: { currentUser: string, view: SelectedView, wsDispatch(e: 
             //mx.editor.createModel()
             const model = ((window as any).monaco).editor.createModel(props.view.text, 'javascript');
             reviewManager.editor.setModel(model)
-            reviewManager.loadFromStore(props.view.comments,[])
+            reviewManager.loadFromStore(props.view.comments, [])
         }
     }, [reviewManager, props.view]);
 
