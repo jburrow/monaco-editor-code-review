@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const events_comments_reducers_1 = require("./events-comments-reducers");
+exports.reduceComments = events_comments_reducers_1.reduceComments;
 const uuid = require("uuid/v4");
 const monacoWindow = window;
 var NavigationDirection;

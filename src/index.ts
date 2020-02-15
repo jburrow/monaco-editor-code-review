@@ -5,6 +5,9 @@ import {
     ReviewComment, ReviewCommentRenderState
 } from "./events-comments-reducers";
 import * as uuid from "uuid/v4";
+export {
+    ReviewCommentStore, ReviewCommentEvent, reduceComments
+}
 
 interface MonacoWindow {
     monaco: any;
@@ -176,12 +179,12 @@ export class ReviewManager {
 
     load(events: ReviewCommentEvent[]): void {
         const store = reduceComments(events)
-        this.loadFromStore(store,events);
+        this.loadFromStore(store, events);
     }
 
     loadFromStore(store: ReviewCommentStore, events: ReviewCommentEvent[]) {
         this.editor.changeViewZones((changeAccessor: monacoEditor.editor.IViewZoneChangeAccessor) => {
-           
+
             // Remove all the existing comments     
             for (const viewState of Object.values(this.store.comments)) {
                 const x = this.getRenderState(viewState.comment.id);
@@ -716,7 +719,7 @@ export class ReviewManager {
                         }
                     })
 
-                    if (selection) {                        
+                    if (selection) {
                         decorators.push({
                             range: new monacoWindow.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn),
                             options: {

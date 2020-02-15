@@ -7,6 +7,7 @@
   "scripts": {
     "start": "webpack-dev-server",
     "compile": "tsc && webpack --mode=production",
+    "tsc": "tsc" ,
     "doc": "typedoc --out ./docs ./src/index.ts",
     "test": "jest --coverage",
     "testpub": "jest --coverage --coverageReporters=text-lcov | coveralls"

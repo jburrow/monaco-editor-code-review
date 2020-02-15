@@ -1,5 +1,6 @@
 import * as monacoEditor from "monaco-editor";
-import { CodeSelection, CommentState as ReviewCommentStore, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
+import { reduceComments, CodeSelection, CommentState as ReviewCommentStore, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
+export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
 declare enum NavigationDirection {
     next = 1,
     prev = 2
@@ -130,4 +131,3 @@ export declare class ReviewManager {
     addActions(): void;
     navigateToComment(direction: NavigationDirection): void;
 }
-export {};
