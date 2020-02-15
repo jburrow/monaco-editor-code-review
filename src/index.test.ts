@@ -5,10 +5,16 @@ interface MonacoWindow {
     monaco: any;
 }
 
+class Range{
+    constructor(){
+
+    }
+}
+
 const monacoWindow = (window as any) as MonacoWindow;
 monacoWindow.monaco = {
     KeyMod: { CtrlCmd: 0 }, KeyCode: { F10: 1 },
-    Range: () => { },
+    Range,
     editor: { ContentWidgetPositionPreference: { BELOW: 'BELOW' } }
 };
 
