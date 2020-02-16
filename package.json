@@ -1,9 +1,9 @@
 {
   "name": "monaco-review",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server",
     "compile": "tsc && webpack --mode=production",
@@ -13,7 +13,7 @@
     "testpub": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.8.4",
     "@babel/types": "^7.8.3",
