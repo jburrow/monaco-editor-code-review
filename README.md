@@ -1,4 +1,5 @@
 # monaco-editor-code-review [![Build Status](https://travis-ci.org/jburrow/monaco-editor-code-review.svg?branch=master)](https://travis-ci.org/jburrow/monaco-editor-code-review) [![Coverage Status](https://coveralls.io/repos/github/jburrow/monaco-editor-code-review/badge.svg?branch=master)](https://coveralls.io/github/jburrow/monaco-editor-code-review?branch=master)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review?ref=badge_shield)
 
 ![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true)
 
@@ -59,3 +60,7 @@ Your first reaction might be there is no need for this because github or gitlab 
 review tools, and you are right! However - Monaco can be embedded in many types of applications, and this 
 library enables you integrate a light way of allowing users to annotate documents rendered in it. 
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review?ref=badge_large)
