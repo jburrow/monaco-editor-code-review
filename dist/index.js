@@ -334,7 +334,7 @@ class ReviewManager {
             for (var item of this.iterateComments()) {
                 if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
                     (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
-                    count += events_comments_reducers_1.calculateNumberOfLines(item.state.comment.text);
+                    count += this.calculateNumberOfLines(item.state.comment.text);
                 }
                 if (item.state.comment == this.activeComment) {
                     break;
@@ -507,7 +507,7 @@ class ReviewManager {
                     domNode.appendChild(this.createElement(`${item.state.comment.text}`, 'reviewComment text', 'div'));
                     x.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
-                        heightInLines: item.state.numberOfLines,
+                        heightInLines: this.calculateNumberOfLines(item.state.comment.text),
                         domNode: domNode,
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
@@ -539,6 +539,9 @@ class ReviewManager {
                 this.currentCommentDecorations = this.editor.deltaDecorations(this.currentCommentDecorations, decorators);
             }
         });
+    }
+    calculateNumberOfLines(text) {
+        return text ? text.split(/\r*\n/).length + 1 : 1;
     }
     addActions() {
         this.editor.addAction({

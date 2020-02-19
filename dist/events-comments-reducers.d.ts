@@ -16,25 +16,22 @@ export declare type ReviewCommentEvent = {
     type: 'delete';
 } & CommonFields;
 export interface CommentState {
-    comments: {
-        [reviewCommentId: string]: ReviewCommentState;
-    };
+    comments: Record<string, ReviewCommentState>;
     deletedCommentIds?: Set<string>;
     dirtyCommentIds?: Set<string>;
 }
 export declare function commentReducer(event: ReviewCommentEvent, state: CommentState): {
+    comments: {
+        [x: string]: ReviewCommentState;
+    };
     dirtyCommentIds: Set<string>;
     deletedCommentIds: Set<string>;
-    comments: {
-        [reviewCommentId: string]: ReviewCommentState;
-    };
 };
 export declare function calculateNumberOfLines(text: string): number;
 export declare class ReviewCommentState {
-    numberOfLines: number;
     comment: ReviewComment;
     history: ReviewComment[];
-    constructor(comment: ReviewComment, numberOfLines: number);
+    constructor(comment: ReviewComment);
 }
 export declare enum ReviewCommentRenderState {
     dirty = 1,

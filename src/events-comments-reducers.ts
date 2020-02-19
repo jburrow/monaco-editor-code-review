@@ -1,4 +1,5 @@
 import * as uuid from "uuid/v4";
+import { stringLiteral } from "@babel/types";
 
 export type CommonFields = {
     id?: string,
@@ -15,7 +16,7 @@ export type ReviewCommentEvent =
     { type: 'delete' } & CommonFields;
 
 export interface CommentState {
-    comments: { [reviewCommentId: string]: ReviewCommentState };
+    comments: Record<string, ReviewCommentState>;
     deletedCommentIds?: Set<string>;
     dirtyCommentIds?: Set<string>;
 };
@@ -25,31 +26,42 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
     const dirtyLineNumbers = new Set<number>();
     const deletedCommentIds = new Set<string>();
     const dirtyCommentIds = new Set<string>();
+    let comments = {...state.comments};
 
     switch (event.type) {
         case "edit":
-            const parent = state.comments[event.targetId];
+            const parent = comments[event.targetId]
             if (!parent) break;
 
-            parent.comment = { ...parent.comment, author: event.createdBy, dt: event.createdAt, text: event.text };
-            parent.history.push(parent.comment);
-            parent.numberOfLines = calculateNumberOfLines(event.text);
-            dirtyLineNumbers.add(parent.comment.lineNumber);
+            const edit:ReviewCommentState = {
+                comment: {
+                    ...parent.comment,
+                    author: event.createdBy,
+                    dt: event.createdAt,
+                    text: event.text
+                },
+                history: parent.history.concat(parent.comment),
+                //numberOfLines: calculateNumberOfLines(event.text)
+            };
+
+            dirtyLineNumbers.add(edit.comment.lineNumber);
             console.log('edit', event);
+
+            comments[event.targetId] = edit;
             break;
 
         case "delete":
-            const selected = state.comments[event.targetId];
-            delete state.comments[event.targetId];
+            const selected = comments[event.targetId];
+            delete comments[event.targetId];
 
             deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
             console.log('delete', event);
             break;
-            
+
         case "create":
-            if (!state.comments[event.id]) {
-                state.comments[event.id] = new ReviewCommentState({
+            if (!comments[event.id]) {
+                comments[event.id] = new ReviewCommentState({
                     author: event.createdBy,
                     dt: event.createdAt,
                     id: event.id,
@@ -58,7 +70,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
                     text: event.text,
                     parentId: event.targetId,
                     status: ReviewCommentStatus.active
-                }, calculateNumberOfLines(event.text));
+                });
                 console.log('insert', event);
                 dirtyLineNumbers.add(event.lineNumber);
             }
@@ -73,25 +85,16 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
         }
     }
 
-    return { ...state, dirtyCommentIds, deletedCommentIds };
+    return { comments, dirtyCommentIds, deletedCommentIds };
 }
 
-export function calculateNumberOfLines(text: string): number {
-    return text ? text.split(/\r*\n/).length + 1 : 1;
-}
+
 
 export class ReviewCommentState {
-    //viewZoneId: string;
-    //renderStatus: ReviewCommentRenderState;
-    numberOfLines: number;
     comment: ReviewComment;
     history: ReviewComment[];
 
-    constructor(comment: ReviewComment, numberOfLines: number) {
-        //this.renderStatus = ReviewCommentRenderState.normal;//render stuff
-        //this.viewZoneId = null; //render stuff
-        this.numberOfLines = numberOfLines;//render stuff
-
+    constructor(comment: ReviewComment) {
         this.comment = comment;
         this.history = [comment];
     }

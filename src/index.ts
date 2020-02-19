@@ -1,7 +1,7 @@
 import * as monacoEditor from "monaco-editor";
 import {
     reduceComments, ReviewCommentStatus, commentReducer, CodeSelection,
-    calculateNumberOfLines, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent,
+     CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent,
     ReviewComment, ReviewCommentRenderState
 } from "./events-comments-reducers";
 import * as uuid from "uuid/v4";
@@ -476,7 +476,7 @@ export class ReviewManager {
             for (var item of this.iterateComments()) {
                 if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
                     (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
-                    count += calculateNumberOfLines(item.state.comment.text);
+                    count += this.calculateNumberOfLines(item.state.comment.text);
                 }
 
                 if (item.state.comment == this.activeComment) {
@@ -696,7 +696,7 @@ export class ReviewManager {
 
                     x.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
-                        heightInLines: item.state.numberOfLines,
+                        heightInLines: this.calculateNumberOfLines(item.state.comment.text),
                         domNode: domNode,
                         suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
@@ -732,6 +732,10 @@ export class ReviewManager {
                 this.currentCommentDecorations = this.editor.deltaDecorations(this.currentCommentDecorations, decorators);
             }
         });
+    }
+
+    calculateNumberOfLines(text: string): number {
+        return text ? text.split(/\r*\n/).length + 1 : 1;
     }
 
     addActions() {

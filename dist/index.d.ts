@@ -128,6 +128,7 @@ export declare class ReviewManager {
     private createElement;
     getRenderState(commentId: string): RenderStoreItem;
     refreshComments(): void;
+    calculateNumberOfLines(text: string): number;
     addActions(): void;
     navigateToComment(direction: NavigationDirection): void;
 }

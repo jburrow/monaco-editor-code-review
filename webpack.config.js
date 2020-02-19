@@ -8,7 +8,7 @@ const baseConfig = (mode, target) => {
       docs: "./src/docs.ts",
     },
     mode,
-    devtool: "none",
+    devtool: "source-map",
     devServer: {
       publicPath: "/dist/"
     },

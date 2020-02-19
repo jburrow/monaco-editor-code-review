@@ -6,27 +6,30 @@ function commentReducer(event, state) {
     const dirtyLineNumbers = new Set();
     const deletedCommentIds = new Set();
     const dirtyCommentIds = new Set();
+    let comments = Object.assign({}, state.comments);
     switch (event.type) {
         case "edit":
-            const parent = state.comments[event.targetId];
+            const parent = comments[event.targetId];
             if (!parent)
                 break;
-            parent.comment = Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text });
-            parent.history.push(parent.comment);
-            parent.numberOfLines = calculateNumberOfLines(event.text);
-            dirtyLineNumbers.add(parent.comment.lineNumber);
+            const edit = {
+                comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text }),
+                history: parent.history.concat(parent.comment),
+            };
+            dirtyLineNumbers.add(edit.comment.lineNumber);
             console.log('edit', event);
+            comments[event.targetId] = edit;
             break;
         case "delete":
-            const selected = state.comments[event.targetId];
-            delete state.comments[event.targetId];
+            const selected = comments[event.targetId];
+            delete comments[event.targetId];
             deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
             console.log('delete', event);
             break;
         case "create":
-            if (!state.comments[event.id]) {
-                state.comments[event.id] = new ReviewCommentState({
+            if (!comments[event.id]) {
+                comments[event.id] = new ReviewCommentState({
                     author: event.createdBy,
                     dt: event.createdAt,
                     id: event.id,
@@ -35,7 +38,7 @@ function commentReducer(event, state) {
                     text: event.text,
                     parentId: event.targetId,
                     status: ReviewCommentStatus.active
-                }, calculateNumberOfLines(event.text));
+                });
                 console.log('insert', event);
                 dirtyLineNumbers.add(event.lineNumber);
             }
@@ -48,7 +51,7 @@ function commentReducer(event, state) {
             }
         }
     }
-    return Object.assign(Object.assign({}, state), { dirtyCommentIds, deletedCommentIds });
+    return { comments, dirtyCommentIds, deletedCommentIds };
 }
 exports.commentReducer = commentReducer;
 function calculateNumberOfLines(text) {
@@ -56,10 +59,7 @@ function calculateNumberOfLines(text) {
 }
 exports.calculateNumberOfLines = calculateNumberOfLines;
 class ReviewCommentState {
-    constructor(comment, numberOfLines) {
-        //this.renderStatus = ReviewCommentRenderState.normal;//render stuff
-        //this.viewZoneId = null; //render stuff
-        this.numberOfLines = numberOfLines; //render stuff
+    constructor(comment) {
         this.comment = comment;
         this.history = [comment];
     }
