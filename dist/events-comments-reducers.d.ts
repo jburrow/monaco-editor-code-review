@@ -4,17 +4,17 @@ export declare type CommonFields = {
     createdBy?: string;
     createdAt?: Date | string;
 };
-export declare type ReviewCommentEvent = {
-    type: 'create';
+export declare type ReviewCommentEvent = ({
+    type: "create";
     lineNumber: number;
     text: string;
     selection?: CodeSelection;
-} & CommonFields | {
-    type: 'edit';
+} & CommonFields) | ({
+    type: "edit";
     text: string;
-} & CommonFields | {
-    type: 'delete';
-} & CommonFields;
+} & CommonFields) | ({
+    type: "delete";
+} & CommonFields);
 export interface CommentState {
     comments: Record<string, ReviewCommentState>;
     deletedCommentIds?: Set<string>;
@@ -27,7 +27,6 @@ export declare function commentReducer(event: ReviewCommentEvent, state: Comment
     dirtyCommentIds: Set<string>;
     deletedCommentIds: Set<string>;
 };
-export declare function calculateNumberOfLines(text: string): number;
 export declare class ReviewCommentState {
     comment: ReviewComment;
     history: ReviewComment[];

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid = require("uuid/v4");
-;
 function commentReducer(event, state) {
     const dirtyLineNumbers = new Set();
     const deletedCommentIds = new Set();
@@ -14,18 +13,20 @@ function commentReducer(event, state) {
                 break;
             const edit = {
                 comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text }),
-                history: parent.history.concat(parent.comment),
+                history: parent.history.concat(parent.comment)
             };
             dirtyLineNumbers.add(edit.comment.lineNumber);
-            console.log('edit', event);
+            console.debug("edit", event);
             comments[event.targetId] = edit;
             break;
         case "delete":
             const selected = comments[event.targetId];
+            if (!selected)
+                break;
             delete comments[event.targetId];
             deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
-            console.log('delete', event);
+            console.debug("delete", event);
             break;
         case "create":
             if (!comments[event.id]) {
@@ -39,7 +40,7 @@ function commentReducer(event, state) {
                     parentId: event.targetId,
                     status: ReviewCommentStatus.active
                 });
-                console.log('insert', event);
+                console.debug("insert", event);
                 dirtyLineNumbers.add(event.lineNumber);
             }
             break;
@@ -54,10 +55,6 @@ function commentReducer(event, state) {
     return { comments, dirtyCommentIds, deletedCommentIds };
 }
 exports.commentReducer = commentReducer;
-function calculateNumberOfLines(text) {
-    return text ? text.split(/\r*\n/).length + 1 : 1;
-}
-exports.calculateNumberOfLines = calculateNumberOfLines;
 class ReviewCommentState {
     constructor(comment) {
         this.comment = comment;
