@@ -296,6 +296,13 @@ test("Enter Comment Widgets", () => {
   //expect(cs.viewZoneId).toBe(0);
 });
 
+test("Count number of lines", () => {
+  const editor = getMockEditor();
+  const rm = createReviewManager(editor, "current.user");
+  const lines = rm.calculateNumberOfLines("line\nline");
+  expect(lines).toBe(3);
+});
+
 test("Navigation - Forward and Back", () => {
   const editor = getMockEditor();
   const rm = createReviewManager(editor, "current.user");
