@@ -13,11 +13,11 @@ const index_1 = require("./index");
 const moment = require("moment");
 const win = window;
 let reviewManager = null;
-let currentMode = '';
+let currentMode = "";
 let currentEditor = null;
-let theme = 'vs-dark';
-const fooUser = 'foo.user';
-const barUser = 'bar.user';
+let theme = "vs-dark";
+const fooUser = "foo.user";
+const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
     return new Promise(resolve => {
         if (!win.require) {
@@ -41,10 +41,10 @@ function getRandomInt(max) {
 }
 function setView(editorMode, diffMode, theme, currentUser, editorReadonly, commentsReadonly) {
     console.warn(arguments);
-    const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
+    const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
     // currentMode = mode;
     document.getElementById("containerEditor").innerHTML = "";
-    if (editorMode == 'editor-mode') {
+    if (editorMode == "editor-mode") {
         currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
             value: exampleSourceCode[idx],
             language: "typescript",
@@ -65,7 +65,7 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
             readOnly: editorReadonly,
             glyphMargin: true,
             contextmenu: true,
-            automaticLayout: true,
+            automaticLayout: true
         });
         e.setModel({
             original: originalModel,
@@ -76,12 +76,12 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
     }
 }
 function generateDifferentContents() {
-    const idx = getRandomInt((exampleSourceCode.length) / 2) * 2;
+    const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
     if (currentMode.startsWith("standard")) {
-        (currentEditor).setValue(exampleSourceCode[idx]);
+        currentEditor.setValue(exampleSourceCode[idx]);
     }
     else {
-        const e = (currentEditor);
+        const e = currentEditor;
         e.getModel().modified.setValue(exampleSourceCode[idx]);
         e.getModel().modified.setValue(exampleSourceCode[idx + 1]);
     }
@@ -92,8 +92,8 @@ function fetchSourceCode(url) {
         const response = yield fetch(url);
         const exampleText = yield response.text();
         const modifiedText = exampleText.replace(new RegExp("string", "g"), "string /* String!*/");
-        exampleSourceCode.push(url + '\n' + exampleText);
-        exampleSourceCode.push(url + '\n' + modifiedText);
+        exampleSourceCode.push(url + "\n" + exampleText);
+        exampleSourceCode.push(url + "\n" + modifiedText);
     });
 }
 function init() {
@@ -116,14 +116,14 @@ function init() {
 function initReviewManager(editor, currentUser, readOnly) {
     reviewManager = index_1.createReviewManager(editor, currentUser, createRandomComments(), updatedComments => renderComments(updatedComments), {
         editButtonEnableRemove: true,
-        formatDate: (createdAt) => moment(createdAt).format('YY-MM-DD HH:mm'),
+        formatDate: (createdAt) => moment(createdAt).format("YY-MM-DD HH:mm"),
         readOnly: readOnly
     });
     setCurrentUser();
     renderComments(reviewManager.events);
 }
 function toggleTheme() {
-    theme = theme == 'vs' ? 'vs-dark' : 'vs';
+    theme = theme == "vs" ? "vs-dark" : "vs";
     win.monaco.editor.setTheme(theme);
 }
 function handleCommentReadonlyChange() {
@@ -146,7 +146,7 @@ function createRandomComments() {
             id: "id-0",
             lineNumber: firstLine + 10,
             createdBy: fooUser,
-            createdAt: '2019-01-01T00:00:00.000',
+            createdAt: "2019-01-01T00:00:00.000",
             text: "Near the start",
             selection: {
                 startColumn: 5,
@@ -160,7 +160,7 @@ function createRandomComments() {
             targetId: "id-2",
             type: "edit",
             createdBy: fooUser,
-            createdAt: '2019-06-01T00:00:00.000Z',
+            createdAt: "2019-06-01T00:00:00.000Z",
             text: "EDIT EDIT at start"
         },
         {
@@ -168,7 +168,7 @@ function createRandomComments() {
             type: "create",
             lineNumber: firstLine + 5,
             createdBy: fooUser,
-            createdAt: '2019-06-01T00:00:00.000Z',
+            createdAt: "2019-06-01T00:00:00.000Z",
             text: "at start"
         },
         {
@@ -177,8 +177,8 @@ function createRandomComments() {
             targetId: "id-1",
             lineNumber: firstLine + 5,
             createdBy: fooUser,
-            createdAt: '2019-12-01T00:00:00.000Z',
-            text: "this code isn't very good",
+            createdAt: "2019-12-01T00:00:00.000Z",
+            text: "this code isn't very good"
         },
         {
             id: "id-3",
@@ -186,7 +186,7 @@ function createRandomComments() {
             targetId: "id-2",
             lineNumber: firstLine + 5,
             createdBy: barUser,
-            createdAt: '2019-06-01T00:00:00.000Z',
+            createdAt: "2019-06-01T00:00:00.000Z",
             text: "I think you will find it is good enough"
         },
         {
@@ -195,7 +195,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: barUser,
             createdAt: new Date(),
-            text: "I think you will find it is good enough",
+            text: "I think you will find it is good enough"
         },
         {
             targetId: "id-3",
@@ -203,31 +203,35 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: barUser,
             createdAt: new Date(),
-            text: "I think you will find it is good enough",
+            text: "I think you will find it is good enough"
         }
     ];
     return result;
 }
 function renderComments(events) {
     events = events || [];
-    console.log('Events #', events.length, events);
-    const rawHtml = '<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>' + events
-        .map(comment => {
-        return `<tr>
-                    <td>${comment.type || '&nbsp;'}</td>
-                    <td>${comment.id || '&nbsp;'}</td>
+    console.log("Events #", events.length, events);
+    const rawHtml = "<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>" +
+        events
+            .map(comment => {
+            return `<tr>
+                    <td>${comment.type || "&nbsp;"}</td>
+                    <td>${comment.id || "&nbsp;"}</td>
                     <td>${comment.createdBy}</td> 
                     <td>${comment.createdAt}</td>                     
                     </tr>
                     <tr>
-                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || '&nbsp;'}</td>                    
+                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || "&nbsp;"}</td>                    
                 </tr>`;
-    })
-        .join("") + '</table>';
+        })
+            .join("") +
+        "</table>";
     const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
-    const activeHtml = '<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>' + activeComments
-        .map(comment => `<tr>
-                    <td>${comment.id || '&nbsp;'}</td>                                     
+    const activeHtml = "<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>" +
+        activeComments
+            .map(comment => `<tr>
+                    <td>${comment.id ||
+            "&nbsp;"}</td>                                     
                     <td>${comment.lineNumber}</td>
                     <td>${comment.author}</td> 
                     <td>${comment.dt}</td> 
@@ -235,7 +239,8 @@ function renderComments(events) {
                 <tr>
                     <td colspan="4" class="comment_text">${comment.text}</td>                                        
                 </tr>`)
-        .join("") + '</table>';
+            .join("") +
+        "</table>";
     document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Events</h5>${rawHtml}</div>`;
 }
 function clearComments() {

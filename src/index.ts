@@ -8,7 +8,7 @@ import {
   ReviewCommentState,
   ReviewCommentEvent,
   ReviewComment,
-  ReviewCommentRenderState
+  ReviewCommentRenderState,
 } from "./events-comments-reducers";
 import * as uuid from "uuid/v4";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
@@ -21,13 +21,13 @@ const monacoWindow = (window as any) as MonacoWindow;
 
 enum NavigationDirection {
   next = 1,
-  prev = 2
+  prev = 2,
 }
 
 export enum EditorMode {
   insertComment = 1,
   editComment = 2,
-  toolbar = 3
+  toolbar = 3,
 }
 
 export function createReviewManager(
@@ -101,11 +101,12 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
   rulerMarkerDarkColor: "darkorange",
   showAddCommentGlyph: true,
   showInRuler: true,
-  verticalOffset: 0
+  verticalOffset: 0,
 };
 
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
+const POSITION_EXACT = 0;
 
 interface EditorElements {
   cancel: HTMLButtonElement;
@@ -245,12 +246,12 @@ export class ReviewManager {
     const missingThemes = {
       dark: {
         "button.background": "#0e639c",
-        "button.foreground": "#ffffff"
+        "button.foreground": "#ffffff",
       },
       light: {
         "button.background": "#007acc",
-        "button.foreground": "#ffffff"
-      }
+        "button.foreground": "#ffffff",
+      },
     };
     if (!value) {
       value =
@@ -270,7 +271,8 @@ export class ReviewManager {
     add.innerText = this.config.editButtonAddText;
     add.className = "editButton add";
     add.setAttribute(CONTROL_ATTR_NAME, "");
-    add.onclick = () => this.setEditorMode(EditorMode.insertComment);
+    add.onclick = () =>
+      this.setEditorMode(EditorMode.insertComment, "add-comment");
     root.appendChild(add);
 
     let remove = null;
@@ -300,7 +302,7 @@ export class ReviewManager {
       edit.setAttribute(CONTROL_ATTR_NAME, "");
       edit.innerText = this.config.editButtonEditText;
       edit.className = "editButton edit";
-      edit.onclick = () => this.setEditorMode(EditorMode.editComment);
+      edit.onclick = () => this.setEditorMode(EditorMode.editComment, "edit");
       root.appendChild(edit);
     }
 
@@ -308,7 +310,7 @@ export class ReviewManager {
   }
 
   handleCancel() {
-    this.setEditorMode(EditorMode.toolbar);
+    this.setEditorMode(EditorMode.toolbar, "cancel");
     this.editor.focus();
   }
 
@@ -321,7 +323,7 @@ export class ReviewManager {
       ? null
       : (this.editor.getSelection() as CodeSelection);
     this.addComment(lineNumber, text, selection);
-    this.setEditorMode(EditorMode.toolbar);
+    this.setEditorMode(EditorMode.toolbar, "add-comment-1");
     this.editor.focus();
   }
 
@@ -338,7 +340,7 @@ export class ReviewManager {
   }
 
   createInlineEditorElement(): EditorElements {
-    var root = document.createElement("span") as HTMLSpanElement;
+    var root = document.createElement("div") as HTMLDivElement;
     root.className = "reviewCommentEditor";
 
     const textarea = document.createElement("textarea") as HTMLTextAreaElement;
@@ -346,6 +348,7 @@ export class ReviewManager {
     textarea.className = "reviewCommentEditor text";
     textarea.innerText = "";
     textarea.style.resize = "none";
+    textarea.style.width = "100%";
     textarea.name = "text";
     textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
@@ -390,12 +393,12 @@ export class ReviewManager {
           return {
             position: {
               lineNumber: this_.activeComment.lineNumber,
-              column: 1
+              column: 1,
             },
-            preference: [POSITION_BELOW]
+            preference: [POSITION_BELOW],
           };
         }
-      }
+      },
     };
 
     this.editor.addContentWidget(this.widgetInlineToolbar);
@@ -412,6 +415,7 @@ export class ReviewManager {
         return "widgetInlineEditor";
       },
       getDomNode: () => {
+        console.log("getDomNode");
         return editorElement.root;
       },
       getPosition: () => {
@@ -419,17 +423,19 @@ export class ReviewManager {
           this.editorMode == EditorMode.insertComment ||
           this.editorMode == EditorMode.editComment
         ) {
+          const position = this.editor.getPosition();
+
           return {
             position: {
               lineNumber: this.activeComment
                 ? this.activeComment.lineNumber
-                : this.editor.getPosition().lineNumber + 1,
-              column: 1
+                : position.lineNumber + 1,
+              column: position.column,
             },
-            preference: [POSITION_BELOW]
+            preference: [POSITION_EXACT],
           };
         }
-      }
+      },
     };
 
     this.editor.addContentWidget(this.widgetInlineCommentEditor);
@@ -452,7 +458,7 @@ export class ReviewManager {
 
     this.activeComment = comment;
     if (lineNumbersToMakeDirty.length > 0) {
-      this.filterAndMapComments(lineNumbersToMakeDirty, comment => {
+      this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
         this.renderStore[comment.id].renderStatus =
           ReviewCommentRenderState.dirty;
       });
@@ -474,7 +480,9 @@ export class ReviewManager {
     if (ev.target && ev.target.position && ev.target.position.lineNumber) {
       this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
       this.renderAddCommentLineDecoration(
-        this.config.readOnly ? null : this.currentLineDecorationLineNumber
+        this.config.readOnly === true
+          ? null
+          : this.currentLineDecorationLineNumber
       );
     }
   }
@@ -486,9 +494,9 @@ export class ReviewManager {
             range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
             options: {
               marginClassName: "activeLineMarginClass",
-              zIndex: 100
-            }
-          }
+              zIndex: 100,
+            },
+          },
         ]
       : [];
     this.currentLineDecorations = this.editor.deltaDecorations(
@@ -510,15 +518,15 @@ export class ReviewManager {
     ) {
       this.editor.setPosition({
         lineNumber: this.currentLineDecorationLineNumber,
-        column: 1
+        column: 1,
       });
-      this.setEditorMode(EditorMode.insertComment);
+      this.setEditorMode(EditorMode.insertComment, "mouse-down-1");
     } else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
       let activeComment: ReviewComment = null;
 
       if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
         for (const comment of Object.values(this.store.comments).map(
-          c => c.comment
+          (c) => c.comment
         )) {
           const x = this.getRenderState(comment.id);
           if (x.viewZoneId == ev.target.detail.viewZoneId) {
@@ -529,7 +537,7 @@ export class ReviewManager {
       }
       this.setActiveComment(activeComment);
       this.refreshComments();
-      this.setEditorMode(EditorMode.toolbar);
+      this.setEditorMode(EditorMode.toolbar, "mouse-down-2");
     }
   }
 
@@ -571,7 +579,7 @@ export class ReviewManager {
     if (this.inlineToolbarElements.remove) {
       const hasChildren =
         this.activeComment &&
-        this.iterateComments(c => c.comment.id === this.activeComment.id)
+        this.iterateComments((c) => c.comment.id === this.activeComment.id)
           .length > 1;
       const isSameUser =
         this.activeComment && this.activeComment.author === this.currentUser;
@@ -586,13 +594,13 @@ export class ReviewManager {
   }
 
   layoutInlineCommentEditor() {
-    [this.editorElements.root, this.editorElements.textarea].forEach(e => {
+    [this.editorElements.root, this.editorElements.textarea].forEach((e) => {
       e.style.backgroundColor = this.getThemedColor("editor.background");
       e.style.color = this.getThemedColor("editor.foreground");
     });
 
     [this.editorElements.confirm, this.editorElements.cancel].forEach(
-      button => {
+      (button) => {
         button.style.backgroundColor = this.getThemedColor("button.background");
         button.style.color = this.getThemedColor("button.foreground");
       }
@@ -602,14 +610,17 @@ export class ReviewManager {
       this.editorMode === EditorMode.insertComment
         ? "Add Comment"
         : "Edit Comment";
-    this.editorElements.root.style.marginTop = `${this.calculateMarginTopOffset(
-      true
-    )}px`;
+    // this.editorElements.root.style.marginTop = `${this.calculateMarginTopOffset(
+    //   true
+    // )}px`;
+
+    console.log("layout", this.editorElements.root);
 
     this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
   }
 
-  setEditorMode(mode: EditorMode) {
+  setEditorMode(mode: EditorMode, why: string = null) {
+    console.log("setEditorMode", why);
     this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
     console.warn(
       "setEditorMode",
@@ -622,8 +633,8 @@ export class ReviewManager {
       EditorMode[this.editorMode]
     );
 
-    this.layoutInlineCommentEditor();
     this.layoutInlineToolbar();
+    this.layoutInlineCommentEditor();
 
     if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
       if (mode == EditorMode.insertComment) {
@@ -655,11 +666,11 @@ export class ReviewManager {
 
       results.push({
         depth,
-        state: cs
+        state: cs,
       });
       this.recurseComments(
         allComments,
-        x => x.comment.parentId === comment.id,
+        (x) => x.comment.parentId === comment.id,
         depth + 1,
         results
       );
@@ -689,7 +700,7 @@ export class ReviewManager {
             text,
             lineNumber,
             selection,
-            targetId: this.activeComment && this.activeComment.id
+            targetId: this.activeComment && this.activeComment.id,
           };
 
     return this.addEvent(event);
@@ -876,7 +887,7 @@ export class ReviewManager {
                 item.state.comment.text
               ),
               domNode: domNode,
-              suppressMouseDown: true // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
+              suppressMouseDown: true, // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
             });
           }
         }
@@ -891,9 +902,9 @@ export class ReviewManager {
                 overviewRuler: {
                   color: this.config.rulerMarkerColor,
                   darkColor: this.config.rulerMarkerDarkColor,
-                  position: 1
-                }
-              }
+                  position: 1,
+                },
+              },
             });
 
             if (selection) {
@@ -905,8 +916,8 @@ export class ReviewManager {
                   selection.endColumn
                 ),
                 options: {
-                  className: "reviewComment selection"
-                }
+                  className: "reviewComment selection",
+                },
               });
             }
           }
@@ -929,7 +940,7 @@ export class ReviewManager {
       id: "my-unique-id-add",
       label: "Add Comment",
       keybindings: [
-        monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10
+        monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10,
       ],
       precondition: "add-context-key",
       keybindingContext: null,
@@ -937,15 +948,15 @@ export class ReviewManager {
       contextMenuOrder: 0,
 
       run: () => {
-        this.setEditorMode(EditorMode.insertComment);
-      }
+        this.setEditorMode(EditorMode.insertComment, "add-comment-x");
+      },
     });
 
     this.editor.addAction({
       id: "my-unique-id-next",
       label: "Next Comment",
       keybindings: [
-        monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F12
+        monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F12,
       ],
       precondition: null,
       keybindingContext: null,
@@ -954,14 +965,14 @@ export class ReviewManager {
 
       run: () => {
         this.navigateToComment(NavigationDirection.next);
-      }
+      },
     });
 
     this.editor.addAction({
       id: "my-unique-id-prev",
       label: "Prev Comment",
       keybindings: [
-        monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F11
+        monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F11,
       ],
       precondition: null,
       keybindingContext: null,
@@ -970,7 +981,7 @@ export class ReviewManager {
 
       run: () => {
         this.navigateToComment(NavigationDirection.prev);
-      }
+      },
     });
   }
 
@@ -983,8 +994,8 @@ export class ReviewManager {
     }
 
     const comments = Object.values(this.store.comments)
-      .map(cs => cs.comment)
-      .filter(c => {
+      .map((cs) => cs.comment)
+      .filter((c) => {
         if (!c.parentId) {
           if (direction === NavigationDirection.next) {
             return c.lineNumber > currentLine;

@@ -1,11 +1,9 @@
 .reviewCommentEditor {
-  border: 1px solid black;
-  width: 80%;
-  padding: 5px;
-  background-color: cornflowerblue;
+  border: 1px solid pink;
+  width: 100%;
   /* vscode fallback order */
-  font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace;
-  z-index: 1000;
+  font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
+    "Courier New", monospace;
 }
 
 .reviewCommentEditor.text {
