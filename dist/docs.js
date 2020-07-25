@@ -19,7 +19,7 @@ let theme = "vs-dark";
 const fooUser = "foo.user";
 const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         if (!win.require) {
             console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
             var prefix = "https://microsoft.github.io/monaco-editor";
@@ -52,7 +52,7 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
             contextmenu: true,
             automaticLayout: true,
             readOnly: editorReadonly,
-            theme: theme
+            theme: theme,
         });
         initReviewManager(currentEditor, currentUser, commentsReadonly);
     }
@@ -65,11 +65,11 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
             readOnly: editorReadonly,
             glyphMargin: true,
             contextmenu: true,
-            automaticLayout: true
+            automaticLayout: true,
         });
         e.setModel({
             original: originalModel,
-            modified: modifiedModel
+            modified: modifiedModel,
         });
         currentEditor = e;
         initReviewManager(e.modifiedEditor, currentUser, commentsReadonly);
@@ -92,8 +92,9 @@ function fetchSourceCode(url) {
         const response = yield fetch(url);
         const exampleText = yield response.text();
         const modifiedText = exampleText.replace(new RegExp("string", "g"), "string /* String!*/");
-        exampleSourceCode.push(url + "\n" + exampleText);
-        exampleSourceCode.push(url + "\n" + modifiedText);
+        const longLines = "A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text \nA very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text ";
+        exampleSourceCode.push(url + "\n" + longLines + exampleText);
+        exampleSourceCode.push(url + "\n" + longLines + modifiedText);
     });
 }
 function init() {
@@ -106,7 +107,7 @@ function init() {
         const tsobj = yield response.text();
         console.log("Compiled at:", tsobj);
         win.require.config({
-            paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" }
+            paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" },
         });
         win.require(["vs/editor/editor.main"], function () {
             setView("editor-mode", "", "vs-dark", fooUser, false, false);
@@ -114,17 +115,13 @@ function init() {
     });
 }
 function initReviewManager(editor, currentUser, readOnly) {
-    reviewManager = index_1.createReviewManager(editor, currentUser, createRandomComments(), updatedComments => renderComments(updatedComments), {
+    reviewManager = index_1.createReviewManager(editor, currentUser, createRandomComments(), (updatedComments) => renderComments(updatedComments), {
         editButtonEnableRemove: true,
         formatDate: (createdAt) => moment(createdAt).format("YY-MM-DD HH:mm"),
-        readOnly: readOnly
+        readOnly: readOnly,
     });
     setCurrentUser();
     renderComments(reviewManager.events);
-}
-function toggleTheme() {
-    theme = theme == "vs" ? "vs-dark" : "vs";
-    win.monaco.editor.setTheme(theme);
 }
 function handleCommentReadonlyChange() {
     reviewManager.setReadOnlyMode(event.srcElement.checked);
@@ -152,8 +149,8 @@ function createRandomComments() {
                 startColumn: 5,
                 startLineNumber: firstLine + 5,
                 endColumn: 10,
-                endLineNumber: firstLine + 10
-            }
+                endLineNumber: firstLine + 10,
+            },
         },
         {
             id: "id-2-edit",
@@ -161,7 +158,7 @@ function createRandomComments() {
             type: "edit",
             createdBy: fooUser,
             createdAt: "2019-06-01T00:00:00.000Z",
-            text: "EDIT EDIT at start"
+            text: "EDIT EDIT at start",
         },
         {
             id: "id-1",
@@ -169,7 +166,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: fooUser,
             createdAt: "2019-06-01T00:00:00.000Z",
-            text: "at start"
+            text: "at start",
         },
         {
             id: "id-2",
@@ -178,7 +175,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: fooUser,
             createdAt: "2019-12-01T00:00:00.000Z",
-            text: "this code isn't very good"
+            text: "this code isn't very good",
         },
         {
             id: "id-3",
@@ -187,7 +184,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: barUser,
             createdAt: "2019-06-01T00:00:00.000Z",
-            text: "I think you will find it is good enough"
+            text: "I think you will find it is good enough",
         },
         {
             targetId: "id-3",
@@ -195,7 +192,7 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: barUser,
             createdAt: new Date(),
-            text: "I think you will find it is good enough"
+            text: "I think you will find it is good enough",
         },
         {
             targetId: "id-3",
@@ -203,8 +200,8 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: barUser,
             createdAt: new Date(),
-            text: "I think you will find it is good enough"
-        }
+            text: "I think you will find it is good enough",
+        },
     ];
     return result;
 }
@@ -213,7 +210,7 @@ function renderComments(events) {
     console.log("Events #", events.length, events);
     const rawHtml = "<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>" +
         events
-            .map(comment => {
+            .map((comment) => {
             return `<tr>
                     <td>${comment.type || "&nbsp;"}</td>
                     <td>${comment.id || "&nbsp;"}</td>
@@ -226,12 +223,11 @@ function renderComments(events) {
         })
             .join("") +
         "</table>";
-    const activeComments = Object.values(reviewManager.store.comments).map(cs => cs.comment);
+    const activeComments = Object.values(reviewManager.store.comments).map((cs) => cs.comment);
     const activeHtml = "<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>" +
         activeComments
-            .map(comment => `<tr>
-                    <td>${comment.id ||
-            "&nbsp;"}</td>                                     
+            .map((comment) => `<tr>
+                    <td>${comment.id || "&nbsp;"}</td>                                     
                     <td>${comment.lineNumber}</td>
                     <td>${comment.author}</td> 
                     <td>${comment.dt}</td> 

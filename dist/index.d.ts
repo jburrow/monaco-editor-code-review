@@ -117,7 +117,7 @@ export declare class ReviewManager {
     private calculateMarginTopOffset;
     layoutInlineToolbar(): void;
     layoutInlineCommentEditor(): void;
-    setEditorMode(mode: EditorMode): void;
+    setEditorMode(mode: EditorMode, why?: string): void;
     getDateTimeNow(): Date;
     private recurseComments;
     private iterateComments;

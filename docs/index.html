@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>monaco-review - v0.0.4</title>
-	<meta name="description" content="">
+	<title>monaco-review</title>
+	<meta name="description" content="Documentation for monaco-review">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -13,7 +13,7 @@
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">monaco-review - v0.0.4</a>
+					<a href="index.html" class="title">monaco-review</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -56,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> monaco-review - v0.0.4</h1>
+			<h1>monaco-review</h1>
 		</div>
 	</div>
 </header>
@@ -64,9 +64,11 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#monaco-editor-code-review-a-hrefhttpstravis-ciorgjburrowmonaco-editor-code-reviewimg-srchttpstravis-ciorgjburrowmonaco-editor-code-reviewsvgbranchmaster-altbuild-statusa-a-hrefhttpscoverallsiogithubjburrowmonaco-editor-code-reviewbranchmasterimg-srchttpscoverallsioreposgithubjburrowmonaco-editor-code-reviewbadgesvgbranchmaster-altcoverage-statusa" id="monaco-editor-code-review-a-hrefhttpstravis-ciorgjburrowmonaco-editor-code-reviewimg-srchttpstravis-ciorgjburrowmonaco-editor-code-reviewsvgbranchmaster-altbuild-statusa-a-hrefhttpscoverallsiogithubjburrowmonaco-editor-code-reviewbranchmasterimg-srchttpscoverallsioreposgithubjburrowmonaco-editor-code-reviewbadgesvgbranchmaster-altcoverage-statusa" style="color: inherit; text-decoration: none;">
-					<h1>monaco-editor-code-review <a href="https://travis-ci.org/jburrow/monaco-editor-code-review"><img src="https://travis-ci.org/jburrow/monaco-editor-code-review.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/jburrow/monaco-editor-code-review?branch=master"><img src="https://coveralls.io/repos/github/jburrow/monaco-editor-code-review/badge.svg?branch=master" alt="Coverage Status"></a></h1>
+				<a href="#monaco-editor-code-review" id="monaco-editor-code-review" style="color: inherit; text-decoration: none;">
+					<h1>monaco-editor-code-review</h1>
 				</a>
+				<p><a href="https://travis-ci.org/jburrow/monaco-editor-code-review"><img src="https://travis-ci.org/jburrow/monaco-editor-code-review.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/github/jburrow/monaco-editor-code-review?branch=master"><img src="https://coveralls.io/repos/github/jburrow/monaco-editor-code-review/badge.svg?branch=master" alt="Coverage Status"></a>
+				<a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review.svg?type=shield" alt="FOSSA Status"></a></p>
 				<p><img src="https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true" alt="screenshot"></p>
 				<p>Lightweight extension (31KiB) for monaco-editor to allow commenting off code.
 				This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.</p>
@@ -74,32 +76,32 @@
 				<ul>
 					<li>Try it out: <a href="https://jburrow.github.io/monaco-editor-code-review/examples/index.html">https://jburrow.github.io/monaco-editor-code-review/examples/index.html</a></li>
 					<li>See example source-code<ul>
-							<li><a href="examples/index.html">docs/index.html</a> </li>
+							<li><a href="examples/index.html">docs/index.html</a></li>
 							<li><a href="src/docs.ts">src/docs.ts</a></li>
 						</ul>
 					</li>
 					<li>Read the Api-Docs: <a href="https://jburrow.github.io/monaco-editor-code-review/docs/">https://jburrow.github.io/monaco-editor-code-review/docs/</a></li>
 				</ul>
-				<p>Simply add the monaco-editor-code-review/index.js to your .html page. </p>
-				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"../index.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+				<p>Simply add the monaco-editor-code-review/index.js to your .html page.</p>
+				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;../index.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 				<pre><code class="language-javascript"><span class="hljs-comment">//Type: ./src/types/index.ts#ReviewManagerConfig</span>
-<span class="hljs-keyword">var</span> overriddenConfig = {}; 
+<span class="hljs-keyword">var</span> overriddenConfig = {};
 
 <span class="hljs-comment">//Type: ./src/types/index.ts#ReviewComment</span>
-<span class="hljs-keyword">var</span> existingComments = [{<span class="hljs-attr">author</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">dt</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">text</span>:<span class="hljs-string">''</span>, 
-                         <span class="hljs-attr">lineNumber</span>:<span class="hljs-number">10</span> }]; 
+<span class="hljs-keyword">var</span> existingComments = [{<span class="hljs-attr">author</span>:<span class="hljs-string">&#x27;&#x27;</span>,
+                         <span class="hljs-attr">dt</span>:<span class="hljs-string">&#x27;&#x27;</span>,
+                         <span class="hljs-attr">text</span>:<span class="hljs-string">&#x27;&#x27;</span>,
+                         <span class="hljs-attr">lineNumber</span>:<span class="hljs-number">10</span> }];
 
-<span class="hljs-keyword">var</span> editor = monaco.editor.create(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"container"</span>), {
-        <span class="hljs-attr">value</span>: <span class="hljs-string">'...some source code '</span><span class="hljs-string">''</span>,
-        <span class="hljs-attr">language</span>: <span class="hljs-string">"javascript"</span>,        
+<span class="hljs-keyword">var</span> editor = monaco.editor.create(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;container&quot;</span>), {
+        <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;...some source code &#x27;</span><span class="hljs-string">&#x27;&#x27;</span>,
+        <span class="hljs-attr">language</span>: <span class="hljs-string">&quot;javascript&quot;</span>,
         <span class="hljs-attr">contextmenu</span>: <span class="hljs-literal">true</span>
     });
-<span class="hljs-keyword">var</span> rm = MonacoEditorCodeReview.createReviewManager(editor, 
-                                                    <span class="hljs-string">"name-of-current-user"</span>, 
-                                                    existingComments, 
-                                                    (newComments)=&gt;{<span class="hljs-built_in">console</span>.info(newComments);}, 
+<span class="hljs-keyword">var</span> rm = MonacoEditorCodeReview.createReviewManager(editor,
+                                                    <span class="hljs-string">&quot;name-of-current-user&quot;</span>,
+                                                    existingComments,
+                                                    <span class="hljs-function">(<span class="hljs-params">newComments</span>)=&gt;</span>{<span class="hljs-built_in">console</span>.info(newComments);},
                                                     overriddenConfig);</code></pre>
 				<p>Features</p>
 				<ul>
@@ -115,7 +117,11 @@
 				</a>
 				<p>Your first reaction might be there is no need for this because github or gitlab all have excellent code
 					review tools, and you are right! However - Monaco can be embedded in many types of applications, and this
-				library enables you integrate a light way of allowing users to annotate documents rendered in it. </p>
+				library enables you integrate a light way of allowing users to annotate documents rendered in it.</p>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review?ref=badge_large"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review.svg?type=large" alt="FOSSA Status"></a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -127,13 +133,13 @@
 					<li class="label tsd-is-external">
 						<span>Internals</span>
 					</li>
-					<li class=" tsd-kind-external-module">
+					<li class=" tsd-kind-module">
 						<a href="modules/_index_.html">&quot;index&quot;</a>
 					</li>
 					<li class="label tsd-is-external">
 						<span>Externals</span>
 					</li>
-					<li class=" tsd-kind-external-module tsd-is-external">
+					<li class=" tsd-kind-module tsd-is-external">
 						<a href="modules/_events_comments_reducers_.html">&quot;events-<wbr>comments-<wbr>reducers&quot;</a>
 					</li>
 				</ul>
@@ -150,57 +156,18 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
 				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
-				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>
@@ -210,6 +177,5 @@
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

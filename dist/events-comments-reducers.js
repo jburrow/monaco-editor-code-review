@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid = require("uuid/v4");
+exports.reduceComments = exports.ReviewCommentStatus = exports.ReviewCommentRenderState = exports.ReviewCommentState = exports.commentReducer = void 0;
+const uuid = require("uuid");
 function commentReducer(event, state) {
     const dirtyLineNumbers = new Set();
     const deletedCommentIds = new Set();
@@ -13,7 +14,7 @@ function commentReducer(event, state) {
                 break;
             const edit = {
                 comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text }),
-                history: parent.history.concat(parent.comment)
+                history: parent.history.concat(parent.comment),
             };
             dirtyLineNumbers.add(edit.comment.lineNumber);
             console.debug("edit", event);
@@ -38,7 +39,7 @@ function commentReducer(event, state) {
                     selection: event.selection,
                     text: event.text,
                     parentId: event.targetId,
-                    status: ReviewCommentStatus.active
+                    status: ReviewCommentStatus.active,
                 });
                 console.debug("insert", event);
                 dirtyLineNumbers.add(event.lineNumber);
@@ -78,7 +79,7 @@ function reduceComments(actions, state = null) {
     state = state || { comments: {} };
     for (const a of actions) {
         if (!a.id) {
-            a.id = uuid();
+            a.id = uuid.v4();
         }
         state = commentReducer(a, state);
     }

@@ -10,7 +10,7 @@ import {
   ReviewComment,
   ReviewCommentRenderState,
 } from "./events-comments-reducers";
-import * as uuid from "uuid/v4";
+import * as uuid from "uuid";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
 
 interface MonacoWindow {
@@ -709,7 +709,7 @@ export class ReviewManager {
   private addEvent(event: ReviewCommentEvent) {
     event.createdBy = this.currentUser;
     event.createdAt = this.getDateTimeNow();
-    event.id = uuid();
+    event.id = uuid.v4();
 
     this.events.push(event);
     this.store = commentReducer(event, this.store);

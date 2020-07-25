@@ -1,4 +1,4 @@
-import * as uuid from "uuid/v4";
+import * as uuid from "uuid";
 
 export type CommonFields = {
   id?: string;
@@ -40,9 +40,9 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
           ...parent.comment,
           author: event.createdBy,
           dt: event.createdAt,
-          text: event.text
+          text: event.text,
         },
-        history: parent.history.concat(parent.comment)
+        history: parent.history.concat(parent.comment),
       };
 
       dirtyLineNumbers.add(edit.comment.lineNumber);
@@ -72,7 +72,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
           selection: event.selection,
           text: event.text,
           parentId: event.targetId,
-          status: ReviewCommentStatus.active
+          status: ReviewCommentStatus.active,
         });
         console.debug("insert", event);
         dirtyLineNumbers.add(event.lineNumber);
@@ -104,7 +104,7 @@ export class ReviewCommentState {
 export enum ReviewCommentRenderState {
   dirty = 1,
   hidden = 2,
-  normal = 3
+  normal = 3,
 }
 
 export interface CodeSelection {
@@ -128,7 +128,7 @@ export interface ReviewComment {
 export enum ReviewCommentStatus {
   active = 1,
   deleted = 2,
-  edit = 3
+  edit = 3,
 }
 
 export function reduceComments(
@@ -139,7 +139,7 @@ export function reduceComments(
 
   for (const a of actions) {
     if (!a.id) {
-      a.id = uuid();
+      a.id = uuid.v4();
     }
     state = commentReducer(a, state);
   }
