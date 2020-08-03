@@ -405,9 +405,8 @@ class ReviewManager {
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
     setEditorMode(mode, why = null) {
-        console.log("setEditorMode", why);
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-        console.warn("setEditorMode", EditorMode[mode], "Comment:", this.activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
+        console.log("setEditorMode", EditorMode[mode], why, "Comment:", this.activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
         this.layoutInlineToolbar();
         this.layoutInlineCommentEditor();
         if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
