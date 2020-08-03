@@ -620,11 +620,11 @@ export class ReviewManager {
   }
 
   setEditorMode(mode: EditorMode, why: string = null) {
-    console.log("setEditorMode", why);
     this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-    console.warn(
+    console.log(
       "setEditorMode",
       EditorMode[mode],
+      why,
       "Comment:",
       this.activeComment,
       "ReadOnly:",
