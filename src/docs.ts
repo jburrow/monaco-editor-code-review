@@ -156,6 +156,8 @@ async function init() {
 
   win.require(["vs/editor/editor.main"], function () {
     setView("editor-mode", "", "vs-dark", fooUser, false, false);
+
+    window.dispatchEvent(new Event("monaco-ready"));
   });
 }
 

@@ -61,8 +61,8 @@
 
   <div class="buttons alert alert-light">
     Editor Mode:<select id="option_editor_mode">
-      <option>editor-mode</option>
       <option>diff-mode</option>
+      <option>editor-mode</option>
     </select>
     Diff Mode:<select id="option_diff_mode">
       <option>side-by-side</option>
@@ -80,12 +80,7 @@
     <input id="option_editor_readonly" type="checkbox"></input>Editor Readonly
     <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()"></input>Comments
     Readonly
-    <button onclick="setView( document.getElementById('option_editor_mode').value,
-                                document.getElementById('option_diff_mode').value,
-                                document.getElementById('option_theme').value,
-                                document.getElementById('option_current_user').value,
-                                document.getElementById('option_editor_readonly').checked,
-                                document.getElementById('option_comments_readonly').checked)"
+    <button onclick="updateSettings()"
       class="btn btn-primary">Update Editor</button>
     <button onclick="clearComments()" class="btn btn-secondary">
       Clear Comments
@@ -102,3 +97,17 @@
 </html>
 
 <script type="module" src="../dist/docs-commonjs-es5.js"></script>
+<script>
+  function updateSettings(){
+   window.setView( document.getElementById('option_editor_mode').value,
+                                 document.getElementById('option_diff_mode').value,
+                                 document.getElementById('option_theme').value,
+                                 document.getElementById('option_current_user').value,
+                                 document.getElementById('option_editor_readonly').checked,
+                                 document.getElementById('option_comments_readonly').checked);
+                                }
+
+   window.addEventListener('monaco-ready',updateSettings);
+
+
+</script>
