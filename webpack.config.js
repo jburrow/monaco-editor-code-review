@@ -10,11 +10,9 @@ const baseConfig = (mode, target) => {
     mode,
     devtool: "source-map",
     devServer: {
-      publicPath: "/dist/"
+      publicPath: "/dist/",
     },
-    plugins: [
-
-    ],
+    plugins: [],
     module: {
       rules: [
         {
@@ -24,63 +22,58 @@ const baseConfig = (mode, target) => {
           options: {
             experimentalWatchApi: true,
             compilerOptions: {
-              target
-            }
-          }
-        }
-      ]
+              target,
+            },
+          },
+        },
+      ],
     },
     externals: {
-      "monaco-editor": "monaco"
+      "monaco-editor": "monaco",
     },
     resolve: {
-      extensions: [".tsx", ".ts", ".js"]
-    },
-    output: {
-      filename: "[name].js",
-      path: path.join(__dirname, "dist"),
-      pathinfo: false
+      extensions: [".tsx", ".ts", ".js"],
     },
     optimization: {
       removeAvailableModules: false,
       removeEmptyChunks: false,
-      splitChunks: false
-    }
+      splitChunks: false,
+    },
   };
 };
 
 function getConfigs(mode) {
-  const ext = mode === 'production' ? 'min.js' : 'js';
+  const ext = mode === "production" ? "min.js" : "js";
   const var_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
       filename: "[name]-var-es2017." + ext,
       path: path.join(__dirname, "dist"),
       libraryTarget: "var",
-      library: "MonacoEditorCodeReview"
+      library: "MonacoEditorCodeReview",
     },
     plugins: [
       new TimestampWebpackPlugin({
         path: path.join(__dirname, "dist"),
-        filename: "timestamp.json"
-      })
-    ]
+        filename: "timestamp.json",
+      }),
+    ],
   };
 
   const common_es5 = {
     ...baseConfig(mode, "es5"),
     output: {
       filename: "[name]-commonjs-es5." + ext,
-      path: path.join(__dirname, "dist")
-    }
+      path: path.join(__dirname, "dist"),
+    },
   };
 
   const common_es2017 = {
     ...baseConfig(mode, "es2017"),
     output: {
       filename: "[name]-commonjs-es2017." + ext,
-      path: path.join(__dirname, "dist")
-    }
+      path: path.join(__dirname, "dist"),
+    },
   };
   return [var_es2017, common_es5, common_es2017];
 }

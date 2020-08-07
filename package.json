@@ -1,12 +1,12 @@
 {
   "name": "monaco-review",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server",
-    "compile": "tsc && webpack --mode=production",
+    "compile": "tsc && webpack --mode=development",
     "tsc": "tsc",
     "doc": "typedoc --out ./docs ./src/index.ts",
     "test": "jest --coverage",
