@@ -1104,7 +1104,7 @@ class ReviewManager {
     }
     setReadOnlyMode(value) {
         this.config.readOnly = value;
-        this.canAddCondition.set(value);
+        this.canAddCondition.set(!value);
         this.renderAddCommentLineDecoration(null);
     }
     load(events) {

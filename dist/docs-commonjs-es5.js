@@ -22663,7 +22663,7 @@ var ReviewManager = /** @class */ (function () {
     }
     ReviewManager.prototype.setReadOnlyMode = function (value) {
         this.config.readOnly = value;
-        this.canAddCondition.set(value);
+        this.canAddCondition.set(!value);
         this.renderAddCommentLineDecoration(null);
     };
     ReviewManager.prototype.load = function (events) {

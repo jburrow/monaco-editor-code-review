@@ -193,7 +193,7 @@ export class ReviewManager {
 
   setReadOnlyMode(value: boolean) {
     this.config.readOnly = value;
-    this.canAddCondition.set(value);
+    this.canAddCondition.set(!value);
     this.renderAddCommentLineDecoration(null);
   }
 
