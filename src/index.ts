@@ -239,7 +239,7 @@ export class ReviewManager {
     // editor.selectionHighlightBackground: e {rgba: e}
     // editorIndentGuide.activeBackground: e {rgba: e}
     // editorIndentGuide.background: e {rgba: e}
-    const theme = (this.editor as any)._themeService.getTheme();
+    const theme = (this.editor as any)._themeService._theme;
     let value = theme.getColor(name);
 
     // HACK - Buttons themes are not in monaco ... so just hack in theme for dark

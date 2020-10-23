@@ -1165,7 +1165,7 @@ var ReviewManager = /** @class */ (function () {
         // editor.selectionHighlightBackground: e {rgba: e}
         // editorIndentGuide.activeBackground: e {rgba: e}
         // editorIndentGuide.background: e {rgba: e}
-        var theme = this.editor._themeService.getTheme();
+        var theme = this.editor._themeService._theme;
         var value = theme.getColor(name);
         // HACK - Buttons themes are not in monaco ... so just hack in theme for dark
         var missingThemes = {
