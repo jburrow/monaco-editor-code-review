@@ -1,5 +1,4 @@
 const path = require("path");
-const TimestampWebpackPlugin = require("timestamp-webpack-plugin");
 
 const baseConfig = (mode, target) => {
   return {
@@ -11,6 +10,7 @@ const baseConfig = (mode, target) => {
     devtool: "source-map",
     devServer: {
       publicPath: "/dist/",
+      compress:true,
     },
     plugins: [],
     module: {
@@ -53,10 +53,7 @@ function getConfigs(mode) {
       library: "MonacoEditorCodeReview",
     },
     plugins: [
-      new TimestampWebpackPlugin({
-        path: path.join(__dirname, "dist"),
-        filename: "timestamp.json",
-      }),
+
     ],
   };
 
@@ -78,9 +75,9 @@ function getConfigs(mode) {
   return [var_es2017, common_es5, common_es2017];
 }
 
-module.exports = (env, argv) => {
-  if (!argv.mode || argv.mode === "development") {
-    return getConfigs("development");
+module.exports = ({ WEBPACK_SERVE }) => {
+  if (WEBPACK_SERVE) {
+    return getConfigs("development")[0];
   } else {
     return getConfigs("development").concat(getConfigs("production"));
   }

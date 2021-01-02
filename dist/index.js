@@ -106,8 +106,20 @@ class ReviewManager {
         // editor.selectionHighlightBackground: e {rgba: e}
         // editorIndentGuide.activeBackground: e {rgba: e}
         // editorIndentGuide.background: e {rgba: e}
-        const theme = this.editor._themeService._theme;
-        let value = theme.getColor(name);
+        let themeName = null;
+        let value = null;
+        let theme = null;
+        const themeService = this.editor._themeService;
+        if (themeService.getTheme) {
+            // v21
+            theme = themeService.getTheme();
+            themeName = theme.themeName;
+        }
+        else if (themeService._theme) {
+            //v20
+            theme = themeService._theme;
+        }
+        value = theme.getColor(name);
         // HACK - Buttons themes are not in monaco ... so just hack in theme for dark
         const missingThemes = {
             dark: {
@@ -121,7 +133,7 @@ class ReviewManager {
         };
         if (!value) {
             value =
-                missingThemes[theme.themeName.indexOf("dark") > -1 ? "dark" : "light"][name];
+                missingThemes[themeName.indexOf("dark") > -1 ? "dark" : "light"][name];
         }
         return value;
     }

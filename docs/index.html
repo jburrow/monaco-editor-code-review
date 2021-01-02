@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for monaco-review">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -40,8 +41,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -51,12 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<ul class="tsd-breadcrumb">
-				<li>
-					<a href="globals.html">Globals</a>
-				</li>
-			</ul>
-			<h1>monaco-review</h1>
+			<h1>Project monaco-review</h1>
 		</div>
 	</div>
 </header>
@@ -83,26 +77,28 @@
 					<li>Read the Api-Docs: <a href="https://jburrow.github.io/monaco-editor-code-review/docs/">https://jburrow.github.io/monaco-editor-code-review/docs/</a></li>
 				</ul>
 				<p>Simply add the monaco-editor-code-review/index.js to your .html page.</p>
-				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;../index.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
-				<pre><code class="language-javascript"><span class="hljs-comment">//Type: ./src/types/index.ts#ReviewManagerConfig</span>
-<span class="hljs-keyword">var</span> overriddenConfig = {};
+				<pre><code class="language-html"><span style="color: #800000">&lt;script</span><span style="color: #000000FF"> </span><span style="color: #FF0000">src</span><span style="color: #000000FF">=</span><span style="color: #0000FF">&quot;../index.js&quot;</span><span style="color: #800000">&gt;&lt;/script&gt;</span>
+</code></pre>
+				<pre><code class="language-javascript"><span style="color: #008000">//Type: ./src/types/index.ts#ReviewManagerConfig</span>
+<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">overriddenConfig</span><span style="color: #000000"> = {};</span>
 
-<span class="hljs-comment">//Type: ./src/types/index.ts#ReviewComment</span>
-<span class="hljs-keyword">var</span> existingComments = [{<span class="hljs-attr">author</span>:<span class="hljs-string">&#x27;&#x27;</span>,
-                         <span class="hljs-attr">dt</span>:<span class="hljs-string">&#x27;&#x27;</span>,
-                         <span class="hljs-attr">text</span>:<span class="hljs-string">&#x27;&#x27;</span>,
-                         <span class="hljs-attr">lineNumber</span>:<span class="hljs-number">10</span> }];
+<span style="color: #008000">//Type: ./src/types/index.ts#ReviewComment</span>
+<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">existingComments</span><span style="color: #000000"> = [{</span><span style="color: #001080">author:</span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                         </span><span style="color: #001080">dt:</span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                         </span><span style="color: #001080">text:</span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                         </span><span style="color: #001080">lineNumber:</span><span style="color: #098658">10</span><span style="color: #000000"> }];</span>
 
-<span class="hljs-keyword">var</span> editor = monaco.editor.create(<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;container&quot;</span>), {
-        <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;...some source code &#x27;</span><span class="hljs-string">&#x27;&#x27;</span>,
-        <span class="hljs-attr">language</span>: <span class="hljs-string">&quot;javascript&quot;</span>,
-        <span class="hljs-attr">contextmenu</span>: <span class="hljs-literal">true</span>
-    });
-<span class="hljs-keyword">var</span> rm = MonacoEditorCodeReview.createReviewManager(editor,
-                                                    <span class="hljs-string">&quot;name-of-current-user&quot;</span>,
-                                                    existingComments,
-                                                    <span class="hljs-function">(<span class="hljs-params">newComments</span>)=&gt;</span>{<span class="hljs-built_in">console</span>.info(newComments);},
-                                                    overriddenConfig);</code></pre>
+<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">editor</span><span style="color: #000000"> = </span><span style="color: #001080">monaco</span><span style="color: #000000">.</span><span style="color: #001080">editor</span><span style="color: #000000">.</span><span style="color: #795E26">create</span><span style="color: #000000">(</span><span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">getElementById</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;container&quot;</span><span style="color: #000000">), {</span>
+<span style="color: #000000">        </span><span style="color: #001080">value:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;...some source code &#039;&#039;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">language:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;javascript&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">contextmenu:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span>
+<span style="color: #000000">    });</span>
+<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">rm</span><span style="color: #000000"> = </span><span style="color: #001080">MonacoEditorCodeReview</span><span style="color: #000000">.</span><span style="color: #795E26">createReviewManager</span><span style="color: #000000">(</span><span style="color: #001080">editor</span><span style="color: #000000">,</span>
+<span style="color: #000000">                                                    </span><span style="color: #A31515">&quot;name-of-current-user&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                                                    </span><span style="color: #001080">existingComments</span><span style="color: #000000">,</span>
+<span style="color: #000000">                                                    (</span><span style="color: #001080">newComments</span><span style="color: #000000">)</span><span style="color: #0000FF">=&gt;</span><span style="color: #000000">{</span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">info</span><span style="color: #000000">(</span><span style="color: #001080">newComments</span><span style="color: #000000">);},</span>
+<span style="color: #000000">                                                    </span><span style="color: #001080">overriddenConfig</span><span style="color: #000000">);</span>
+</code></pre>
 				<p>Features</p>
 				<ul>
 					<li>Add comment</li>
@@ -127,25 +123,34 @@
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
-					</li>
-					<li class="label tsd-is-external">
-						<span>Internals</span>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_index_.html">&quot;index&quot;</a>
-					</li>
-					<li class="label tsd-is-external">
-						<span>Externals</span>
-					</li>
-					<li class=" tsd-kind-module tsd-is-external">
-						<a href="modules/_events_comments_reducers_.html">&quot;events-<wbr>comments-<wbr>reducers&quot;</a>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/editormode.html" class="tsd-kind-icon">Editor<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/reviewmanager.html" class="tsd-kind-icon">Review<wbr>Manager</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/reviewcommentstore.html" class="tsd-kind-icon">Review<wbr>Comment<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/reviewmanagerconfig.html" class="tsd-kind-icon">Review<wbr>Manager<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#reviewcommentevent" class="tsd-kind-icon">Review<wbr>Comment<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#createreviewmanager" class="tsd-kind-icon">create<wbr>Review<wbr>Manager</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#reducecomments" class="tsd-kind-icon">reduce<wbr>Comments</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -156,18 +161,15 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
-				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 		</div>
 	</div>
