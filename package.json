@@ -1,6 +1,6 @@
 {
   "name": "monaco-review",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,14 +14,17 @@
   },
   "author": "",
   "license": "MIT",
+  "peerDependencies":{
+    "monaco-editor": ">=0.19"
+  },
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
-    "@babel/types": "^7.12.12",
     "moment": "^2.29.1",
-    "ts-loader": "^8.0.13",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "ts-loader": "^8.0.13",
+    "@babel/runtime": "^7.12.5",
+    "@babel/types": "^7.12.12",
     "@types/jest": "^26.0.19",
     "@types/uuid": "^8.3.0",
     "coveralls": "^3.1.0",
