@@ -118,7 +118,7 @@ export declare class ReviewManager {
     layoutInlineToolbar(): void;
     layoutInlineCommentEditor(): void;
     setEditorMode(mode: EditorMode, why?: string): void;
-    getDateTimeNow(): Date;
+    getDateTimeNow(): number;
     private recurseComments;
     private iterateComments;
     removeComment(id: string): ReviewCommentEvent;

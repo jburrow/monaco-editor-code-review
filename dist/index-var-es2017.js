@@ -544,7 +544,7 @@ class ReviewManager {
         }
     }
     getDateTimeNow() {
-        return new Date();
+        return new Date().getTime();
     }
     recurseComments(allComments, filterFn, depth, results) {
         const comments = Object.values(allComments).filter(filterFn);
@@ -603,15 +603,21 @@ class ReviewManager {
         return event;
     }
     formatDate(dt) {
-        if (this.config.formatDate) {
-            return this.config.formatDate(dt);
+        if (Number.isInteger(dt)) {
+            try {
+                const d = new Date(dt);
+                if (this.config.formatDate) {
+                    return this.config.formatDate(d);
+                }
+                else {
+                    return d.toISOString();
+                }
+            }
+            catch (_a) {
+                console.warn("[formatDate] Unable to convert", dt, "to date object");
+            }
         }
-        else if (dt instanceof Date) {
-            return dt.toISOString();
-        }
-        else {
-            return dt;
-        }
+        return `${dt}`;
     }
     createElement(text, className, tagName = null) {
         const span = document.createElement(tagName || "span");

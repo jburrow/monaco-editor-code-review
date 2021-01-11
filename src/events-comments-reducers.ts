@@ -4,7 +4,7 @@ export type CommonFields = {
   id?: string;
   targetId?: string;
   createdBy?: string;
-  createdAt?: Date | string;
+  createdAt?: number;
   // script on here maybe?
 };
 
@@ -118,7 +118,7 @@ export interface ReviewComment {
   id: string;
   parentId?: string;
   author: string;
-  dt: Date | string;
+  dt: number;
   lineNumber: number;
   text: string;
   selection: CodeSelection;

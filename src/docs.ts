@@ -208,7 +208,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       id: "id-0",
       lineNumber: firstLine + 10,
       createdBy: fooUser,
-      createdAt: "2019-01-01T00:00:00.000",
+      createdAt: new Date().getTime(),
       text: "Near the start",
       selection: {
         startColumn: 5,
@@ -222,7 +222,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       targetId: "id-2",
       type: "edit",
       createdBy: fooUser,
-      createdAt: "2019-06-01T00:00:00.000Z",
+      createdAt: new Date().getTime(),
       text: "EDIT EDIT at start",
     },
     {
@@ -230,7 +230,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       type: "create",
       lineNumber: firstLine + 5,
       createdBy: fooUser,
-      createdAt: "2019-06-01T00:00:00.000Z",
+      createdAt: new Date().getTime(),
       text: "at start",
     },
     {
@@ -239,7 +239,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       targetId: "id-1",
       lineNumber: firstLine + 5,
       createdBy: fooUser,
-      createdAt: "2019-12-01T00:00:00.000Z",
+      createdAt: new Date().getTime(),
       text: "this code isn't very good",
     },
     {
@@ -248,7 +248,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       targetId: "id-2",
       lineNumber: firstLine + 5,
       createdBy: barUser,
-      createdAt: "2019-06-01T00:00:00.000Z",
+      createdAt: new Date().getTime(),
       text: "I think you will find it is good enough",
     },
     {
@@ -256,7 +256,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       type: "create",
       lineNumber: firstLine + 5,
       createdBy: barUser,
-      createdAt: new Date(),
+      createdAt: new Date().getTime(),
       text: "I think you will find it is good enough",
     },
     {
@@ -264,7 +264,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       type: "create",
       lineNumber: firstLine + 5,
       createdBy: barUser,
-      createdAt: new Date(),
+      createdAt: new Date().getTime(),
       text: "I think you will find it is good enough",
     },
   ];

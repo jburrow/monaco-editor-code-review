@@ -14,7 +14,7 @@ monacoWindow.monaco = {
   KeyMod: { CtrlCmd: 0 },
   KeyCode: { F10: 1 },
   Range,
-  editor: { ContentWidgetPositionPreference: { BELOW: "BELOW" } }
+  editor: { ContentWidgetPositionPreference: { BELOW: "BELOW" } },
 };
 
 function getMockEditor() {
@@ -23,8 +23,8 @@ function getMockEditor() {
     _zones: {},
     _actions: [],
     focus: () => null,
-    addAction: action => editor._actions.push(action),
-    createContextKey: name => {
+    addAction: (action) => editor._actions.push(action),
+    createContextKey: (name) => {
       return { set: () => null };
     },
     getRawOptions: () => ({ lineHeight: 19 }),
@@ -33,26 +33,26 @@ function getMockEditor() {
       startColumn: 1,
       endLineNumber: 18,
       endColumn: 19,
-      selectionStartLineNumber: 15
+      selectionStartLineNumber: 15,
     }),
     addContentWidget: () => null,
     onMouseDown: () => null,
     onMouseMove: () => null,
-    onDidChangeConfiguration: cb => null,
+    onDidChangeConfiguration: (cb) => null,
     revealLineInCenter: () => null,
     deltaDecorations: () => null,
-    changeViewZones: cb =>
+    changeViewZones: (cb) =>
       cb({
-        removeZone: zoneId => {
+        removeZone: (zoneId) => {
           // console.debug('deleted zone', zoneId);
           delete editor._zones[zoneId];
         },
-        addZone: zone => {
+        addZone: (zone) => {
           const zoneId = editor._zoneId++;
           editor._zones[zoneId] = zone;
           // console.debug('created', zoneId, zone.domNode.className);
           return zoneId;
-        }
+        },
       }),
     layoutContentWidget: () => null,
     getPosition: () => {
@@ -62,10 +62,10 @@ function getMockEditor() {
       getTheme: () => {
         return {
           themeName: "",
-          getColor: () => ""
+          getColor: () => "",
         };
-      }
-    }
+      },
+    },
   };
 
   return editor;
@@ -73,15 +73,15 @@ function getMockEditor() {
 
 test("Widget Coverage", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(editor, "current.user", [], comments => {});
+  const rm = createReviewManager(editor, "current.user", [], (comments) => {});
   rm.activeComment = {
     selection: undefined,
     status: 1,
     id: "id.1",
     author: "",
-    dt: "",
+    dt: 0,
     text: "",
-    lineNumber: 1
+    lineNumber: 1,
   };
   rm.widgetInlineToolbar.getId();
   rm.widgetInlineToolbar.getPosition();
@@ -93,7 +93,7 @@ test("Widget Coverage", () => {
   rm.activeComment = null;
   rm.widgetInlineCommentEditor.getPosition();
 
-  editor._actions.map(action => action.run());
+  editor._actions.map((action) => action.run());
 });
 
 test("createReviewManager to editor and add comments", () => {
@@ -102,15 +102,15 @@ test("createReviewManager to editor and add comments", () => {
     type: "create",
     lineNumber: 1,
     createdBy: "author",
-    createdAt: new Date("2019-01-01"),
-    text: "#1"
+    createdAt: new Date("2019-01-01").getTime(),
+    text: "#1",
   };
 
   const rm = createReviewManager(
     editor,
     "current.user",
     [comment],
-    comments => {}
+    (comments) => {}
   );
 
   expect(Object.keys(editor._zones).length).toBe(1);
@@ -142,15 +142,15 @@ test("load clears the comments", () => {
     type: "create",
     lineNumber: 1,
     createdBy: "author",
-    createdAt: new Date("2019-01-01"),
-    text: "#1"
+    createdAt: new Date("2019-01-01").getTime(),
+    text: "#1",
   };
 
   const rm = createReviewManager(
     editor,
     "current.user",
     [comment],
-    comments => {}
+    (comments) => {}
   );
   rm.load([]);
   expect(Object.keys(editor._zones).length).toBe(0);
@@ -180,8 +180,8 @@ test("Remove a comment via the widgets", () => {
   rm.handleMouseDown({
     target: {
       element: { className: "", hasAttribute: () => false },
-      detail: { viewZoneId }
-    }
+      detail: { viewZoneId },
+    },
   });
   expect(rm.activeComment.id).toBe(comment.id);
   //TODO - expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber);
@@ -198,7 +198,7 @@ test("Remove a comment via the widgets", () => {
 });
 
 test("Toggling read-only comments", () => {
-  const now = () => new Date("2010-01-01");
+  const now = () => new Date("2010-01-01").getTime();
   const editor = getMockEditor();
   const rm = createReviewManager(editor, "current.user", [
     {
@@ -207,8 +207,8 @@ test("Toggling read-only comments", () => {
       createdBy: "original.author",
       createdAt: now(),
       lineNumber: 1,
-      text: "text"
-    }
+      text: "text",
+    },
   ]);
   rm.getDateTimeNow = now;
 
@@ -225,7 +225,7 @@ test("Toggling read-only comments", () => {
 });
 
 test("Edited Comments", () => {
-  const now = () => new Date("2010-01-01");
+  const now = () => new Date("2010-01-01").getTime();
   const editor = getMockEditor();
   const rm = createReviewManager(editor, "current.user", [
     {
@@ -234,8 +234,8 @@ test("Edited Comments", () => {
       createdBy: "original.author",
       createdAt: now(),
       lineNumber: 1,
-      text: "text"
-    }
+      text: "text",
+    },
   ]);
   rm.getDateTimeNow = now;
 
@@ -253,7 +253,7 @@ test("Edited Comments", () => {
     id: comment.id,
     lineNumber: comment.lineNumber,
     text: "editted", //Copied from edit
-    parentId: undefined
+    parentId: undefined,
   };
 
   const comments = Object.values(rm.store.comments);
@@ -274,7 +274,7 @@ test("Enter Comment Widgets", () => {
   rm.handleTextAreaKeyDown(({
     code: "Escape",
     ctrlKey: false,
-    preventDefault: () => null
+    preventDefault: () => null,
   } as any) as KeyboardEvent);
   expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 
@@ -287,7 +287,7 @@ test("Enter Comment Widgets", () => {
   rm.handleTextAreaKeyDown(({
     code: "Enter",
     ctrlKey: true,
-    preventDefault: () => null
+    preventDefault: () => null,
   } as any) as KeyboardEvent);
   expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 

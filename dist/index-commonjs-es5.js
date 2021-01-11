@@ -586,7 +586,7 @@ var ReviewManager = /** @class */ (function () {
         }
     };
     ReviewManager.prototype.getDateTimeNow = function () {
-        return new Date();
+        return new Date().getTime();
     };
     ReviewManager.prototype.recurseComments = function (allComments, filterFn, depth, results) {
         var comments = Object.values(allComments).filter(filterFn);
@@ -650,15 +650,21 @@ var ReviewManager = /** @class */ (function () {
         return event;
     };
     ReviewManager.prototype.formatDate = function (dt) {
-        if (this.config.formatDate) {
-            return this.config.formatDate(dt);
+        if (Number.isInteger(dt)) {
+            try {
+                var d = new Date(dt);
+                if (this.config.formatDate) {
+                    return this.config.formatDate(d);
+                }
+                else {
+                    return d.toISOString();
+                }
+            }
+            catch (_a) {
+                console.warn("[formatDate] Unable to convert", dt, "to date object");
+            }
         }
-        else if (dt instanceof Date) {
-            return dt.toISOString();
-        }
-        else {
-            return dt;
-        }
+        return "" + dt;
     };
     ReviewManager.prototype.createElement = function (text, className, tagName) {
         if (tagName === void 0) { tagName = null; }

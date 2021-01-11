@@ -21575,7 +21575,7 @@ function createRandomComments() {
             id: "id-0",
             lineNumber: firstLine + 10,
             createdBy: fooUser,
-            createdAt: "2019-01-01T00:00:00.000",
+            createdAt: new Date().getTime(),
             text: "Near the start",
             selection: {
                 startColumn: 5,
@@ -21589,7 +21589,7 @@ function createRandomComments() {
             targetId: "id-2",
             type: "edit",
             createdBy: fooUser,
-            createdAt: "2019-06-01T00:00:00.000Z",
+            createdAt: new Date().getTime(),
             text: "EDIT EDIT at start",
         },
         {
@@ -21597,7 +21597,7 @@ function createRandomComments() {
             type: "create",
             lineNumber: firstLine + 5,
             createdBy: fooUser,
-            createdAt: "2019-06-01T00:00:00.000Z",
+            createdAt: new Date().getTime(),
             text: "at start",
         },
         {
@@ -21606,7 +21606,7 @@ function createRandomComments() {
             targetId: "id-1",
             lineNumber: firstLine + 5,
             createdBy: fooUser,
-            createdAt: "2019-12-01T00:00:00.000Z",
+            createdAt: new Date().getTime(),
             text: "this code isn't very good",
         },
         {
@@ -21615,7 +21615,7 @@ function createRandomComments() {
             targetId: "id-2",
             lineNumber: firstLine + 5,
             createdBy: barUser,
-            createdAt: "2019-06-01T00:00:00.000Z",
+            createdAt: new Date().getTime(),
             text: "I think you will find it is good enough",
         },
         {
@@ -21623,7 +21623,7 @@ function createRandomComments() {
             type: "create",
             lineNumber: firstLine + 5,
             createdBy: barUser,
-            createdAt: new Date(),
+            createdAt: new Date().getTime(),
             text: "I think you will find it is good enough",
         },
         {
@@ -21631,7 +21631,7 @@ function createRandomComments() {
             type: "create",
             lineNumber: firstLine + 5,
             createdBy: barUser,
-            createdAt: new Date(),
+            createdAt: new Date().getTime(),
             text: "I think you will find it is good enough",
         },
     ];
@@ -22229,7 +22229,7 @@ class ReviewManager {
         }
     }
     getDateTimeNow() {
-        return new Date();
+        return new Date().getTime();
     }
     recurseComments(allComments, filterFn, depth, results) {
         const comments = Object.values(allComments).filter(filterFn);
@@ -22288,15 +22288,21 @@ class ReviewManager {
         return event;
     }
     formatDate(dt) {
-        if (this.config.formatDate) {
-            return this.config.formatDate(dt);
+        if (Number.isInteger(dt)) {
+            try {
+                const d = new Date(dt);
+                if (this.config.formatDate) {
+                    return this.config.formatDate(d);
+                }
+                else {
+                    return d.toISOString();
+                }
+            }
+            catch (_a) {
+                console.warn("[formatDate] Unable to convert", dt, "to date object");
+            }
         }
-        else if (dt instanceof Date) {
-            return dt.toISOString();
-        }
-        else {
-            return dt;
-        }
+        return `${dt}`;
     }
     createElement(text, className, tagName = null) {
         const span = document.createElement(tagName || "span");

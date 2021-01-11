@@ -11,6 +11,7 @@ import {
   ReviewCommentRenderState,
 } from "./events-comments-reducers";
 import * as uuid from "uuid";
+import { numberLiteral } from "@babel/types";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
 
 interface MonacoWindow {
@@ -660,8 +661,8 @@ export class ReviewManager {
     }
   }
 
-  getDateTimeNow() {
-    return new Date();
+  getDateTimeNow(): number {
+    return new Date().getTime();
   }
 
   private recurseComments(
@@ -744,14 +745,20 @@ export class ReviewManager {
     return event;
   }
 
-  private formatDate(dt: Date | string) {
-    if (this.config.formatDate) {
-      return this.config.formatDate(dt);
-    } else if (dt instanceof Date) {
-      return dt.toISOString();
-    } else {
-      return dt;
+  private formatDate(dt: number) {
+    if (Number.isInteger(dt)) {
+      try {
+        const d = new Date(dt);
+        if (this.config.formatDate) {
+          return this.config.formatDate(d);
+        } else {
+          return d.toISOString();
+        }
+      } catch {
+        console.warn("[formatDate] Unable to convert", dt, "to date object");
+      }
     }
+    return `${dt}`;
   }
 
   private createElement(
