@@ -6,7 +6,7 @@
 ![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true)
 
 Lightweight extension (31KiB) for monaco-editor to allow commenting off code.
-This module has 1 explicit run-time dependencies (uuid). There is an implicit dependency on monaco-editor.
+This module has 2 explicit dependencies (uuid + moment). There is an peer-dependency dependency on monaco-editor.
 
 For a working examplple of all the features and the behaviours
 
