@@ -131,10 +131,7 @@ export enum ReviewCommentStatus {
   edit = 3,
 }
 
-export function reduceComments(
-  actions: ReviewCommentEvent[],
-  state: CommentState = null
-) {
+export function reduceComments(actions: ReviewCommentEvent[], state: CommentState = null) {
   state = state || { comments: {} };
 
   for (const a of actions) {

@@ -31,9 +31,7 @@ const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
   return new Promise((resolve) => {
     if (!win.require) {
-      console.warn(
-        "Unable to find a local node_modules folder - so dynamically using cdn instead"
-      );
+      console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
       var prefix = "https://microsoft.github.io/monaco-editor";
       const scriptTag = document.createElement("script");
       scriptTag.src = prefix + "/node_modules/monaco-editor/min/vs/loader.js";
@@ -66,40 +64,28 @@ function setView(
   // currentMode = mode;
   document.getElementById("containerEditor").innerHTML = "";
   if (editorMode == "editor-mode") {
-    currentEditor = win.monaco.editor.create(
-      document.getElementById("containerEditor"),
-      {
-        value: exampleSourceCode[idx],
-        language: "typescript",
-        glyphMargin: true,
-        contextmenu: true,
-        automaticLayout: true,
-        readOnly: editorReadonly,
-        theme: theme,
-      }
-    );
+    currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
+      value: exampleSourceCode[idx],
+      language: "typescript",
+      glyphMargin: true,
+      contextmenu: true,
+      automaticLayout: true,
+      readOnly: editorReadonly,
+      theme: theme,
+    });
     initReviewManager(currentEditor, currentUser, commentsReadonly);
   } else {
-    var originalModel = win.monaco.editor.createModel(
-      exampleSourceCode[idx],
-      "typescript"
-    );
-    var modifiedModel = win.monaco.editor.createModel(
-      exampleSourceCode[idx + 1],
-      "typescript"
-    );
+    var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
+    var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
 
-    const e = win.monaco.editor.createDiffEditor(
-      document.getElementById("containerEditor"),
-      {
-        renderSideBySide: diffMode !== "inline-diff",
-        theme: theme,
-        readOnly: editorReadonly,
-        glyphMargin: true,
-        contextmenu: true,
-        automaticLayout: true,
-      }
-    );
+    const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
+      renderSideBySide: diffMode !== "inline-diff",
+      theme: theme,
+      readOnly: editorReadonly,
+      glyphMargin: true,
+      contextmenu: true,
+      automaticLayout: true,
+    });
     e.setModel({
       original: originalModel,
       modified: modifiedModel,
@@ -128,10 +114,7 @@ async function fetchSourceCode(url: string) {
   const response = await fetch(url);
   const exampleText = await response.text();
 
-  const modifiedText = exampleText.replace(
-    new RegExp("string", "g"),
-    "string /* String!*/"
-  );
+  const modifiedText = exampleText.replace(new RegExp("string", "g"), "string /* String!*/");
 
   const longLines =
     "A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text \nA very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text ";
@@ -161,11 +144,7 @@ async function init() {
   });
 }
 
-function initReviewManager(
-  editor: any,
-  currentUser: string,
-  readOnly: boolean
-) {
+function initReviewManager(editor: any, currentUser: string, readOnly: boolean) {
   reviewManager = createReviewManager(
     editor,
     currentUser,
@@ -173,8 +152,7 @@ function initReviewManager(
     (updatedComments) => renderComments(updatedComments),
     {
       editButtonEnableRemove: true,
-      formatDate: (createdAt: Date | string) =>
-        moment(createdAt).format("YY-MM-DD HH:mm"),
+      formatDate: (createdAt: Date | string) => moment(createdAt).format("YY-MM-DD HH:mm"),
       readOnly: readOnly,
     }
   );
@@ -286,34 +264,26 @@ function renderComments(events: ReviewCommentEvent[]) {
                     <td>${comment.createdAt}</td>                     
                     </tr>
                     <tr>
-                    <td colspan="4" class="comment_text">${
-                      JSON.stringify(comment) || "&nbsp;"
-                    }</td>                    
+                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || "&nbsp;"}</td>                    
                 </tr>`;
       })
       .join("") +
     "</table>";
 
-  const activeComments = Object.values(reviewManager.store.comments).map(
-    (cs) => cs.comment
-  );
+  const activeComments = Object.values(reviewManager.store.comments).map((cs) => cs.comment);
   const activeHtml =
     "<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>" +
     activeComments
       .map(
         (comment) =>
           `<tr>
-                    <td>${
-                      comment.id || "&nbsp;"
-                    }</td>                                     
+                    <td>${comment.id || "&nbsp;"}</td>                                     
                     <td>${comment.lineNumber}</td>
                     <td>${comment.author}</td> 
                     <td>${comment.dt}</td> 
                 </tr>
                 <tr>
-                    <td colspan="4" class="comment_text">${
-                      comment.text
-                    }</td>                                        
+                    <td colspan="4" class="comment_text">${comment.text}</td>                                        
                 </tr>`
       )
       .join("") +

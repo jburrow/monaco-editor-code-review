@@ -106,12 +106,7 @@ test("createReviewManager to editor and add comments", () => {
     text: "#1",
   };
 
-  const rm = createReviewManager(
-    editor,
-    "current.user",
-    [comment],
-    (comments) => {}
-  );
+  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
 
   expect(Object.keys(editor._zones).length).toBe(1);
   expect(rm.activeComment).toBe(null);
@@ -146,12 +141,7 @@ test("load clears the comments", () => {
     text: "#1",
   };
 
-  const rm = createReviewManager(
-    editor,
-    "current.user",
-    [comment],
-    (comments) => {}
-  );
+  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
   rm.load([]);
   expect(Object.keys(editor._zones).length).toBe(0);
   expect(Object.keys(rm.store.comments).length).toBe(0);
@@ -159,14 +149,7 @@ test("load clears the comments", () => {
 
 test("Remove a comment via the widgets", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(
-    editor,
-    "current.user",
-    null,
-    null,
-    null,
-    true
-  );
+  const rm = createReviewManager(editor, "current.user", null, null, null, true);
 
   expect(rm.activeComment).toBe(null);
   expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
