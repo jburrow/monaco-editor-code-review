@@ -240,8 +240,7 @@ class ReviewManager {
             },
         };
         if (!value) {
-            value =
-                missingThemes[themeName.indexOf("dark") > -1 ? "dark" : "light"][name];
+            value = missingThemes[themeName.indexOf("dark") > -1 ? "dark" : "light"][name];
         }
         return value;
     }
@@ -287,13 +286,9 @@ class ReviewManager {
         this.editor.focus();
     }
     handleAddComment() {
-        const lineNumber = this.activeComment
-            ? this.activeComment.lineNumber
-            : this.editor.getSelection().endLineNumber;
+        const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
         const text = this.editorElements.textarea.value;
-        const selection = this.activeComment
-            ? null
-            : this.editor.getSelection();
+        const selection = this.activeComment ? null : this.editor.getSelection();
         this.addComment(lineNumber, text, selection);
         this.setEditorMode(EditorMode.toolbar, "add-comment-1");
         this.editor.focus();
@@ -349,9 +344,7 @@ class ReviewManager {
                 return buttonsElement.root;
             },
             getPosition: () => {
-                if (this_.activeComment &&
-                    this_.editorMode == EditorMode.toolbar &&
-                    !this_.config.readOnly) {
+                if (this_.activeComment && this_.editorMode == EditorMode.toolbar && !this_.config.readOnly) {
                     return {
                         position: {
                             lineNumber: this_.activeComment.lineNumber,
@@ -374,18 +367,14 @@ class ReviewManager {
                 return "widgetInlineEditor";
             },
             getDomNode: () => {
-                console.log("getDomNode");
                 return editorElement.root;
             },
             getPosition: () => {
-                if (this.editorMode == EditorMode.insertComment ||
-                    this.editorMode == EditorMode.editComment) {
+                if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
                     const position = this.editor.getPosition();
                     return {
                         position: {
-                            lineNumber: this.activeComment
-                                ? this.activeComment.lineNumber
-                                : position.lineNumber + 1,
+                            lineNumber: this.activeComment ? this.activeComment.lineNumber : position.lineNumber + 1,
                             column: position.column,
                         },
                         preference: [POSITION_EXACT],
@@ -399,8 +388,7 @@ class ReviewManager {
     setActiveComment(comment) {
         this.verbose && console.debug("setActiveComment", comment);
         const lineNumbersToMakeDirty = [];
-        if (this.activeComment &&
-            (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
+        if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
             lineNumbersToMakeDirty.push(this.activeComment.lineNumber);
         }
         if (comment) {
@@ -409,8 +397,7 @@ class ReviewManager {
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
             this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-                this.renderStore[comment.id].renderStatus =
-                    events_comments_reducers_1.ReviewCommentRenderState.dirty;
+                this.renderStore[comment.id].renderStatus = events_comments_reducers_1.ReviewCommentRenderState.dirty;
             });
         }
     }
@@ -424,9 +411,7 @@ class ReviewManager {
     handleMouseMove(ev) {
         if (ev.target && ev.target.position && ev.target.position.lineNumber) {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
-            this.renderAddCommentLineDecoration(this.config.readOnly === true
-                ? null
-                : this.currentLineDecorationLineNumber);
+            this.renderAddCommentLineDecoration(this.config.readOnly === true ? null : this.currentLineDecorationLineNumber);
         }
     }
     renderAddCommentLineDecoration(lineNumber) {
@@ -445,8 +430,7 @@ class ReviewManager {
     }
     handleMouseDown(ev) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event
-        if (ev.target.element.className &&
-            ev.target.element.className.indexOf("activeLineMarginClass") > -1) {
+        if (ev.target.element.className && ev.target.element.className.indexOf("activeLineMarginClass") > -1) {
             this.editor.setPosition({
                 lineNumber: this.currentLineDecorationLineNumber,
                 column: 1,
@@ -476,8 +460,7 @@ class ReviewManager {
         if (this.activeComment) {
             for (var item of this.iterateComments()) {
                 if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
-                    (item.state.comment != this.activeComment ||
-                        includeActiveCommentHeight)) {
+                    (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
                     count += this.calculateNumberOfLines(item.state.comment.text);
                 }
                 if (item.state.comment == this.activeComment) {
@@ -493,15 +476,10 @@ class ReviewManager {
         this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
         this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
         if (this.inlineToolbarElements.remove) {
-            const hasChildren = this.activeComment &&
-                this.iterateComments((c) => c.comment.id === this.activeComment.id)
-                    .length > 1;
+            const hasChildren = this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment.id).length > 1;
             const isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
-            this.inlineToolbarElements.remove.style.display = hasChildren
-                ? "none"
-                : "";
-            this.inlineToolbarElements.edit.style.display =
-                hasChildren || !isSameUser ? "none" : "";
+            this.inlineToolbarElements.remove.style.display = hasChildren ? "none" : "";
+            this.inlineToolbarElements.edit.style.display = hasChildren || !isSameUser ? "none" : "";
         }
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
@@ -515,18 +493,13 @@ class ReviewManager {
             button.style.color = this.getThemedColor("button.foreground");
         });
         this.editorElements.confirm.innerText =
-            this.editorMode === EditorMode.insertComment
-                ? "Add Comment"
-                : "Edit Comment";
-        // this.editorElements.root.style.marginTop = `${this.calculateMarginTopOffset(
-        //   true
-        // )}px`;
-        console.log("layout", this.editorElements.root);
+            this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
     setEditorMode(mode, why = null) {
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-        console.log("setEditorMode", EditorMode[mode], why, "Comment:", this.activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
+        this.verbose &&
+            console.log("setEditorMode", EditorMode[mode], why, "Comment:", this.activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
         this.layoutInlineToolbar();
         this.layoutInlineCommentEditor();
         if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
@@ -534,9 +507,7 @@ class ReviewManager {
                 this.editorElements.textarea.value = "";
             }
             else if (mode == EditorMode.editComment) {
-                this.editorElements.textarea.value = this.activeComment
-                    ? this.activeComment.text
-                    : "";
+                this.editorElements.textarea.value = this.activeComment ? this.activeComment.text : "";
             }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...
             setTimeout(() => this.editorElements.textarea.focus(), 100); //TODO - make configurable
@@ -590,8 +561,7 @@ class ReviewManager {
         if (this.activeComment && !this.store.comments[this.activeComment.id]) {
             this.setActiveComment(null);
         }
-        else if (this.activeComment &&
-            this.activeComment.status === events_comments_reducers_1.ReviewCommentStatus.deleted) {
+        else if (this.activeComment && this.activeComment.status === events_comments_reducers_1.ReviewCommentStatus.deleted) {
             this.setActiveComment(null);
         }
         this.refreshComments();
@@ -641,8 +611,7 @@ class ReviewManager {
             }
             this.store.deletedCommentIds = null;
             for (const cid of Array.from(this.store.dirtyCommentIds || [])) {
-                this.getRenderState(cid).renderStatus =
-                    events_comments_reducers_1.ReviewCommentRenderState.dirty;
+                this.getRenderState(cid).renderStatus = events_comments_reducers_1.ReviewCommentRenderState.dirty;
             }
             this.store.dirtyCommentIds = null;
             for (const item of this.iterateComments()) {
@@ -660,46 +629,18 @@ class ReviewManager {
                     rs.renderStatus = events_comments_reducers_1.ReviewCommentRenderState.normal;
                 }
                 if (!lineNumbers[item.state.comment.lineNumber]) {
-                    lineNumbers[item.state.comment.lineNumber] =
-                        item.state.comment.selection;
+                    lineNumbers[item.state.comment.lineNumber] = item.state.comment.selection;
                 }
                 if (rs.viewZoneId == null) {
                     this.verbose && console.debug("Zone.Create", item.state.comment.id);
                     const isActive = this.activeComment == item.state.comment;
-                    const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
-                    domNode.style.marginLeft =
-                        this.config.commentIndent * (item.depth + 1) +
-                            this.config.commentIndentOffset +
-                            "px";
-                    domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
-                    // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
-                    domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
-                    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
-                    if (item.state.history.length > 1) {
-                        domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history"));
-                    }
-                    domNode.appendChild(this.createElement(`${item.state.comment.text}`, "reviewComment text", "div"));
-                    //todo jxb fixme
-                    //   function getTextWidth() {
-                    //     text = document.createElement("span");
-                    //     document.body.appendChild(text);
-                    //     text.style.font = "times new roman";
-                    //     text.style.fontSize = 16 + "px";
-                    //     text.style.height = 'auto';
-                    //     text.style.width = 'auto';
-                    //     text.style.position = 'absolute';
-                    //     text.style.whiteSpace = 'no-wrap';
-                    //     text.innerHTML = 'Hello World';
-                    //     width = Math.ceil(text.clientWidth);
-                    //     formattedWidth = width + "px";
-                    //     document.querySelector('.output').textContent
-                    //             = formattedWidth;
-                    //     document.body.removeChild(text);
-                    // }
+                    const domNode = this.config.renderComment
+                        ? this.config.renderComment(isActive, item)
+                        : this.renderComment(isActive, item);
                     rs.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
                         heightInLines: this.calculateNumberOfLines(item.state.comment.text),
-                        domNode: domNode,
+                        domNode,
                         suppressMouseDown: true,
                     });
                 }
@@ -731,6 +672,19 @@ class ReviewManager {
             }
         });
     }
+    renderComment(isActive, item) {
+        const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
+        domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
+        domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+        // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
+        domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
+        domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
+        if (item.state.history.length > 1) {
+            domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history"));
+        }
+        domNode.appendChild(this.createElement(`${item.state.comment.text}`, "reviewComment text", "div"));
+        return domNode;
+    }
     calculateNumberOfLines(text) {
         return text ? text.split(/\r*\n/).length + 1 : 1;
     }
@@ -738,9 +692,7 @@ class ReviewManager {
         this.editor.addAction({
             id: "my-unique-id-add",
             label: "Add Comment",
-            keybindings: [
-                monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10,
-            ],
+            keybindings: [monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10],
             precondition: "add-context-key",
             keybindingContext: null,
             contextMenuGroupId: "navigation",
@@ -752,9 +704,7 @@ class ReviewManager {
         this.editor.addAction({
             id: "my-unique-id-next",
             label: "Next Comment",
-            keybindings: [
-                monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F12,
-            ],
+            keybindings: [monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F12],
             precondition: null,
             keybindingContext: null,
             contextMenuGroupId: "navigation",
@@ -766,9 +716,7 @@ class ReviewManager {
         this.editor.addAction({
             id: "my-unique-id-prev",
             label: "Prev Comment",
-            keybindings: [
-                monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F11,
-            ],
+            keybindings: [monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F11],
             precondition: null,
             keybindingContext: null,
             contextMenuGroupId: "navigation",

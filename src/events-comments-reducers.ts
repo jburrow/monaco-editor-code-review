@@ -6,6 +6,8 @@ export type CommonFields = {
   createdBy?: string;
   createdAt?: number;
   // script on here maybe?
+  //type:''
+  //status
 };
 
 export type ReviewCommentEvent =

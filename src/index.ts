@@ -66,6 +66,7 @@ export interface ReviewManagerConfig {
   reviewCommentIconSelect?: string;
   showInRuler?: boolean;
   verticalOffset?: number;
+  renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 
 interface ReviewManagerConfigPrivate {
@@ -84,6 +85,7 @@ interface ReviewManagerConfigPrivate {
   showAddCommentGlyph: boolean;
   showInRuler: boolean;
   verticalOffset: number;
+  renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
@@ -403,7 +405,6 @@ export class ReviewManager {
         return "widgetInlineEditor";
       },
       getDomNode: () => {
-        console.log("getDomNode");
         return editorElement.root;
       },
       getPosition: () => {
@@ -557,28 +558,24 @@ export class ReviewManager {
 
     this.editorElements.confirm.innerText =
       this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
-    // this.editorElements.root.style.marginTop = `${this.calculateMarginTopOffset(
-    //   true
-    // )}px`;
-
-    console.log("layout", this.editorElements.root);
 
     this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
   }
 
   setEditorMode(mode: EditorMode, why: string = null) {
     this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
-    console.log(
-      "setEditorMode",
-      EditorMode[mode],
-      why,
-      "Comment:",
-      this.activeComment,
-      "ReadOnly:",
-      this.config.readOnly,
-      "Result:",
-      EditorMode[this.editorMode]
-    );
+    this.verbose &&
+      console.log(
+        "setEditorMode",
+        EditorMode[mode],
+        why,
+        "Comment:",
+        this.activeComment,
+        "ReadOnly:",
+        this.config.readOnly,
+        "Result:",
+        EditorMode[this.editorMode]
+      );
 
     this.layoutInlineToolbar();
     this.layoutInlineCommentEditor();
@@ -756,46 +753,14 @@ export class ReviewManager {
 
             const isActive = this.activeComment == item.state.comment;
 
-            const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
-            domNode.style.marginLeft =
-              this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
-            domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+            const domNode = this.config.renderComment
+              ? this.config.renderComment(isActive, item)
+              : this.renderComment(isActive, item);
 
-            // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
-
-            domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
-            domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
-            if (item.state.history.length > 1) {
-              domNode.appendChild(
-                this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history")
-              );
-            }
-            domNode.appendChild(this.createElement(`${item.state.comment.text}`, "reviewComment text", "div"));
-            //todo jxb fixme
-            //   function getTextWidth() {
-
-            //     text = document.createElement("span");
-            //     document.body.appendChild(text);
-
-            //     text.style.font = "times new roman";
-            //     text.style.fontSize = 16 + "px";
-            //     text.style.height = 'auto';
-            //     text.style.width = 'auto';
-            //     text.style.position = 'absolute';
-            //     text.style.whiteSpace = 'no-wrap';
-            //     text.innerHTML = 'Hello World';
-
-            //     width = Math.ceil(text.clientWidth);
-            //     formattedWidth = width + "px";
-
-            //     document.querySelector('.output').textContent
-            //             = formattedWidth;
-            //     document.body.removeChild(text);
-            // }
             rs.viewZoneId = changeAccessor.addZone({
               afterLineNumber: item.state.comment.lineNumber,
               heightInLines: this.calculateNumberOfLines(item.state.comment.text),
-              domNode: domNode,
+              domNode,
               suppressMouseDown: true, // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
             });
           }
@@ -835,6 +800,23 @@ export class ReviewManager {
         }
       }
     );
+  }
+
+  private renderComment(isActive: boolean, item: ReviewCommentIterItem) {
+    const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
+    domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
+    domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+
+    // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
+    domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
+    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
+    if (item.state.history.length > 1) {
+      domNode.appendChild(
+        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history")
+      );
+    }
+    domNode.appendChild(this.createElement(`${item.state.comment.text}`, "reviewComment text", "div"));
+    return domNode;
   }
 
   calculateNumberOfLines(text: string): number {

@@ -1,5 +1,5 @@
 import * as monacoEditor from "monaco-editor";
-import { reduceComments, CodeSelection, CommentState as ReviewCommentStore, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
+import { reduceComments, CodeSelection, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
 declare enum NavigationDirection {
     next = 1,
@@ -11,6 +11,10 @@ export declare enum EditorMode {
     toolbar = 3
 }
 export declare function createReviewManager(editor: any, currentUser: string, actions?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
+interface ReviewCommentIterItem {
+    depth: number;
+    state: ReviewCommentState;
+}
 interface OnActionsChanged {
     (actions: ReviewCommentEvent[]): void;
 }
@@ -29,6 +33,7 @@ export interface ReviewManagerConfig {
     reviewCommentIconSelect?: string;
     showInRuler?: boolean;
     verticalOffset?: number;
+    renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 interface ReviewManagerConfigPrivate {
     commentIndent: number;
@@ -48,6 +53,7 @@ interface ReviewManagerConfigPrivate {
     showAddCommentGlyph: boolean;
     showInRuler: boolean;
     verticalOffset: number;
+    renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 interface EditorElements {
     cancel: HTMLButtonElement;
@@ -128,6 +134,7 @@ export declare class ReviewManager {
     private createElement;
     getRenderState(commentId: string): RenderStoreItem;
     refreshComments(): void;
+    private renderComment;
     calculateNumberOfLines(text: string): number;
     addActions(): void;
     navigateToComment(direction: NavigationDirection): void;
