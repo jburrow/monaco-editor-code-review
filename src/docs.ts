@@ -123,7 +123,7 @@ async function fetchSourceCode(url: string) {
 }
 
 async function init() {
-  console.log("hi!!!!");
+  console.log("[init]");
 
   var prefix = await ensureMonacoIsAvailable();
   await fetchSourceCode("../src/index.ts");
