@@ -58,7 +58,6 @@ function setView(
   editorReadonly: boolean,
   commentsReadonly: boolean
 ) {
-  console.warn(arguments);
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
   // currentMode = mode;
@@ -124,6 +123,8 @@ async function fetchSourceCode(url: string) {
 }
 
 async function init() {
+  console.log("hi!!!!");
+
   var prefix = await ensureMonacoIsAvailable();
   await fetchSourceCode("../src/index.ts");
   await fetchSourceCode("../src/docs.ts");
@@ -251,7 +252,7 @@ function createRandomComments(): ReviewCommentEvent[] {
 
 function renderComments(events: ReviewCommentEvent[]) {
   events = events || [];
-  console.log("Events #", events.length, events);
+  console.log("Events::: #", events.length, events);
 
   const rawHtml =
     "<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>" +

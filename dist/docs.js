@@ -40,7 +40,6 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 function setView(editorMode, diffMode, theme, currentUser, editorReadonly, commentsReadonly) {
-    console.warn(arguments);
     const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
     // currentMode = mode;
     document.getElementById("containerEditor").innerHTML = "";
@@ -99,6 +98,7 @@ function fetchSourceCode(url) {
 }
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("hi!!!!");
         var prefix = yield ensureMonacoIsAvailable();
         yield fetchSourceCode("../src/index.ts");
         yield fetchSourceCode("../src/docs.ts");
@@ -208,7 +208,7 @@ function createRandomComments() {
 }
 function renderComments(events) {
     events = events || [];
-    console.log("Events #", events.length, events);
+    console.log("Events::: #", events.length, events);
     const rawHtml = "<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>" +
         events
             .map((comment) => {

@@ -21476,7 +21476,6 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 function setView(editorMode, diffMode, theme, currentUser, editorReadonly, commentsReadonly) {
-    console.warn(arguments);
     const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
     // currentMode = mode;
     document.getElementById("containerEditor").innerHTML = "";
@@ -21532,6 +21531,7 @@ async function fetchSourceCode(url) {
     exampleSourceCode.push(url + "\n" + longLines + modifiedText);
 }
 async function init() {
+    console.log("hi!!!!");
     var prefix = await ensureMonacoIsAvailable();
     await fetchSourceCode("../src/index.ts");
     await fetchSourceCode("../src/docs.ts");
@@ -21640,7 +21640,7 @@ function createRandomComments() {
 }
 function renderComments(events) {
     events = events || [];
-    console.log("Events #", events.length, events);
+    console.log("Events::: #", events.length, events);
     const rawHtml = "<table><tr><td>Type</td><td>Id</td><td>Created By</td><td>Create At</td></tr>" +
         events
             .map((comment) => {
