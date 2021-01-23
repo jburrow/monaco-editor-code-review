@@ -1,5 +1,5 @@
 import { createReviewManager, ReviewManager } from "./index";
-import * as moment from "moment";
+import * as moment from "dayjs";
 import { ReviewCommentEvent } from "./events-comments-reducers";
 
 interface WindowDoc {

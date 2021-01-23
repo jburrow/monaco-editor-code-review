@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
-const moment = require("moment");
+const moment = require("dayjs");
 const win = window;
 let reviewManager = null;
 let currentMode = "";
