@@ -2,10 +2,6 @@ const path = require("path");
 
 const baseConfig = (mode) => {
   return {
-    entry: {
-      index: "./src/index.ts",
-      docs: "./src/docs.ts",
-    },
     mode,
     devtool: "source-map",
     devServer: {
@@ -52,6 +48,9 @@ function getConfigs(mode) {
       libraryTarget: "var",
       library: "MonacoEditorCodeReview",
     },
+    entry: {
+      index: "./src/index.ts",
+    },
   };
 
   const common_es2017 = {
@@ -60,13 +59,16 @@ function getConfigs(mode) {
       filename: "[name]-commonjs-es2017." + ext,
       path: path.join(__dirname, "dist"),
     },
+    entry: {
+      docs: "./src/docs.ts",
+    },
   };
   return [var_es2017, common_es2017];
 }
 
 module.exports = () => {
   // if (WEBPACK_SERVE) {
-    return getConfigs("development")[1];
+  return getConfigs("development");
   // } else {
   //   return getConfigs("development").concat(getConfigs("production"));
   // }

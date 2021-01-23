@@ -1,3 +1,4 @@
+var MonacoEditorCodeReview =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1696,4 +1697,4 @@ exports.ReviewManager = ReviewManager;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index-commonjs-es2017.js.map
+//# sourceMappingURL=index-var-es2017.js.map
