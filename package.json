@@ -8,7 +8,7 @@
     "printWidth": 120
   },
   "scripts": {
-    "start": "webpack serve",
+    "start": "webpack-dev-server",
     "compile": "tsc && webpack --mode=development",
     "tsc": "tsc",
     "doc": "typedoc --out ./docs ./src/index.ts",
@@ -24,13 +24,14 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "moment": "^2.29.1",
     "@babel/runtime": "^7.12.5",
     "@babel/types": "^7.12.12",
     "@types/jest": "^26.0.20",
     "@types/uuid": "^8.3.0",
+    "@webpack-cli/serve": "^1.2.2",
     "coveralls": "^3.1.0",
     "jest": "^26.6.3",
+    "moment": "^2.29.1",
     "monaco-editor": "^0.21.3",
     "ts-jest": "^26.4.4",
     "ts-loader": "^8.0.14",

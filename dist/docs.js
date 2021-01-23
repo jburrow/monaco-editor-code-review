@@ -98,7 +98,7 @@ function fetchSourceCode(url) {
 }
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("hi!!!!");
+        console.log("[init] 123");
         var prefix = yield ensureMonacoIsAvailable();
         yield fetchSourceCode("../src/index.ts");
         yield fetchSourceCode("../src/docs.ts");
