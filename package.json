@@ -1,6 +1,6 @@
 {
   "name": "monaco-review",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Code review extension for Monaco",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,16 +15,16 @@
     "test": "jest --coverage",
     "testpub": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
-  "author": "",
+  "author": "James Burrow",
   "license": "MIT",
   "peerDependencies": {
     "monaco-editor": ">=0.19"
   },
   "dependencies": {
-    "moment": "^2.29.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "moment": "^2.29.1",
     "@babel/runtime": "^7.12.5",
     "@babel/types": "^7.12.12",
     "@types/jest": "^26.0.20",
