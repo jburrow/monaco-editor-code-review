@@ -12,10 +12,9 @@ import {
 } from "./events-comments-reducers";
 import * as uuid from "uuid";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
-import "@vanillawc/wc-markdown";
-import { convertMarkdownToHTML } from "./comment";
 
-console.log("convertMarkdownToHTML:", convertMarkdownToHTML);
+import { convertMarkdownToHTML } from "./comment";
+import "./index.css";
 
 interface MonacoWindow {
   monaco: any;
@@ -329,11 +328,11 @@ export class ReviewManager {
     if (e.code === "Escape") {
       this.handleCancel();
       e.preventDefault();
-      console.info("preventDefault: Escape Key");
+      console.info("[handleTextAreaKeyDown] preventDefault: Escape Key");
     } else if (e.code === "Enter" && e.ctrlKey) {
       this.handleAddComment();
       e.preventDefault();
-      console.info("preventDefault: ctrl+Enter");
+      console.info("[handleTextAreaKeyDown] preventDefault: ctrl+Enter");
     }
   }
 
@@ -345,6 +344,7 @@ export class ReviewManager {
     textarea.setAttribute(CONTROL_ATTR_NAME, "");
     textarea.className = "reviewCommentEditor text";
     textarea.innerText = "";
+    textarea.rows = 2;
     textarea.style.resize = "none";
     textarea.style.width = "100%";
     textarea.name = "text";
@@ -757,9 +757,6 @@ export class ReviewManager {
           rs.viewZoneId = changeAccessor.addZone({
             afterLineNumber: item.state.comment.lineNumber,
             heightInPx: height,
-            onComputedHeight: (x) => {
-              console.log(x, height, item.state.comment.text);
-            },
             domNode,
             suppressMouseDown: true, // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
           });
@@ -804,7 +801,7 @@ export class ReviewManager {
   private renderComment(isActive: boolean, item: ReviewCommentIterItem) {
     const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
     domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
-    domNode.style.backgroundColor = "red"; //this.getThemedColor("editor.selectionHighlightBackground");
+    domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
 
     // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
     domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
@@ -816,20 +813,8 @@ export class ReviewManager {
     }
 
     const n = document.createElement("div");
+    n.className = "reviewComment text";
     n.innerHTML = convertMarkdownToHTML(item.state.comment.text);
-    domNode.appendChild(n);
-    // domNode.appendChild(this.createElement(, "reviewComment text", "div"));
-    // const n = document.createElement("wc-markdown");
-    // n.style.width = "200px";
-    // n.style.display = "inline-block";
-    // n.innerHTML = item.state.comment.text;
-
-    // // `###  Mar
-
-    // // This sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from the \`innerHTML of the\` \`<wc-markdown>\` tag
-    // // `;
-    // ////*[@id="containerEditor"]/div/div[3]/div/div[1]/div[2]/div[1]/div[3]/span[1]/wc-markdown/pre/code
-    // //document.querySelector("#containerEditor > div > div.editor.modified > div > div.overflow-guard > div.monaco-scrollable-element.editor-scrollable.vs-dark.mac")
     domNode.appendChild(n);
 
     return domNode;
