@@ -36,20 +36,20 @@
 }
 
 .reviewComment.author {
-  /* background-color: #FF3333; */
+  background-color: #FF3333;
 }
 
 .reviewComment.dt {
-  /* background-color: #FF5555; */
+  background-color: #FF5555;
 }
 
 .reviewComment.id {
-  /* background-color: #FF9999; */
+  background-color: #FF9999;
   color: black;
 }
 
 .reviewComment.history {
-  /* background-color: #FF0AAA; */
+  background-color: #FF0AAA;
   padding-left: 10px;
   font-style: italic;
 }
@@ -72,7 +72,30 @@
   text-decoration: underline;
   cursor: pointer;
 }
-
+wc-markdown{
+  display:inline-block;
+  background-color: darkslategrey;
+}
+wc-markdown p{
+  display: block;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+wc-markdown pre{
+  background-color:yellow;
+  width:100px;
+  display: inline-block;
+}
+wc-markdown pre code{
+  background-color:orange;
+  width:100px;
+  word-wrap: break-word; 
+  display: inline-block;
+  white-space: pre-wrap;
+  
+}
 /*
   .editButton.add {
   }
