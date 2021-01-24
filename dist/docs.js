@@ -103,9 +103,6 @@ function init() {
         yield fetchSourceCode("../src/index.ts");
         yield fetchSourceCode("../src/docs.ts");
         yield fetchSourceCode("../src/index.test.ts");
-        const response = yield fetch("../dist/timestamp.json");
-        const tsobj = yield response.text();
-        console.log("Compiled at:", tsobj);
         win.require.config({
             paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" },
         });
@@ -145,7 +142,7 @@ function createRandomComments() {
             lineNumber: firstLine + 10,
             createdBy: fooUser,
             createdAt: new Date().getTime(),
-            text: "Near the start",
+            text: "at start 1",
             selection: {
                 startColumn: 5,
                 startLineNumber: firstLine + 5,
@@ -167,7 +164,10 @@ function createRandomComments() {
             lineNumber: firstLine + 5,
             createdBy: fooUser,
             createdAt: new Date().getTime(),
-            text: "at start",
+            text: `###  Markdown Example
+<script>alert()</script>
+      This sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from the the \`innerHTML of the\` \`<wc-markdown>\` tag
+      `,
         },
         {
             id: "id-2",

@@ -1,4 +1,5 @@
 import { createReviewManager, ReviewManager } from "./index";
+import * as monacoEditor from "monaco-editor";
 import * as moment from "dayjs";
 import { ReviewCommentEvent } from "./events-comments-reducers";
 
@@ -130,10 +131,6 @@ async function init() {
   await fetchSourceCode("../src/docs.ts");
   await fetchSourceCode("../src/index.test.ts");
 
-  const response = await fetch("../dist/timestamp.json");
-  const tsobj = await response.text();
-  console.log("Compiled at:", tsobj);
-
   win.require.config({
     paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" },
   });
@@ -145,7 +142,7 @@ async function init() {
   });
 }
 
-function initReviewManager(editor: any, currentUser: string, readOnly: boolean) {
+function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, readOnly: boolean) {
   reviewManager = createReviewManager(
     editor,
     currentUser,
@@ -188,7 +185,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       lineNumber: firstLine + 10,
       createdBy: fooUser,
       createdAt: new Date().getTime(),
-      text: "Near the start",
+      text: "at start 1",
       selection: {
         startColumn: 5,
         startLineNumber: firstLine + 5,
@@ -210,7 +207,10 @@ function createRandomComments(): ReviewCommentEvent[] {
       lineNumber: firstLine + 5,
       createdBy: fooUser,
       createdAt: new Date().getTime(),
-      text: "at start",
+      text: `###  Markdown Example
+<script>alert()</script>
+      This sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from the the \`innerHTML of the\` \`<wc-markdown>\` tag
+      `,
     },
     {
       id: "id-2",
@@ -306,4 +306,5 @@ win.generateDifferentContents = generateDifferentContents;
 win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
+
 init();

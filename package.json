@@ -1,6 +1,6 @@
 {
   "name": "monaco-review",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "Code review extension for Monaco",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,9 +21,12 @@
     "monaco-editor": ">=0.19"
   },
   "dependencies": {
+    "showdown": "^1.9.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "css-loader": "^5.0.1",
+    "style-loader": "^2.0.0",
     "dayjs": "^1.10.4",
     "@babel/runtime": "^7.12.5",
     "@babel/types": "^7.12.12",

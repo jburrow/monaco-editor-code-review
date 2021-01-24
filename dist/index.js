@@ -4,6 +4,8 @@ exports.ReviewManager = exports.createReviewManager = exports.EditorMode = expor
 const events_comments_reducers_1 = require("./events-comments-reducers");
 Object.defineProperty(exports, "reduceComments", { enumerable: true, get: function () { return events_comments_reducers_1.reduceComments; } });
 const uuid = require("uuid");
+const comment_1 = require("./comment");
+require("./index.css");
 const monacoWindow = window;
 var NavigationDirection;
 (function (NavigationDirection) {
@@ -189,12 +191,12 @@ class ReviewManager {
         if (e.code === "Escape") {
             this.handleCancel();
             e.preventDefault();
-            console.info("preventDefault: Escape Key");
+            console.info("[handleTextAreaKeyDown] preventDefault: Escape Key");
         }
         else if (e.code === "Enter" && e.ctrlKey) {
             this.handleAddComment();
             e.preventDefault();
-            console.info("preventDefault: ctrl+Enter");
+            console.info("[handleTextAreaKeyDown] preventDefault: ctrl+Enter");
         }
     }
     createInlineEditorElement() {
@@ -204,6 +206,7 @@ class ReviewManager {
         textarea.setAttribute(CONTROL_ATTR_NAME, "");
         textarea.className = "reviewCommentEditor text";
         textarea.innerText = "";
+        textarea.rows = 2;
         textarea.style.resize = "none";
         textarea.style.width = "100%";
         textarea.name = "text";
@@ -529,9 +532,12 @@ class ReviewManager {
                     const domNode = this.config.renderComment
                         ? this.config.renderComment(isActive, item)
                         : this.renderComment(isActive, item);
+                    document.body.appendChild(domNode);
+                    const height = domNode.offsetHeight;
+                    document.body.removeChild(domNode);
                     rs.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
-                        heightInLines: this.calculateNumberOfLines(item.state.comment.text),
+                        heightInPx: height,
                         domNode,
                         suppressMouseDown: true,
                     });
@@ -568,17 +574,21 @@ class ReviewManager {
         const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
         domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
         domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
-        // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
+        // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
         domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
         domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
         if (item.state.history.length > 1) {
             domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history"));
         }
-        domNode.appendChild(this.createElement(`${item.state.comment.text}`, "reviewComment text", "div"));
+        const n = document.createElement("div");
+        n.className = "reviewComment text";
+        n.innerHTML = comment_1.convertMarkdownToHTML(item.state.comment.text);
+        domNode.appendChild(n);
         return domNode;
     }
     calculateNumberOfLines(text) {
-        return text ? text.split(/\r*\n/).length + 1 : 1;
+        return 10;
+        text ? text.split(/\r*\n/).length + 1 : 1;
     }
     addActions() {
         this.editor.addAction({

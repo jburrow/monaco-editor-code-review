@@ -1,6 +1,7 @@
 import * as monacoEditor from "monaco-editor";
 import { reduceComments, CodeSelection, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
+import "./index.css";
 declare enum NavigationDirection {
     next = 1,
     prev = 2
@@ -91,7 +92,7 @@ export declare class ReviewManager {
     verbose: boolean;
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
     renderStore: Record<string, RenderStoreItem>;
-    constructor(editor: any, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
+    constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
     setReadOnlyMode(value: boolean): void;
     load(events: ReviewCommentEvent[]): void;
     loadFromStore(store: ReviewCommentStore, events: ReviewCommentEvent[]): void;
