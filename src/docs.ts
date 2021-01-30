@@ -91,8 +91,7 @@ function setView(
       modified: modifiedModel,
     });
 
-    currentEditor = e;
-    initReviewManager(e.modifiedEditor, currentUser, commentsReadonly);
+    initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
   }
 }
 
