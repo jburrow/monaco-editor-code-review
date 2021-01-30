@@ -711,6 +711,7 @@ export class ReviewManager {
     return this.renderStore[commentId];
   }
   editId: string;
+  commentHeightCache: Record<string, number> = {};
   refreshComments() {
     this.editor.changeViewZones((changeAccessor) => {
       const lineNumbers: { [key: number]: CodeSelection } = {};
@@ -719,7 +720,6 @@ export class ReviewManager {
         if (this.editId) {
           changeAccessor.removeZone(this.editId);
         }
-        //debugger;
         const node = document.createElement("div");
         node.style.backgroundColor = "orange";
         node.innerHTML = "hello";
@@ -779,13 +779,22 @@ export class ReviewManager {
             : this.renderComment(isActive, item);
           //renderComment invoked
 
-          document.body.appendChild(domNode);
-          const height = domNode.offsetHeight;
-          document.body.removeChild(domNode);
+          const cacheKey = `${item.state.comment.id}-${item.state.history.length}`;
+          // attach to dom to calculate height
+          if (this.commentHeightCache[cacheKey] === undefined) {
+            document.body.appendChild(domNode);
+            const height = domNode.offsetHeight;
+            document.body.removeChild(domNode);
+
+            this.commentHeightCache[cacheKey] = height;
+            console.log("calculated height");
+          } else {
+            console.log("using cached height", cacheKey, this.commentHeightCache[item.state.comment.id]);
+          }
 
           rs.viewZoneId = changeAccessor.addZone({
             afterLineNumber: item.state.comment.lineNumber,
-            heightInPx: height,
+            heightInPx: this.commentHeightCache[cacheKey],
             domNode,
             suppressMouseDown: true, // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
           });
