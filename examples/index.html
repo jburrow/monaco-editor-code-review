@@ -3,17 +3,15 @@
   <head>
     <style>
       body {
-        height: calc(100% - 20px);
-        display: flex;
-        flex-direction: column;
+        height: 100%;
+        display: grid;
+
+        grid-template-rows: 50px 2fr 1fr;
         margin: 5px;
       }
 
-      .editor {
-        flex: auto;
-        overflow: hidden;
-        margin: 5px;
-        height: 400px;
+      #containerEditor {
+        grid-row: 2;
       }
 
       h5 {
@@ -22,16 +20,17 @@
         margin-top: 5px;
       }
 
-      .summary {
-        height: auto;
+      #summaryEditor {
         max-height: 300px;
-        min-height: 300px;
+        grid-row: 3;
         padding: 10px;
         overflow: auto;
         display: flex;
         flex-direction: row;
       }
-
+      #buttons {
+        grid-row: 1;
+      }
       .btn {
         margin-top: 5px;
       }
@@ -52,7 +51,7 @@
   </head>
 
   <body>
-    <div class="buttons alert alert-light">
+    <div id="buttons" class="buttons alert alert-light">
       Editor Mode:<select id="option_editor_mode">
         <option>diff-mode</option>
         <option>editor-mode</option>
@@ -74,11 +73,13 @@
       <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()" />Comments Readonly
       <button onclick="updateSettings()" class="btn btn-primary">Update Editor</button>
       <button onclick="clearComments()" class="btn btn-secondary">Clear Comments</button>
+      <button onclick="toggleSummaryView()" class btn-secondary>Toggle Summary Table</button>
+      <h5>Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment</h5>
     </div>
-    <h5>Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment</h5>
-    <div class="editor" id="containerEditor"></div>
 
-    <div class="summary" id="summaryEditor"></div>
+    <div id="containerEditor"></div>
+
+    <div id="summaryEditor"></div>
   </body>
 </html>
 

@@ -264,14 +264,48 @@ export class ReviewManager {
     return value;
   }
 
+  styles: Record<string, {}> = {
+    reviewComment: {
+      "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
+    "Courier New", monospace;`,
+    },
+    "reviewComment.dt": {},
+    "reviewComment.active": {},
+    "reviewComment.inactive": {},
+    "reviewComment.author": {},
+    "reviewComment.text": {},
+    reviewCommentEditor: {
+      padding: "5px",
+      "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
+    },
+    "reviewCommentEditor.save": { width: "150px" },
+    "reviewCommentEditor.cancel": { width: "150px" },
+    "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
+    editButtonsContainer: {},
+    "editButton.add": {},
+    "editButton.remove": {},
+    "editButton.edit": {},
+  };
+  applyStyles(element: HTMLElement, className: string) {
+    if (this.styles[className] === undefined) {
+      console.log("[CLASSNAME]", className);
+    } else {
+      if (this.styles[className]) {
+        for (const [key, value] of Object.entries(this.styles[className])) {
+          element.style[key] = value;
+        }
+      }
+    }
+  }
+
   createInlineEditButtonsElement(): InlineToolbarElements {
     var root = document.createElement("div") as HTMLDivElement;
-    root.className = "editButtonsContainer";
+    this.applyStyles(root, "editButtonsContainer");
     root.style.marginLeft = this.config.editButtonOffset;
 
     const add = document.createElement("span") as HTMLSpanElement;
     add.innerText = this.config.editButtonAddText;
-    add.className = "editButton add";
+    this.applyStyles(add, "editButton.add");
     add.setAttribute(CONTROL_ATTR_NAME, "");
     add.onclick = () => this.setEditorMode(EditorMode.insertComment, "add-comment");
     root.appendChild(add);
@@ -288,7 +322,8 @@ export class ReviewManager {
       remove = document.createElement("span") as HTMLSpanElement;
       remove.setAttribute(CONTROL_ATTR_NAME, "");
       remove.innerText = this.config.editButtonRemoveText;
-      remove.className = "editButton remove";
+      this.applyStyles(remove, "editButton.remove");
+
       remove.onclick = () => this.activeComment && this.removeComment(this.activeComment.id);
       root.appendChild(remove);
     }
@@ -301,7 +336,8 @@ export class ReviewManager {
       edit = document.createElement("span") as HTMLSpanElement;
       edit.setAttribute(CONTROL_ATTR_NAME, "");
       edit.innerText = this.config.editButtonEditText;
-      edit.className = "editButton edit";
+
+      this.applyStyles(edit, "editButton.edit");
       edit.onclick = () => this.setEditorMode(EditorMode.editComment, "edit");
       root.appendChild(edit);
     }
@@ -337,29 +373,26 @@ export class ReviewManager {
 
   createInlineEditorElement(): EditorElements {
     var root = document.createElement("div") as HTMLDivElement;
-    root.className = "reviewCommentEditor";
-    root.style.fontFamily = 'Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata","Courier New", monospace;';
+    this.applyStyles(root, "reviewCommentEditor");
 
     const textarea = document.createElement("textarea") as HTMLTextAreaElement;
     textarea.setAttribute(CONTROL_ATTR_NAME, "");
-    textarea.className = "reviewCommentEditor text";
+    this.applyStyles(textarea, "reviewCommentEditor.text");
     textarea.innerText = "";
-    textarea.rows = 2;
-    textarea.style.resize = "none";
-    textarea.style.width = "100%";
+    textarea.rows = 3;
     textarea.name = "text";
     textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
     const confirm = document.createElement("button") as HTMLButtonElement;
     confirm.setAttribute(CONTROL_ATTR_NAME, "");
-    confirm.className = "reviewCommentEditor save";
-    //confirm.style.fontFamily = "Consolas";
+    this.applyStyles(confirm, "reviewCommentEditor.save");
+
     confirm.innerText = "Add Comment";
     confirm.onclick = this.handleAddComment.bind(this);
 
     const cancel = document.createElement("button") as HTMLButtonElement;
     cancel.setAttribute(CONTROL_ATTR_NAME, "");
-    cancel.className = "reviewCommentEditor cancel";
+    this.applyStyles(cancel, "reviewCommentEditor.cancel");
     cancel.innerText = "Cancel";
     cancel.onclick = this.handleCancel.bind(this);
 
@@ -412,12 +445,11 @@ export class ReviewManager {
         return editorElement.root;
       },
       getPosition: () => {
-        console.log("getPosition");
         if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
           const { column } = this.editor.getPosition();
           const lineNumber = this.getActivePosition();
 
-          console.log("getPosition", lineNumber, column);
+          //console.log("getPosition", lineNumber, column);
           return {
             position: {
               lineNumber,
@@ -453,7 +485,10 @@ export class ReviewManager {
     this.activeComment = comment;
     if (lineNumbersToMakeDirty.length > 0) {
       this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-        this.renderStore[comment.id].renderStatus = ReviewCommentRenderState.dirty;
+        const cs = this.renderStore[comment.id];
+        if (cs) {
+          cs.renderStatus = ReviewCommentRenderState.dirty;
+        }
       });
     }
   }
@@ -505,10 +540,11 @@ export class ReviewManager {
       let activeComment: ReviewComment = null;
 
       if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
-        for (const comment of Object.values(this.store.comments).map((c) => c.comment)) {
-          const x = this.getRenderState(comment.id);
-          if (x.viewZoneId == ev.target.detail.viewZoneId) {
-            activeComment = comment;
+        for (const cs of Object.values(this.store.comments)) {
+          const rs = this.getRenderState(cs.comment.id);
+          if (rs.viewZoneId == ev.target.detail.viewZoneId) {
+            activeComment = cs.comment;
+            console.log(cs.comment.text, cs.history.length);
             break;
           }
         }
@@ -519,29 +555,29 @@ export class ReviewManager {
     }
   }
 
-  private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
-    let count = 0;
-    let marginTop = 0;
-    const lineHeight = this.editorConfig.lineHeight;
+  // private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
+  //   let count = 0;
+  //   let marginTop = 0;
+  //   const lineHeight = this.editorConfig.lineHeight;
 
-    if (this.activeComment) {
-      for (var item of this.iterateComments()) {
-        if (
-          item.state.comment.lineNumber === this.activeComment.lineNumber &&
-          (item.state.comment != this.activeComment || includeActiveCommentHeight)
-        ) {
-          count += this.calculateNumberOfLines(item.state.comment.text);
-        }
+  //   if (this.activeComment) {
+  //     for (var item of this.iterateComments()) {
+  //       if (
+  //         item.state.comment.lineNumber === this.activeComment.lineNumber &&
+  //         (item.state.comment != this.activeComment || includeActiveCommentHeight)
+  //       ) {
+  //         count += this.calculateNumberOfLines(item.state.comment.text);
+  //       }
 
-        if (item.state.comment == this.activeComment) {
-          break;
-        }
-      }
-      marginTop = count * lineHeight;
-    }
-    const result = marginTop + this.config.verticalOffset;
-    return result;
-  }
+  //       if (item.state.comment == this.activeComment) {
+  //         break;
+  //       }
+  //     }
+  //     marginTop = count * lineHeight;
+  //   }
+  //   const result = marginTop + this.config.verticalOffset;
+  //   return result;
+  // }
 
   layoutInlineToolbar() {
     this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
@@ -592,6 +628,7 @@ export class ReviewManager {
 
     this.layoutInlineToolbar();
     this.layoutInlineCommentEditor();
+    this.setActiveComment(this.activeComment);
     this.refreshComments();
 
     if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
@@ -654,7 +691,11 @@ export class ReviewManager {
             targetId: this.activeComment && this.activeComment.id,
           };
 
-    return this.addEvent(event);
+    const e = this.addEvent(event);
+
+    //here
+
+    return e;
   }
 
   private addEvent(event: ReviewCommentEvent) {
@@ -670,6 +711,8 @@ export class ReviewManager {
     } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
       this.setActiveComment(null);
     }
+
+    this.setActiveComment(null);
 
     this.refreshComments();
     this.layoutInlineToolbar();
@@ -699,7 +742,7 @@ export class ReviewManager {
 
   private createElement(text: string, className: string, tagName: string = null) {
     const span = document.createElement(tagName || "span") as HTMLSpanElement;
-    span.className = className;
+    this.applyStyles(span, className);
     span.innerText = text;
     return span;
   }
@@ -837,31 +880,31 @@ export class ReviewManager {
   }
 
   private renderComment(isActive: boolean, item: ReviewCommentIterItem) {
-    const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
+    const domNode = this.createElement("", `reviewComment.${isActive ? "active" : "inactive"}`);
     domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
     domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
 
     // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
-    domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
-    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
+    domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment.author"));
+    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment.dt"));
     if (item.state.history.length > 1) {
       domNode.appendChild(
-        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history")
+        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history")
       );
     }
 
     const n = document.createElement("div");
-    n.className = "reviewComment text";
+    this.applyStyles(n, "reviewComment.text");
     n.innerHTML = convertMarkdownToHTML(item.state.comment.text);
     domNode.appendChild(n);
 
     return domNode;
   }
 
-  calculateNumberOfLines(text: string): number {
-    return 10;
-    text ? text.split(/\r*\n/).length + 1 : 1;
-  }
+  // calculateNumberOfLines(text: string): number {
+  //   return 10;
+  //   text ? text.split(/\r*\n/).length + 1 : 1;
+  // }
 
   addActions() {
     this.editor.addAction({

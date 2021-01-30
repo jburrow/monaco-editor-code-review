@@ -19,6 +19,7 @@ interface WindowDoc {
   clearComments: () => void;
   setCurrentUser: () => void;
   handleCommentReadonlyChange: () => void;
+  toggleSummaryView: () => void;
 }
 
 const win = (window as any) as WindowDoc;
@@ -299,11 +300,17 @@ function clearComments() {
   renderComments([]);
 }
 
+function toggleSummaryView() {
+  const o = document.getElementById("summaryEditor");
+  o.style.display = o.style.display == "none" ? "" : "none";
+}
+
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
+win.toggleSummaryView = toggleSummaryView;
 
 init();
