@@ -19,12 +19,13 @@ interface WindowDoc {
   clearComments: () => void;
   setCurrentUser: () => void;
   handleCommentReadonlyChange: () => void;
+  toggleSummaryView: () => void;
 }
 
 const win = (window as any) as WindowDoc;
 let reviewManager: ReviewManager = null;
 let currentMode: string = "";
-let currentEditor: any = null;
+let currentEditor: monacoEditor.editor.IStandaloneCodeEditor = null;
 let theme = "vs-dark";
 const fooUser = "foo.user";
 const barUser = "bar.user";
@@ -91,8 +92,7 @@ function setView(
       modified: modifiedModel,
     });
 
-    currentEditor = e;
-    initReviewManager(e.modifiedEditor, currentUser, commentsReadonly);
+    initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
   }
 }
 
@@ -102,7 +102,7 @@ function generateDifferentContents() {
   if (currentMode.startsWith("standard")) {
     currentEditor.setValue(exampleSourceCode[idx]);
   } else {
-    const e = currentEditor;
+    const e = currentEditor as any;
     e.getModel().modified.setValue(exampleSourceCode[idx]);
     e.getModel().modified.setValue(exampleSourceCode[idx + 1]);
   }
@@ -300,11 +300,19 @@ function clearComments() {
   renderComments([]);
 }
 
+function toggleSummaryView() {
+  const o = document.getElementById("summaryEditor");
+  o.style.display = o.style.display === "none" ? "" : "none";
+
+  // currentEditor.layout();
+}
+
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
+win.toggleSummaryView = toggleSummaryView;
 
 init();

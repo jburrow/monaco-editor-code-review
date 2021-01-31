@@ -70,8 +70,7 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
             original: originalModel,
             modified: modifiedModel,
         });
-        currentEditor = e;
-        initReviewManager(e.modifiedEditor, currentUser, commentsReadonly);
+        initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
     }
 }
 function generateDifferentContents() {
@@ -244,11 +243,17 @@ function clearComments() {
     reviewManager.load([]);
     renderComments([]);
 }
+function toggleSummaryView() {
+    const o = document.getElementById("summaryEditor");
+    o.style.display = o.style.display === "none" ? "" : "none";
+    // currentEditor.layout();
+}
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
+win.toggleSummaryView = toggleSummaryView;
 init();
 //# sourceMappingURL=docs.js.map

@@ -1,7 +1,6 @@
 import * as monacoEditor from "monaco-editor";
 import { reduceComments, CodeSelection, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
-import "./index.css";
 declare enum NavigationDirection {
     next = 1,
     prev = 2
@@ -33,7 +32,6 @@ export interface ReviewManagerConfig {
     reviewCommentIconActive?: string;
     reviewCommentIconSelect?: string;
     showInRuler?: boolean;
-    verticalOffset?: number;
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 interface ReviewManagerConfigPrivate {
@@ -53,7 +51,6 @@ interface ReviewManagerConfigPrivate {
     rulerMarkerDarkColor: any;
     showAddCommentGlyph: boolean;
     showInRuler: boolean;
-    verticalOffset: number;
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 interface EditorElements {
@@ -93,10 +90,13 @@ export declare class ReviewManager {
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
     renderStore: Record<string, RenderStoreItem>;
     constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
+    createCustomCssClasses(): void;
     setReadOnlyMode(value: boolean): void;
     load(events: ReviewCommentEvent[]): void;
     loadFromStore(store: ReviewCommentStore, events: ReviewCommentEvent[]): void;
     getThemedColor(name: string): string;
+    styles: Record<string, {}>;
+    applyStyles(element: HTMLElement, className: string): void;
     createInlineEditButtonsElement(): InlineToolbarElements;
     handleCancel(): void;
     handleAddComment(): void;
@@ -104,6 +104,7 @@ export declare class ReviewManager {
     createInlineEditorElement(): EditorElements;
     createInlineToolbarWidget(): InlineToolbarElements;
     createInlineEditorWidget(): EditorElements;
+    getActivePosition(): number;
     setActiveComment(comment: ReviewComment): void;
     filterAndMapComments(lineNumbers: number[], fn: {
         (comment: ReviewComment): void;
@@ -134,9 +135,11 @@ export declare class ReviewManager {
     private formatDate;
     private createElement;
     getRenderState(commentId: string): RenderStoreItem;
+    editId: string;
+    commentHeightCache: Record<string, number>;
     refreshComments(): void;
+    private getHeightCacheKey;
     private renderComment;
-    calculateNumberOfLines(text: string): number;
     addActions(): void;
     navigateToComment(direction: NavigationDirection): void;
 }

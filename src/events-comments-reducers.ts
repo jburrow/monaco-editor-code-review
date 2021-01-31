@@ -48,7 +48,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
       };
 
       dirtyLineNumbers.add(edit.comment.lineNumber);
-      console.debug("edit", event);
+      // console.debug("edit", event);
 
       comments[event.targetId] = edit;
       break;
@@ -61,7 +61,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
 
       deletedCommentIds.add(selected.comment.id);
       dirtyLineNumbers.add(selected.comment.lineNumber);
-      console.debug("delete", event);
+      //console.debug("delete", event);
       break;
 
     case "create":
@@ -76,7 +76,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
           parentId: event.targetId,
           status: ReviewCommentStatus.active,
         });
-        console.debug("insert", event);
+        //console.debug("insert", event);
         dirtyLineNumbers.add(event.lineNumber);
       }
       break;
