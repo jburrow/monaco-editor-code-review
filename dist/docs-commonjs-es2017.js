@@ -6582,7 +6582,6 @@ const defaultReviewManagerConfig = {
     rulerMarkerDarkColor: "darkorange",
     showAddCommentGlyph: true,
     showInRuler: true,
-    verticalOffset: 0,
 };
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
@@ -6597,7 +6596,7 @@ class ReviewManager {
                 "font-size": "12px",
             },
             "reviewComment.dt": {},
-            "reviewComment.active": { border: "1px solid yellow" },
+            "reviewComment.active": { border: "1px solid darkorange" },
             "reviewComment.inactive": {},
             "reviewComment.author": {},
             "reviewComment.text": {},
@@ -6965,30 +6964,25 @@ class ReviewManager {
             this.setEditorMode(EditorMode.toolbar, "mouse-down-2");
         }
     }
-    // private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
-    //   let count = 0;
-    //   let marginTop = 0;
-    //   const lineHeight = this.editorConfig.lineHeight;
-    //   if (this.activeComment) {
-    //     for (var item of this.iterateComments()) {
-    //       if (
-    //         item.state.comment.lineNumber === this.activeComment.lineNumber &&
-    //         (item.state.comment != this.activeComment || includeActiveCommentHeight)
-    //       ) {
-    //         count += this.calculateNumberOfLines(item.state.comment.text);
-    //       }
-    //       if (item.state.comment == this.activeComment) {
-    //         break;
-    //       }
-    //     }
-    //     marginTop = count * lineHeight;
-    //   }
-    //   const result = marginTop + this.config.verticalOffset;
-    //   return result;
-    // }
+    calculateMarginTopOffset(includeActiveCommentHeight) {
+        var _a;
+        let marginTop = 0;
+        if (this.activeComment) {
+            for (var item of this.iterateComments()) {
+                if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
+                    (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
+                    marginTop += (_a = this.commentHeightCache[this.getHeightCacheKey(item)]) !== null && _a !== void 0 ? _a : 0;
+                }
+                if (item.state.comment == this.activeComment) {
+                    break;
+                }
+            }
+        }
+        return marginTop;
+    }
     layoutInlineToolbar() {
         this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
-        //this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
+        this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
         if (this.inlineToolbarElements.remove) {
             const hasChildren = this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment.id).length > 1;
             const isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
@@ -7168,7 +7162,7 @@ class ReviewManager {
                         ? this.config.renderComment(isActive, item)
                         : this.renderComment(isActive, item);
                     //renderComment invoked
-                    const cacheKey = `${item.state.comment.id}-${item.state.history.length}`;
+                    const cacheKey = this.getHeightCacheKey(item);
                     // attach to dom to calculate height
                     if (this.commentHeightCache[cacheKey] === undefined) {
                         document.body.appendChild(domNode);
@@ -7214,6 +7208,9 @@ class ReviewManager {
                 this.currentCommentDecorations = this.editor.deltaDecorations(this.currentCommentDecorations, decorators);
             }
         });
+    }
+    getHeightCacheKey(item) {
+        return `${item.state.comment.id}-${item.state.history.length}`;
     }
     renderComment(isActive, item) {
         const rootNode = this.createElement(null, `reviewComment`); //.${isActive ? "active" : "inactive"}`);

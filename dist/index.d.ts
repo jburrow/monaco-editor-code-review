@@ -32,7 +32,6 @@ export interface ReviewManagerConfig {
     reviewCommentIconActive?: string;
     reviewCommentIconSelect?: string;
     showInRuler?: boolean;
-    verticalOffset?: number;
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 interface ReviewManagerConfigPrivate {
@@ -52,7 +51,6 @@ interface ReviewManagerConfigPrivate {
     rulerMarkerDarkColor: any;
     showAddCommentGlyph: boolean;
     showInRuler: boolean;
-    verticalOffset: number;
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
 }
 interface EditorElements {
@@ -124,6 +122,7 @@ export declare class ReviewManager {
             detail: any;
         };
     }): void;
+    private calculateMarginTopOffset;
     layoutInlineToolbar(): void;
     layoutInlineCommentEditor(): void;
     setEditorMode(mode: EditorMode, why?: string): void;
@@ -139,6 +138,7 @@ export declare class ReviewManager {
     editId: string;
     commentHeightCache: Record<string, number>;
     refreshComments(): void;
+    private getHeightCacheKey;
     private renderComment;
     addActions(): void;
     navigateToComment(direction: NavigationDirection): void;
