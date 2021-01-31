@@ -86,151 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/css-loader/dist/cjs.js!./src/index.css":
-/*!*************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./src/index.css ***!
-  \*************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/cssWithMappingToString.js */ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default.a);
-// Module
-___CSS_LOADER_EXPORT___.push([module.i, ".reviewCommentEditor {\n  /* border: 1px solid pink; */\n  width: 100%;\n  /* vscode fallback order */\n  font-family: Monaco, Menlo, Consolas, \"Droid Sans Mono\", \"Inconsolata\",\n    \"Courier New\", monospace;\n}\n\n.reviewCommentEditor.text {\n  /* background-color: lightseagreen; */\n  width: 100%;\n  height: 60px;\n}\n\n.reviewCommentEditor.save {\n  /* background-color: blue; */\n  margin: 0 5px 5px 0;\n  width: 150px;\n  border: 0px;\n}\n\n.reviewCommentEditor.cancel {\n  /* background-color: rebeccapurple; */\n  margin: 5px 5px 5px 0;\n  width: 150px;\n  border: 0px;\n}\n\n.reviewComment {\n  font-size: 12px;\n}\n\n.reviewComment.text {\n  background-color: rgba(0, 0, 200, 0.2);\n  overflow: hidden;\n}\n\n.reviewComment.author {\n  /* background-color: #FF3333; */\n}\n\n.reviewComment.dt {\n  /* background-color: #FF5555; */\n}\n\n.reviewComment.id {\n  /* background-color: #FF9999; */\n  color: black;\n}\n\n.reviewComment.history {\n  /* background-color: #FF0AAA; */\n  padding-left: 10px;\n  font-style: italic;\n}\n\n.reviewComment.selection {\n  /* border-bottom: 2px solid pink; */\n  /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = \"1px solid blue\"*/\n  /* background-color: yellow; */\n}\n\n.editButtonsContainer {\n  font-size: 12px;\n  width: 45px;\n  padding-right: 2px;\n  text-align: right;\n  color: darkorange;\n}\n\n.editButton:hover {\n  text-decoration: underline;\n  cursor: pointer;\n}\n/* wc-markdown{\n  display:inline-block;\n  background-color: darkslategrey;\n}\nwc-markdown p{\n  display: block;\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0px;\n  margin-inline-end: 0px;\n}\nwc-markdown pre{\n  background-color:yellow;\n  width:100px;\n  display: inline-block;\n}\nwc-markdown pre code{\n  background-color:orange;\n  width:100px;\n  word-wrap: break-word; \n  display: inline-block;\n  white-space: pre-wrap;\n  \n} */\n/*\n  .editButton.add {\n  }\n  \n  .editButton.remove {\n  }\n  */\n\n/*\n  TODO - Work icons and theming - this creates the style below\n  \n  svg = `\n  <svg width=\"100%\" height=\"100%\" xmlns=\"http://www.w3.org/2000/svg\">\n   <g>\n    <title>Layer 1</title>\n    <g id=\"svg_2\">\n     <path fill=\"#re d=\"m12.40135,15.21479l-9.26822,0q-1.15575,0 -1.96699,-0.7272t-0.81125,-1.76321l0,-9.96165q0,-1.03601 0.81125,-1.76321t1.96699,-0.7272l9.26822,0q1.15574,0 1.96699,0.7272t0.81125,1.76321l0,9.96165q0,1.03601 -0.81125,1.76321t-1.96699,0.7272zm-9.26822,-13.28883q-0.37784,0 -0.65566,0.24904t-0.27783,0.58773l0,9.96165q0,0.3387 0.27783,0.58774t0.65566,0.24904l9.26822,0q0.37784,0 0.64455,-0.24904t0.26671,-0.58774l0,-9.96165q0,-0.33869 -0.26671,-0.58773t-0.64455,-0.24904l-9.26822,0zm8.33473,4.98082l-7.40124,0q-0.46674,0 -0.46674,-0.39847q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39847 -0.46674,0.39847zm0,-2.49041l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39847 0.46674,-0.39847l7.40124,0q0.46674,0 0.46674,0.39847q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,4.98082l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39846 0.46674,-0.39846l7.40124,0q0.46674,0 0.46674,0.39846q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,2.49041l-7.40124,0q-0.46674,0 -0.46674,-0.39846q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39846 -0.46674,0.39846z\" id=\"svg_1\" stroke=\"null\"/>\n    </g>\n   </g>\n  </svg>`\n  \n  console.log(`.activeLineMarginClass{    \n    background-image: url(\"data:image/svg+xml;base64,${btoa(svg)}\");\n  }`);\n  \n  */\n\n.activeLineMarginClass {\n  background-image: url(\"data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=\");\n}\n", "",{"version":3,"sources":["webpack://./src/index.css"],"names":[],"mappings":"AAAA;EACE,4BAA4B;EAC5B,WAAW;EACX,0BAA0B;EAC1B;4BAC0B;AAC5B;;AAEA;EACE,qCAAqC;EACrC,WAAW;EACX,YAAY;AACd;;AAEA;EACE,4BAA4B;EAC5B,mBAAmB;EACnB,YAAY;EACZ,WAAW;AACb;;AAEA;EACE,qCAAqC;EACrC,qBAAqB;EACrB,YAAY;EACZ,WAAW;AACb;;AAEA;EACE,eAAe;AACjB;;AAEA;EACE,sCAAsC;EACtC,gBAAgB;AAClB;;AAEA;EACE,+BAA+B;AACjC;;AAEA;EACE,+BAA+B;AACjC;;AAEA;EACE,+BAA+B;EAC/B,YAAY;AACd;;AAEA;EACE,+BAA+B;EAC/B,kBAAkB;EAClB,kBAAkB;AACpB;;AAEA;EACE,mCAAmC;EACnC,iHAAiH;EACjH,8BAA8B;AAChC;;AAEA;EACE,eAAe;EACf,WAAW;EACX,kBAAkB;EAClB,iBAAiB;EACjB,iBAAiB;AACnB;;AAEA;EACE,0BAA0B;EAC1B,eAAe;AACjB;AACA;;;;;;;;;;;;;;;;;;;;;;;GAuBG;AACH;;;;;;GAMG;;AAEH;;;;;;;;;;;;;;;;;GAiBG;;AAEH;EACE,m2DAAm2D;AACr2D","sourcesContent":[".reviewCommentEditor {\n  /* border: 1px solid pink; */\n  width: 100%;\n  /* vscode fallback order */\n  font-family: Monaco, Menlo, Consolas, \"Droid Sans Mono\", \"Inconsolata\",\n    \"Courier New\", monospace;\n}\n\n.reviewCommentEditor.text {\n  /* background-color: lightseagreen; */\n  width: 100%;\n  height: 60px;\n}\n\n.reviewCommentEditor.save {\n  /* background-color: blue; */\n  margin: 0 5px 5px 0;\n  width: 150px;\n  border: 0px;\n}\n\n.reviewCommentEditor.cancel {\n  /* background-color: rebeccapurple; */\n  margin: 5px 5px 5px 0;\n  width: 150px;\n  border: 0px;\n}\n\n.reviewComment {\n  font-size: 12px;\n}\n\n.reviewComment.text {\n  background-color: rgba(0, 0, 200, 0.2);\n  overflow: hidden;\n}\n\n.reviewComment.author {\n  /* background-color: #FF3333; */\n}\n\n.reviewComment.dt {\n  /* background-color: #FF5555; */\n}\n\n.reviewComment.id {\n  /* background-color: #FF9999; */\n  color: black;\n}\n\n.reviewComment.history {\n  /* background-color: #FF0AAA; */\n  padding-left: 10px;\n  font-style: italic;\n}\n\n.reviewComment.selection {\n  /* border-bottom: 2px solid pink; */\n  /* FIX - How to set this programatically document.styleSheets[1].rules[10].style.borderBottom = \"1px solid blue\"*/\n  /* background-color: yellow; */\n}\n\n.editButtonsContainer {\n  font-size: 12px;\n  width: 45px;\n  padding-right: 2px;\n  text-align: right;\n  color: darkorange;\n}\n\n.editButton:hover {\n  text-decoration: underline;\n  cursor: pointer;\n}\n/* wc-markdown{\n  display:inline-block;\n  background-color: darkslategrey;\n}\nwc-markdown p{\n  display: block;\n  margin-block-start: 0;\n  margin-block-end: 0;\n  margin-inline-start: 0px;\n  margin-inline-end: 0px;\n}\nwc-markdown pre{\n  background-color:yellow;\n  width:100px;\n  display: inline-block;\n}\nwc-markdown pre code{\n  background-color:orange;\n  width:100px;\n  word-wrap: break-word; \n  display: inline-block;\n  white-space: pre-wrap;\n  \n} */\n/*\n  .editButton.add {\n  }\n  \n  .editButton.remove {\n  }\n  */\n\n/*\n  TODO - Work icons and theming - this creates the style below\n  \n  svg = `\n  <svg width=\"100%\" height=\"100%\" xmlns=\"http://www.w3.org/2000/svg\">\n   <g>\n    <title>Layer 1</title>\n    <g id=\"svg_2\">\n     <path fill=\"#re d=\"m12.40135,15.21479l-9.26822,0q-1.15575,0 -1.96699,-0.7272t-0.81125,-1.76321l0,-9.96165q0,-1.03601 0.81125,-1.76321t1.96699,-0.7272l9.26822,0q1.15574,0 1.96699,0.7272t0.81125,1.76321l0,9.96165q0,1.03601 -0.81125,1.76321t-1.96699,0.7272zm-9.26822,-13.28883q-0.37784,0 -0.65566,0.24904t-0.27783,0.58773l0,9.96165q0,0.3387 0.27783,0.58774t0.65566,0.24904l9.26822,0q0.37784,0 0.64455,-0.24904t0.26671,-0.58774l0,-9.96165q0,-0.33869 -0.26671,-0.58773t-0.64455,-0.24904l-9.26822,0zm8.33473,4.98082l-7.40124,0q-0.46674,0 -0.46674,-0.39847q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39847 -0.46674,0.39847zm0,-2.49041l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39847 0.46674,-0.39847l7.40124,0q0.46674,0 0.46674,0.39847q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,4.98082l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39846 0.46674,-0.39846l7.40124,0q0.46674,0 0.46674,0.39846q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,2.49041l-7.40124,0q-0.46674,0 -0.46674,-0.39846q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39846 -0.46674,0.39846z\" id=\"svg_1\" stroke=\"null\"/>\n    </g>\n   </g>\n  </svg>`\n  \n  console.log(`.activeLineMarginClass{    \n    background-image: url(\"data:image/svg+xml;base64,${btoa(svg)}\");\n  }`);\n  \n  */\n\n.activeLineMarginClass {\n  background-image: url(\"data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=\");\n}\n"],"sourceRoot":""}]);
-// Exports
-/* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/runtime/api.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-// eslint-disable-next-line func-names
-module.exports = function (cssWithMappingToString) {
-  var list = []; // return the list of modules as css string
-
-  list.toString = function toString() {
-    return this.map(function (item) {
-      var content = cssWithMappingToString(item);
-
-      if (item[2]) {
-        return "@media ".concat(item[2], " {").concat(content, "}");
-      }
-
-      return content;
-    }).join('');
-  }; // import a list of modules into the list
-  // eslint-disable-next-line func-names
-
-
-  list.i = function (modules, mediaQuery, dedupe) {
-    if (typeof modules === 'string') {
-      // eslint-disable-next-line no-param-reassign
-      modules = [[null, modules, '']];
-    }
-
-    var alreadyImportedModules = {};
-
-    if (dedupe) {
-      for (var i = 0; i < this.length; i++) {
-        // eslint-disable-next-line prefer-destructuring
-        var id = this[i][0];
-
-        if (id != null) {
-          alreadyImportedModules[id] = true;
-        }
-      }
-    }
-
-    for (var _i = 0; _i < modules.length; _i++) {
-      var item = [].concat(modules[_i]);
-
-      if (dedupe && alreadyImportedModules[item[0]]) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      if (mediaQuery) {
-        if (!item[2]) {
-          item[2] = mediaQuery;
-        } else {
-          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
-        }
-      }
-
-      list.push(item);
-    }
-  };
-
-  return list;
-};
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/runtime/cssWithMappingToString.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/cssWithMappingToString.js ***!
-  \************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-module.exports = function cssWithMappingToString(item) {
-  var _item = _slicedToArray(item, 4),
-      content = _item[1],
-      cssMapping = _item[3];
-
-  if (typeof btoa === 'function') {
-    // eslint-disable-next-line no-undef
-    var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(cssMapping))));
-    var data = "sourceMappingURL=data:application/json;charset=utf-8;base64,".concat(base64);
-    var sourceMapping = "/*# ".concat(data, " */");
-    var sourceURLs = cssMapping.sources.map(function (source) {
-      return "/*# sourceURL=".concat(cssMapping.sourceRoot || '').concat(source, " */");
-    });
-    return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-  }
-
-  return [content].join('\n');
-};
-
-/***/ }),
-
 /***/ "./node_modules/dayjs/dayjs.min.js":
 /*!*****************************************!*\
   !*** ./node_modules/dayjs/dayjs.min.js ***!
@@ -5392,286 +5247,6 @@ if (true) {
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
-  \****************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isOldIE = function isOldIE() {
-  var memo;
-  return function memorize() {
-    if (typeof memo === 'undefined') {
-      // Test for IE <= 9 as proposed by Browserhacks
-      // @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
-      // Tests for existence of standard globals is to allow style-loader
-      // to operate correctly into non-standard environments
-      // @see https://github.com/webpack-contrib/style-loader/issues/177
-      memo = Boolean(window && document && document.all && !window.atob);
-    }
-
-    return memo;
-  };
-}();
-
-var getTarget = function getTarget() {
-  var memo = {};
-  return function memorize(target) {
-    if (typeof memo[target] === 'undefined') {
-      var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself
-
-      if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-        try {
-          // This will throw an exception if access to iframe is blocked
-          // due to cross-origin restrictions
-          styleTarget = styleTarget.contentDocument.head;
-        } catch (e) {
-          // istanbul ignore next
-          styleTarget = null;
-        }
-      }
-
-      memo[target] = styleTarget;
-    }
-
-    return memo[target];
-  };
-}();
-
-var stylesInDom = [];
-
-function getIndexByIdentifier(identifier) {
-  var result = -1;
-
-  for (var i = 0; i < stylesInDom.length; i++) {
-    if (stylesInDom[i].identifier === identifier) {
-      result = i;
-      break;
-    }
-  }
-
-  return result;
-}
-
-function modulesToDom(list, options) {
-  var idCountMap = {};
-  var identifiers = [];
-
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i];
-    var id = options.base ? item[0] + options.base : item[0];
-    var count = idCountMap[id] || 0;
-    var identifier = "".concat(id, " ").concat(count);
-    idCountMap[id] = count + 1;
-    var index = getIndexByIdentifier(identifier);
-    var obj = {
-      css: item[1],
-      media: item[2],
-      sourceMap: item[3]
-    };
-
-    if (index !== -1) {
-      stylesInDom[index].references++;
-      stylesInDom[index].updater(obj);
-    } else {
-      stylesInDom.push({
-        identifier: identifier,
-        updater: addStyle(obj, options),
-        references: 1
-      });
-    }
-
-    identifiers.push(identifier);
-  }
-
-  return identifiers;
-}
-
-function insertStyleElement(options) {
-  var style = document.createElement('style');
-  var attributes = options.attributes || {};
-
-  if (typeof attributes.nonce === 'undefined') {
-    var nonce =  true ? __webpack_require__.nc : undefined;
-
-    if (nonce) {
-      attributes.nonce = nonce;
-    }
-  }
-
-  Object.keys(attributes).forEach(function (key) {
-    style.setAttribute(key, attributes[key]);
-  });
-
-  if (typeof options.insert === 'function') {
-    options.insert(style);
-  } else {
-    var target = getTarget(options.insert || 'head');
-
-    if (!target) {
-      throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
-    }
-
-    target.appendChild(style);
-  }
-
-  return style;
-}
-
-function removeStyleElement(style) {
-  // istanbul ignore if
-  if (style.parentNode === null) {
-    return false;
-  }
-
-  style.parentNode.removeChild(style);
-}
-/* istanbul ignore next  */
-
-
-var replaceText = function replaceText() {
-  var textStore = [];
-  return function replace(index, replacement) {
-    textStore[index] = replacement;
-    return textStore.filter(Boolean).join('\n');
-  };
-}();
-
-function applyToSingletonTag(style, index, remove, obj) {
-  var css = remove ? '' : obj.media ? "@media ".concat(obj.media, " {").concat(obj.css, "}") : obj.css; // For old IE
-
-  /* istanbul ignore if  */
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = replaceText(index, css);
-  } else {
-    var cssNode = document.createTextNode(css);
-    var childNodes = style.childNodes;
-
-    if (childNodes[index]) {
-      style.removeChild(childNodes[index]);
-    }
-
-    if (childNodes.length) {
-      style.insertBefore(cssNode, childNodes[index]);
-    } else {
-      style.appendChild(cssNode);
-    }
-  }
-}
-
-function applyToTag(style, options, obj) {
-  var css = obj.css;
-  var media = obj.media;
-  var sourceMap = obj.sourceMap;
-
-  if (media) {
-    style.setAttribute('media', media);
-  } else {
-    style.removeAttribute('media');
-  }
-
-  if (sourceMap && typeof btoa !== 'undefined') {
-    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
-  } // For old IE
-
-  /* istanbul ignore if  */
-
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    while (style.firstChild) {
-      style.removeChild(style.firstChild);
-    }
-
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-var singleton = null;
-var singletonCounter = 0;
-
-function addStyle(obj, options) {
-  var style;
-  var update;
-  var remove;
-
-  if (options.singleton) {
-    var styleIndex = singletonCounter++;
-    style = singleton || (singleton = insertStyleElement(options));
-    update = applyToSingletonTag.bind(null, style, styleIndex, false);
-    remove = applyToSingletonTag.bind(null, style, styleIndex, true);
-  } else {
-    style = insertStyleElement(options);
-    update = applyToTag.bind(null, style, options);
-
-    remove = function remove() {
-      removeStyleElement(style);
-    };
-  }
-
-  update(obj);
-  return function updateStyle(newObj) {
-    if (newObj) {
-      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {
-        return;
-      }
-
-      update(obj = newObj);
-    } else {
-      remove();
-    }
-  };
-}
-
-module.exports = function (list, options) {
-  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-  // tags it will allow on a page
-
-  if (!options.singleton && typeof options.singleton !== 'boolean') {
-    options.singleton = isOldIE();
-  }
-
-  list = list || [];
-  var lastIdentifiers = modulesToDom(list, options);
-  return function update(newList) {
-    newList = newList || [];
-
-    if (Object.prototype.toString.call(newList) !== '[object Array]') {
-      return;
-    }
-
-    for (var i = 0; i < lastIdentifiers.length; i++) {
-      var identifier = lastIdentifiers[i];
-      var index = getIndexByIdentifier(identifier);
-      stylesInDom[index].references--;
-    }
-
-    var newLastIdentifiers = modulesToDom(newList, options);
-
-    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
-      var _identifier = lastIdentifiers[_i];
-
-      var _index = getIndexByIdentifier(_identifier);
-
-      if (stylesInDom[_index].references === 0) {
-        stylesInDom[_index].updater();
-
-        stylesInDom.splice(_index, 1);
-      }
-    }
-
-    lastIdentifiers = newLastIdentifiers;
-  };
-};
-
-/***/ }),
-
 /***/ "./node_modules/uuid/dist/esm-browser/index.js":
 /*!*****************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/index.js ***!
@@ -6672,8 +6247,7 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
             original: originalModel,
             modified: modifiedModel,
         });
-        currentEditor = e;
-        initReviewManager(e.modifiedEditor, currentUser, commentsReadonly);
+        initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
     }
 }
 function generateDifferentContents() {
@@ -6842,12 +6416,18 @@ function clearComments() {
     reviewManager.load([]);
     renderComments([]);
 }
+function toggleSummaryView() {
+    const o = document.getElementById("summaryEditor");
+    o.style.display = o.style.display === "none" ? "" : "none";
+    // currentEditor.layout();
+}
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
 win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
+win.toggleSummaryView = toggleSummaryView;
 init();
 
 
@@ -6880,7 +6460,7 @@ function commentReducer(event, state) {
                 history: parent.history.concat(parent.comment),
             };
             dirtyLineNumbers.add(edit.comment.lineNumber);
-            console.debug("edit", event);
+            // console.debug("edit", event);
             comments[event.targetId] = edit;
             break;
         case "delete":
@@ -6890,7 +6470,7 @@ function commentReducer(event, state) {
             delete comments[event.targetId];
             deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
-            console.debug("delete", event);
+            //console.debug("delete", event);
             break;
         case "create":
             if (!comments[event.id]) {
@@ -6904,7 +6484,7 @@ function commentReducer(event, state) {
                     parentId: event.targetId,
                     status: ReviewCommentStatus.active,
                 });
-                console.debug("insert", event);
+                //console.debug("insert", event);
                 dirtyLineNumbers.add(event.lineNumber);
             }
             break;
@@ -6953,34 +6533,6 @@ exports.reduceComments = reduceComments;
 
 /***/ }),
 
-/***/ "./src/index.css":
-/*!***********************!*\
-  !*** ./src/index.css ***!
-  \***********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_index_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/css-loader/dist/cjs.js!./index.css */ "./node_modules/css-loader/dist/cjs.js!./src/index.css");
-
-            
-
-var options = {};
-
-options.insert = "head";
-options.singleton = false;
-
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_index_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = (_node_modules_css_loader_dist_cjs_js_index_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
-
-/***/ }),
-
 /***/ "./src/index.ts":
 /*!**********************!*\
   !*** ./src/index.ts ***!
@@ -6996,7 +6548,6 @@ const events_comments_reducers_1 = __webpack_require__(/*! ./events-comments-red
 Object.defineProperty(exports, "reduceComments", { enumerable: true, get: function () { return events_comments_reducers_1.reduceComments; } });
 const uuid = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/index.js");
 const comment_1 = __webpack_require__(/*! ./comment */ "./src/comment.ts");
-__webpack_require__(/*! ./index.css */ "./src/index.css");
 const monacoWindow = window;
 var NavigationDirection;
 (function (NavigationDirection) {
@@ -7038,6 +6589,31 @@ const POSITION_BELOW = 2; //above=1, below=2, exact=0
 const POSITION_EXACT = 0;
 class ReviewManager {
     constructor(editor, currentUser, onChange, config, verbose) {
+        var _a;
+        this.styles = {
+            reviewComment: {
+                "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
+    "Courier New", monospace;`,
+                "font-size": "12px",
+            },
+            "reviewComment.dt": {},
+            "reviewComment.active": { border: "1px solid yellow" },
+            "reviewComment.inactive": {},
+            "reviewComment.author": {},
+            "reviewComment.text": {},
+            reviewCommentEditor: {
+                padding: "5px",
+                "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
+            },
+            "reviewCommentEditor.save": { width: "150px" },
+            "reviewCommentEditor.cancel": { width: "150px" },
+            "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
+            editButtonsContainer: { cursor: "pointer" },
+            "editButton.add": {},
+            "editButton.remove": {},
+            "editButton.edit": {},
+        };
+        this.commentHeightCache = {};
         this.currentUser = currentUser;
         this.editor = editor;
         this.activeComment = null; //TODO - consider moving onto the store
@@ -7053,7 +6629,7 @@ class ReviewManager {
         this.store = { comments: {} }; //, viewZoneIdsToDelete: [] };
         this.renderStore = {};
         this.verbose = verbose;
-        this.editorConfig = this.editor.getRawOptions();
+        this.editorConfig = (_a = this.editor.getRawOptions()) !== null && _a !== void 0 ? _a : {};
         this.editor.onDidChangeConfiguration(() => (this.editorConfig = this.editor.getRawOptions()));
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
         this.canAddCondition = this.editor.createContextKey("add-context-key", !this.config.readOnly);
@@ -7062,6 +6638,38 @@ class ReviewManager {
         this.addActions();
         if (this.config.showAddCommentGlyph) {
             this.editor.onMouseMove(this.handleMouseMove.bind(this));
+        }
+        this.createCustomCssClasses();
+    }
+    createCustomCssClasses() {
+        const id = "monaco_review_custom_styles";
+        if (!document.getElementById(id)) {
+            const style = document.createElement("style");
+            style.id = "monaco_review_custom_styles";
+            style.type = "text/css";
+            style.innerHTML = `
+
+    .activeLineMarginClass {
+      background-image: url("data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=");
+    }`;
+            /*
+        
+        svg = `
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+         <g>
+          <title>Layer 1</title>
+          <g id="svg_2">
+           <path fill="#re d="m12.40135,15.21479l-9.26822,0q-1.15575,0 -1.96699,-0.7272t-0.81125,-1.76321l0,-9.96165q0,-1.03601 0.81125,-1.76321t1.96699,-0.7272l9.26822,0q1.15574,0 1.96699,0.7272t0.81125,1.76321l0,9.96165q0,1.03601 -0.81125,1.76321t-1.96699,0.7272zm-9.26822,-13.28883q-0.37784,0 -0.65566,0.24904t-0.27783,0.58773l0,9.96165q0,0.3387 0.27783,0.58774t0.65566,0.24904l9.26822,0q0.37784,0 0.64455,-0.24904t0.26671,-0.58774l0,-9.96165q0,-0.33869 -0.26671,-0.58773t-0.64455,-0.24904l-9.26822,0zm8.33473,4.98082l-7.40124,0q-0.46674,0 -0.46674,-0.39847q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39847 -0.46674,0.39847zm0,-2.49041l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39847 0.46674,-0.39847l7.40124,0q0.46674,0 0.46674,0.39847q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,4.98082l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39846 0.46674,-0.39846l7.40124,0q0.46674,0 0.46674,0.39846q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,2.49041l-7.40124,0q-0.46674,0 -0.46674,-0.39846q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39846 -0.46674,0.39846z" id="svg_1" stroke="null"/>
+          </g>
+         </g>
+        </svg>`
+        
+        console.log(`.activeLineMarginClass{
+          background-image: url("data:image/svg+xml;base64,${btoa(svg)}");
+        }`);
+        
+        */
+            document.getElementsByTagName("head")[0].appendChild(style);
         }
     }
     setReadOnlyMode(value) {
@@ -7129,13 +6737,26 @@ class ReviewManager {
         }
         return value;
     }
+    applyStyles(element, className) {
+        if (this.styles[className] === undefined) {
+            console.log("[CLASSNAME]", className);
+        }
+        else {
+            if (this.styles[className]) {
+                for (const [key, value] of Object.entries(this.styles[className])) {
+                    element.style[key] = value;
+                }
+                //debugger;
+            }
+        }
+    }
     createInlineEditButtonsElement() {
         var root = document.createElement("div");
-        root.className = "editButtonsContainer";
+        this.applyStyles(root, "editButtonsContainer");
         root.style.marginLeft = this.config.editButtonOffset;
         const add = document.createElement("span");
         add.innerText = this.config.editButtonAddText;
-        add.className = "editButton add";
+        this.applyStyles(add, "editButton.add");
         add.setAttribute(CONTROL_ATTR_NAME, "");
         add.onclick = () => this.setEditorMode(EditorMode.insertComment, "add-comment");
         root.appendChild(add);
@@ -7149,7 +6770,7 @@ class ReviewManager {
             remove = document.createElement("span");
             remove.setAttribute(CONTROL_ATTR_NAME, "");
             remove.innerText = this.config.editButtonRemoveText;
-            remove.className = "editButton remove";
+            this.applyStyles(remove, "editButton.remove");
             remove.onclick = () => this.activeComment && this.removeComment(this.activeComment.id);
             root.appendChild(remove);
         }
@@ -7160,7 +6781,7 @@ class ReviewManager {
             edit = document.createElement("span");
             edit.setAttribute(CONTROL_ATTR_NAME, "");
             edit.innerText = this.config.editButtonEditText;
-            edit.className = "editButton edit";
+            this.applyStyles(edit, "editButton.edit");
             edit.onclick = () => this.setEditorMode(EditorMode.editComment, "edit");
             root.appendChild(edit);
         }
@@ -7192,25 +6813,22 @@ class ReviewManager {
     }
     createInlineEditorElement() {
         var root = document.createElement("div");
-        root.className = "reviewCommentEditor";
+        this.applyStyles(root, "reviewCommentEditor");
         const textarea = document.createElement("textarea");
         textarea.setAttribute(CONTROL_ATTR_NAME, "");
-        textarea.className = "reviewCommentEditor text";
+        this.applyStyles(textarea, "reviewCommentEditor.text");
         textarea.innerText = "";
-        textarea.rows = 2;
-        textarea.style.resize = "none";
-        textarea.style.width = "100%";
+        textarea.rows = 3;
         textarea.name = "text";
         textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
         const confirm = document.createElement("button");
         confirm.setAttribute(CONTROL_ATTR_NAME, "");
-        confirm.className = "reviewCommentEditor save";
-        confirm.style.fontFamily = "Consolas";
+        this.applyStyles(confirm, "reviewCommentEditor.save");
         confirm.innerText = "Add Comment";
         confirm.onclick = this.handleAddComment.bind(this);
         const cancel = document.createElement("button");
         cancel.setAttribute(CONTROL_ATTR_NAME, "");
-        cancel.className = "reviewCommentEditor cancel";
+        this.applyStyles(cancel, "reviewCommentEditor.cancel");
         cancel.innerText = "Cancel";
         cancel.onclick = this.handleCancel.bind(this);
         root.appendChild(textarea);
@@ -7257,19 +6875,23 @@ class ReviewManager {
             },
             getPosition: () => {
                 if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
-                    const position = this.editor.getPosition();
                     return {
                         position: {
-                            lineNumber: this.activeComment ? this.activeComment.lineNumber : position.lineNumber + 1,
-                            column: position.column,
+                            lineNumber: this.getActivePosition(),
+                            column: 1,
                         },
-                        preference: [POSITION_EXACT],
+                        preference: [2],
                     };
                 }
             },
         };
         this.editor.addContentWidget(this.widgetInlineCommentEditor);
         return editorElement;
+    }
+    getActivePosition() {
+        const position = this.editor.getPosition();
+        return this.activeComment ? this.activeComment.lineNumber : position.lineNumber;
+        //does it need an offset
     }
     setActiveComment(comment) {
         this.verbose && console.debug("setActiveComment", comment);
@@ -7283,7 +6905,10 @@ class ReviewManager {
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
             this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-                this.renderStore[comment.id].renderStatus = events_comments_reducers_1.ReviewCommentRenderState.dirty;
+                const cs = this.renderStore[comment.id];
+                if (cs) {
+                    cs.renderStatus = events_comments_reducers_1.ReviewCommentRenderState.dirty;
+                }
             });
         }
     }
@@ -7326,10 +6951,11 @@ class ReviewManager {
         else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
             let activeComment = null;
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
-                for (const comment of Object.values(this.store.comments).map((c) => c.comment)) {
-                    const x = this.getRenderState(comment.id);
-                    if (x.viewZoneId == ev.target.detail.viewZoneId) {
-                        activeComment = comment;
+                for (const cs of Object.values(this.store.comments)) {
+                    const rs = this.getRenderState(cs.comment.id);
+                    if (rs.viewZoneId == ev.target.detail.viewZoneId) {
+                        activeComment = cs.comment;
+                        console.log(cs.comment.text, cs.history.length);
                         break;
                     }
                 }
@@ -7339,28 +6965,30 @@ class ReviewManager {
             this.setEditorMode(EditorMode.toolbar, "mouse-down-2");
         }
     }
-    calculateMarginTopOffset(includeActiveCommentHeight) {
-        let count = 0;
-        let marginTop = 0;
-        const lineHeight = this.editorConfig.lineHeight;
-        if (this.activeComment) {
-            for (var item of this.iterateComments()) {
-                if (item.state.comment.lineNumber === this.activeComment.lineNumber &&
-                    (item.state.comment != this.activeComment || includeActiveCommentHeight)) {
-                    count += this.calculateNumberOfLines(item.state.comment.text);
-                }
-                if (item.state.comment == this.activeComment) {
-                    break;
-                }
-            }
-            marginTop = count * lineHeight;
-        }
-        const result = marginTop + this.config.verticalOffset;
-        return result;
-    }
+    // private calculateMarginTopOffset(includeActiveCommentHeight: boolean): number {
+    //   let count = 0;
+    //   let marginTop = 0;
+    //   const lineHeight = this.editorConfig.lineHeight;
+    //   if (this.activeComment) {
+    //     for (var item of this.iterateComments()) {
+    //       if (
+    //         item.state.comment.lineNumber === this.activeComment.lineNumber &&
+    //         (item.state.comment != this.activeComment || includeActiveCommentHeight)
+    //       ) {
+    //         count += this.calculateNumberOfLines(item.state.comment.text);
+    //       }
+    //       if (item.state.comment == this.activeComment) {
+    //         break;
+    //       }
+    //     }
+    //     marginTop = count * lineHeight;
+    //   }
+    //   const result = marginTop + this.config.verticalOffset;
+    //   return result;
+    // }
     layoutInlineToolbar() {
         this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
-        this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
+        //this.inlineToolbarElements.root.style.marginTop = `${this.calculateMarginTopOffset(false)}px`;
         if (this.inlineToolbarElements.remove) {
             const hasChildren = this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment.id).length > 1;
             const isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
@@ -7388,6 +7016,8 @@ class ReviewManager {
             console.log("setEditorMode", EditorMode[mode], why, "Comment:", this.activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
         this.layoutInlineToolbar();
         this.layoutInlineCommentEditor();
+        this.setActiveComment(this.activeComment);
+        this.refreshComments();
         if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
             if (mode == EditorMode.insertComment) {
                 this.editorElements.textarea.value = "";
@@ -7444,12 +7074,7 @@ class ReviewManager {
         event.id = uuid.v4();
         this.events.push(event);
         this.store = events_comments_reducers_1.commentReducer(event, this.store);
-        if (this.activeComment && !this.store.comments[this.activeComment.id]) {
-            this.setActiveComment(null);
-        }
-        else if (this.activeComment && this.activeComment.status === events_comments_reducers_1.ReviewCommentStatus.deleted) {
-            this.setActiveComment(null);
-        }
+        this.setActiveComment(null);
         this.refreshComments();
         this.layoutInlineToolbar();
         if (this.onChange) {
@@ -7476,8 +7101,10 @@ class ReviewManager {
     }
     createElement(text, className, tagName = null) {
         const span = document.createElement(tagName || "span");
-        span.className = className;
-        span.innerText = text;
+        this.applyStyles(span, className);
+        if (text) {
+            span.innerText = text;
+        }
         return span;
     }
     getRenderState(commentId) {
@@ -7490,6 +7117,23 @@ class ReviewManager {
         this.editor.changeViewZones((changeAccessor) => {
             var _a;
             const lineNumbers = {};
+            if (this.editorMode === EditorMode.insertComment || this.editorMode === EditorMode.editComment) {
+                if (this.editId) {
+                    changeAccessor.removeZone(this.editId);
+                }
+                const node = document.createElement("div");
+                //node.style.backgroundColor = "orange";
+                //node.innerHTML = "hello";
+                this.editId = changeAccessor.addZone({
+                    afterLineNumber: this.getActivePosition(),
+                    heightInPx: 100,
+                    domNode: node,
+                    suppressMouseDown: true,
+                });
+            }
+            else if (this.editId) {
+                changeAccessor.removeZone(this.editId);
+            }
             for (const cid of Array.from(this.store.deletedCommentIds || [])) {
                 const viewZoneId = (_a = this.renderStore[cid]) === null || _a === void 0 ? void 0 : _a.viewZoneId;
                 changeAccessor.removeZone(viewZoneId);
@@ -7523,12 +7167,22 @@ class ReviewManager {
                     const domNode = this.config.renderComment
                         ? this.config.renderComment(isActive, item)
                         : this.renderComment(isActive, item);
-                    document.body.appendChild(domNode);
-                    const height = domNode.offsetHeight;
-                    document.body.removeChild(domNode);
+                    //renderComment invoked
+                    const cacheKey = `${item.state.comment.id}-${item.state.history.length}`;
+                    // attach to dom to calculate height
+                    if (this.commentHeightCache[cacheKey] === undefined) {
+                        document.body.appendChild(domNode);
+                        const height = domNode.offsetHeight;
+                        document.body.removeChild(domNode);
+                        this.commentHeightCache[cacheKey] = height;
+                        console.log("calculated height");
+                    }
+                    else {
+                        console.log("using cached height", cacheKey, this.commentHeightCache[item.state.comment.id]);
+                    }
                     rs.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
-                        heightInPx: height,
+                        heightInPx: this.commentHeightCache[cacheKey],
                         domNode,
                         suppressMouseDown: true,
                     });
@@ -7562,25 +7216,26 @@ class ReviewManager {
         });
     }
     renderComment(isActive, item) {
-        const domNode = this.createElement("", `reviewComment ${isActive ? "active" : " inactive"}`);
-        domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
-        domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+        const rootNode = this.createElement(null, `reviewComment`); //.${isActive ? "active" : "inactive"}`);
+        rootNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
+        rootNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+        const domNode = this.createElement(null, `reviewComment.${isActive ? "active" : "inactive"}`);
+        rootNode.appendChild(domNode);
         // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
-        domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment author"));
-        domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment dt"));
+        domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment.author"));
+        domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment.dt"));
         if (item.state.history.length > 1) {
-            domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment history"));
+            domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history"));
         }
-        const n = document.createElement("div");
-        n.className = "reviewComment text";
+        const n = this.createElement(null, "reviewComment.text", "div");
         n.innerHTML = comment_1.convertMarkdownToHTML(item.state.comment.text);
         domNode.appendChild(n);
-        return domNode;
+        return rootNode;
     }
-    calculateNumberOfLines(text) {
-        return 10;
-        text ? text.split(/\r*\n/).length + 1 : 1;
-    }
+    // calculateNumberOfLines(text: string): number {
+    //   return 10;
+    //   text ? text.split(/\r*\n/).length + 1 : 1;
+    // }
     addActions() {
         this.editor.addAction({
             id: "my-unique-id-add",

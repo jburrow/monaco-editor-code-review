@@ -25,7 +25,7 @@ interface WindowDoc {
 const win = (window as any) as WindowDoc;
 let reviewManager: ReviewManager = null;
 let currentMode: string = "";
-let currentEditor: any = null;
+let currentEditor: monacoEditor.editor.IStandaloneCodeEditor = null;
 let theme = "vs-dark";
 const fooUser = "foo.user";
 const barUser = "bar.user";
@@ -102,7 +102,7 @@ function generateDifferentContents() {
   if (currentMode.startsWith("standard")) {
     currentEditor.setValue(exampleSourceCode[idx]);
   } else {
-    const e = currentEditor;
+    const e = currentEditor as any;
     e.getModel().modified.setValue(exampleSourceCode[idx]);
     e.getModel().modified.setValue(exampleSourceCode[idx + 1]);
   }
@@ -302,7 +302,9 @@ function clearComments() {
 
 function toggleSummaryView() {
   const o = document.getElementById("summaryEditor");
-  o.style.display = o.style.display == "none" ? "" : "none";
+  o.style.display = o.style.display === "none" ? "" : "none";
+
+  // currentEditor.layout();
 }
 
 win.setView = setView;

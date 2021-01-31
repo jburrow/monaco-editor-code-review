@@ -188,6 +188,42 @@ export class ReviewManager {
     if (this.config.showAddCommentGlyph) {
       this.editor.onMouseMove(this.handleMouseMove.bind(this));
     }
+
+    this.createCustomCssClasses();
+  }
+
+  createCustomCssClasses() {
+    const id = "monaco_review_custom_styles";
+    if (!document.getElementById(id)) {
+      const style = document.createElement("style");
+      style.id = "monaco_review_custom_styles";
+      style.type = "text/css";
+      style.innerHTML = `
+
+    .activeLineMarginClass {
+      background-image: url("data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=");
+    }`;
+
+      /*
+  
+  svg = `
+  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+   <g>
+    <title>Layer 1</title>
+    <g id="svg_2">
+     <path fill="#re d="m12.40135,15.21479l-9.26822,0q-1.15575,0 -1.96699,-0.7272t-0.81125,-1.76321l0,-9.96165q0,-1.03601 0.81125,-1.76321t1.96699,-0.7272l9.26822,0q1.15574,0 1.96699,0.7272t0.81125,1.76321l0,9.96165q0,1.03601 -0.81125,1.76321t-1.96699,0.7272zm-9.26822,-13.28883q-0.37784,0 -0.65566,0.24904t-0.27783,0.58773l0,9.96165q0,0.3387 0.27783,0.58774t0.65566,0.24904l9.26822,0q0.37784,0 0.64455,-0.24904t0.26671,-0.58774l0,-9.96165q0,-0.33869 -0.26671,-0.58773t-0.64455,-0.24904l-9.26822,0zm8.33473,4.98082l-7.40124,0q-0.46674,0 -0.46674,-0.39847q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39847 -0.46674,0.39847zm0,-2.49041l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39847 0.46674,-0.39847l7.40124,0q0.46674,0 0.46674,0.39847q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,4.98082l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39846 0.46674,-0.39846l7.40124,0q0.46674,0 0.46674,0.39846q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,2.49041l-7.40124,0q-0.46674,0 -0.46674,-0.39846q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39846 -0.46674,0.39846z" id="svg_1" stroke="null"/>
+    </g>
+   </g>
+  </svg>`
+  
+  console.log(`.activeLineMarginClass{    
+    background-image: url("data:image/svg+xml;base64,${btoa(svg)}");
+  }`);
+  
+  */
+
+      document.getElementsByTagName("head")[0].appendChild(style);
+    }
   }
 
   setReadOnlyMode(value: boolean) {
@@ -268,9 +304,10 @@ export class ReviewManager {
     reviewComment: {
       "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
     "Courier New", monospace;`,
+      "font-size": "12px",
     },
     "reviewComment.dt": {},
-    "reviewComment.active": {},
+    "reviewComment.active": { border: "1px solid yellow" },
     "reviewComment.inactive": {},
     "reviewComment.author": {},
     "reviewComment.text": {},
@@ -281,7 +318,7 @@ export class ReviewManager {
     "reviewCommentEditor.save": { width: "150px" },
     "reviewCommentEditor.cancel": { width: "150px" },
     "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
-    editButtonsContainer: {},
+    editButtonsContainer: { cursor: "pointer" },
     "editButton.add": {},
     "editButton.remove": {},
     "editButton.edit": {},
@@ -294,6 +331,7 @@ export class ReviewManager {
         for (const [key, value] of Object.entries(this.styles[className])) {
           element.style[key] = value;
         }
+        //debugger;
       }
     }
   }
@@ -446,14 +484,10 @@ export class ReviewManager {
       },
       getPosition: () => {
         if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
-          const { column } = this.editor.getPosition();
-          const lineNumber = this.getActivePosition();
-
-          //console.log("getPosition", lineNumber, column);
           return {
             position: {
-              lineNumber,
-              column,
+              lineNumber: this.getActivePosition(),
+              column: 1,
             },
             preference: [2],
           };
@@ -509,12 +543,12 @@ export class ReviewManager {
   }
 
   renderAddCommentLineDecoration(lineNumber?: number) {
-    const lines = lineNumber
+    const lines: monacoEditor.editor.IModelDeltaDecoration[] = lineNumber
       ? [
           {
             range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
             options: {
-              marginClassName: "activeLineMarginClass",
+              marginClassName: "activeLineMarginClass", //TODO - fix the creation of this style
               zIndex: 100,
             },
           },
@@ -691,11 +725,7 @@ export class ReviewManager {
             targetId: this.activeComment && this.activeComment.id,
           };
 
-    const e = this.addEvent(event);
-
-    //here
-
-    return e;
+    return this.addEvent(event);
   }
 
   private addEvent(event: ReviewCommentEvent) {
@@ -706,14 +736,7 @@ export class ReviewManager {
     this.events.push(event);
     this.store = commentReducer(event, this.store);
 
-    if (this.activeComment && !this.store.comments[this.activeComment.id]) {
-      this.setActiveComment(null);
-    } else if (this.activeComment && this.activeComment.status === ReviewCommentStatus.deleted) {
-      this.setActiveComment(null);
-    }
-
     this.setActiveComment(null);
-
     this.refreshComments();
     this.layoutInlineToolbar();
 
@@ -743,7 +766,9 @@ export class ReviewManager {
   private createElement(text: string, className: string, tagName: string = null) {
     const span = document.createElement(tagName || "span") as HTMLSpanElement;
     this.applyStyles(span, className);
-    span.innerText = text;
+    if (text) {
+      span.innerText = text;
+    }
     return span;
   }
 
@@ -764,8 +789,8 @@ export class ReviewManager {
           changeAccessor.removeZone(this.editId);
         }
         const node = document.createElement("div");
-        node.style.backgroundColor = "orange";
-        node.innerHTML = "hello";
+        //node.style.backgroundColor = "orange";
+        //node.innerHTML = "hello";
         this.editId = changeAccessor.addZone({
           afterLineNumber: this.getActivePosition(),
           heightInPx: 100,
@@ -880,9 +905,12 @@ export class ReviewManager {
   }
 
   private renderComment(isActive: boolean, item: ReviewCommentIterItem) {
-    const domNode = this.createElement("", `reviewComment.${isActive ? "active" : "inactive"}`);
-    domNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
-    domNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+    const rootNode = this.createElement(null, `reviewComment`); //.${isActive ? "active" : "inactive"}`);
+    rootNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
+    rootNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+
+    const domNode = this.createElement(null, `reviewComment.${isActive ? "active" : "inactive"}`);
+    rootNode.appendChild(domNode);
 
     // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
     domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment.author"));
@@ -893,12 +921,11 @@ export class ReviewManager {
       );
     }
 
-    const n = document.createElement("div");
-    this.applyStyles(n, "reviewComment.text");
+    const n = this.createElement(null, "reviewComment.text", "div");
     n.innerHTML = convertMarkdownToHTML(item.state.comment.text);
     domNode.appendChild(n);
 
-    return domNode;
+    return rootNode;
   }
 
   // calculateNumberOfLines(text: string): number {
