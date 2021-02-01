@@ -619,21 +619,10 @@ class ReviewManager {
                         ? this.config.renderComment(isActive, item)
                         : this.renderComment(isActive, item);
                     //renderComment invoked
-                    const cacheKey = this.getHeightCacheKey(item);
-                    // attach to dom to calculate height
-                    if (this.commentHeightCache[cacheKey] === undefined) {
-                        document.body.appendChild(domNode);
-                        const height = domNode.offsetHeight;
-                        document.body.removeChild(domNode);
-                        this.commentHeightCache[cacheKey] = height;
-                        console.log("calculated height");
-                    }
-                    else {
-                        console.log("using cached height", cacheKey, this.commentHeightCache[item.state.comment.id]);
-                    }
+                    const heightInPx = this.measureHeighInPx(item, domNode);
                     rs.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,
-                        heightInPx: this.commentHeightCache[cacheKey],
+                        heightInPx: heightInPx,
                         domNode,
                         suppressMouseDown: true,
                     });
@@ -665,6 +654,26 @@ class ReviewManager {
                 this.currentCommentDecorations = this.editor.deltaDecorations(this.currentCommentDecorations, decorators);
             }
         });
+    }
+    measureHeighInPx(item, domNode) {
+        const cacheKey = this.getHeightCacheKey(item);
+        // attach to dom to calculate height
+        if (this.commentHeightCache[cacheKey] === undefined) {
+            const container = document.createElement("div");
+            container.style.position = "absolute";
+            container.style.top = "0px";
+            container.appendChild(domNode);
+            document.body.appendChild(container);
+            const height = container.offsetHeight;
+            document.body.removeChild(container);
+            container.removeChild(domNode);
+            this.commentHeightCache[cacheKey] = height;
+            console.log("calculated height", height);
+        }
+        else {
+            console.log("using cached height", cacheKey, this.commentHeightCache[item.state.comment.id]);
+        }
+        return this.commentHeightCache[cacheKey];
     }
     getHeightCacheKey(item) {
         return `${item.state.comment.id}-${item.state.history.length}`;

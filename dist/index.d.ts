@@ -138,6 +138,7 @@ export declare class ReviewManager {
     editId: string;
     commentHeightCache: Record<string, number>;
     refreshComments(): void;
+    private measureHeighInPx;
     private getHeightCacheKey;
     private renderComment;
     addActions(): void;
