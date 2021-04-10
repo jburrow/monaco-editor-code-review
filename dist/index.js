@@ -624,7 +624,7 @@ class ReviewManager {
                         afterLineNumber: item.state.comment.lineNumber,
                         heightInPx: heightInPx,
                         domNode,
-                        suppressMouseDown: true,
+                        suppressMouseDown: true, // This stops focus being lost the editor - meaning keyboard shortcuts keeps working
                     });
                 }
             }
