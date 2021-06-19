@@ -10,7 +10,7 @@
   "scripts": {
     "start": "webpack serve",
     "compile": "tsc && webpack --mode=development",
-    "tsc": "tsc",
+    "tsc": "tsc --watch",
     "doc": "typedoc --out ./docs ./src/index.ts",
     "test": "jest --coverage",
     "testpub": "jest --coverage --coverageReporters=text-lcov | coveralls"
@@ -18,7 +18,7 @@
   "author": "James Burrow",
   "license": "MIT",
   "peerDependencies": {
-    "monaco-editor": "^0.23.0"
+    "monaco-editor": "0.23||0.24||0.25||0.26"
   },
   "dependencies": {
     "showdown": "^1.9.1",
