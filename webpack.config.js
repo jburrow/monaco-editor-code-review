@@ -66,10 +66,10 @@ function getConfigs(mode) {
   return [var_es2017, common_es2017];
 }
 
-module.exports = (WEBPACK_SERVE) => {
-  if (WEBPACK_SERVE) {
+module.exports = (env, argv) => {
+  if (argv.env.WEBPACK_SERVE) {
     return getConfigs("development")[1];
   } else {
-    return getConfigs("development").concat(getConfigs("production"));
+    return getConfigs("development").concat([getConfigs("production")[0]]);
   }
 };

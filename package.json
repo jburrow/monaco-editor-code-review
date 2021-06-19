@@ -1,6 +1,6 @@
 {
   "name": "monaco-review",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "Code review extension for Monaco",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "webpack serve",
-    "compile": "tsc && webpack --mode=development",
+    "compile": "tsc && webpack --mode=production",
     "tsc": "tsc --watch",
     "doc": "typedoc --out ./docs ./src/index.ts",
     "test": "jest --coverage",
