@@ -18,7 +18,7 @@
   "author": "James Burrow",
   "license": "MIT",
   "peerDependencies": {
-    "monaco-editor": "0.23||0.24||0.25"
+    "monaco-editor": ">0.21"
   },
   "dependencies": {
     "showdown": "^1.9.1",
