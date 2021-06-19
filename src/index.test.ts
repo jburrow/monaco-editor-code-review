@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent } from "./events-comments-reducers";
 
@@ -9,7 +13,7 @@ class Range {
   constructor() {}
 }
 
-const monacoWindow = (window as any) as MonacoWindow;
+const monacoWindow = window as any as MonacoWindow;
 monacoWindow.monaco = {
   KeyMod: { CtrlCmd: 0 },
   KeyCode: { F10: 1 },
@@ -254,11 +258,11 @@ test("Enter Comment Widgets", () => {
   rm.editorElements.textarea.value = "xxxx";
   rm.setEditorMode(EditorMode.insertComment); // Edit Mode
   expect(rm.editorElements.textarea.value).toBe(""); //Toolbar
-  rm.handleTextAreaKeyDown(({
+  rm.handleTextAreaKeyDown({
     code: "Escape",
     ctrlKey: false,
     preventDefault: () => null,
-  } as any) as KeyboardEvent);
+  } as any as KeyboardEvent);
   expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 
   expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
@@ -267,11 +271,11 @@ test("Enter Comment Widgets", () => {
   rm.setEditorMode(EditorMode.insertComment);
   rm.editorElements.textarea.value = "#5";
 
-  rm.handleTextAreaKeyDown(({
+  rm.handleTextAreaKeyDown({
     code: "Enter",
     ctrlKey: true,
     preventDefault: () => null,
-  } as any) as KeyboardEvent);
+  } as any as KeyboardEvent);
   expect(rm.editorMode).toBe(EditorMode.toolbar); //Toolbar
 
   const cs = Object.values(rm.store.comments)[0];
