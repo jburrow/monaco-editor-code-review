@@ -66,10 +66,10 @@ function getConfigs(mode) {
   return [var_es2017, common_es2017];
 }
 
-module.exports = () => {
-  // if (WEBPACK_SERVE) {
-  return getConfigs("development");
-  // } else {
-  //   return getConfigs("development").concat(getConfigs("production"));
-  // }
+module.exports = (WEBPACK_SERVE) => {
+  if (WEBPACK_SERVE) {
+    return getConfigs("development")[1];
+  } else {
+    return getConfigs("development").concat(getConfigs("production"));
+  }
 };
