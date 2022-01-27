@@ -22,7 +22,7 @@ interface WindowDoc {
   toggleSummaryView: () => void;
 }
 
-const win = (window as any) as WindowDoc;
+const win = window as any as WindowDoc;
 let reviewManager: ReviewManager = null;
 let currentMode: string = "";
 let currentEditor: monacoEditor.editor.IStandaloneCodeEditor = null;
@@ -31,17 +31,33 @@ const fooUser = "foo.user";
 const barUser = "bar.user";
 
 function ensureMonacoIsAvailable() {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     if (!win.require) {
       console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
-      var prefix = "https://microsoft.github.io/monaco-editor";
-      const scriptTag = document.createElement("script");
-      scriptTag.src = prefix + "/node_modules/monaco-editor/min/vs/loader.js";
-      scriptTag.onload = () => {
-        console.debug("Monaco loader is initialized");
-        resolve(prefix);
-      };
-      document.body.appendChild(scriptTag);
+      const github = "https://microsoft.github.io/monaco-editor";
+      const loader = "/node_modules/monaco-editor/min/vs/loader.js";
+
+      let prefix = null;
+      for (const p of [github, ""]) {
+        try {
+          console.log("trying", p);
+          const response = await fetch(p + loader, { method: "HEAD" });
+
+          prefix = p;
+        } catch {}
+      }
+      console.log("prefix", prefix);
+      if (prefix !== null) {
+        const scriptTag = document.createElement("script");
+        scriptTag.src = prefix + loader;
+        scriptTag.onload = () => {
+          console.debug("Monaco loader is initialized");
+          resolve(prefix);
+        };
+        document.body.appendChild(scriptTag);
+      } else {
+        document.body.innerHTML = "Unable to find monaco node_modules";
+      }
     } else {
       resolve("..");
     }
