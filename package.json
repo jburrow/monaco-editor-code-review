@@ -21,7 +21,7 @@
     "monaco-editor": ">0.32"
   },
   "dependencies": {
-    "showdown": "^1.9.1",
+    "showdown": "^2.0.0-alpha",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

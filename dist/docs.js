@@ -127,6 +127,7 @@ function init() {
         });
     });
 }
+console.log("asfds");
 function initReviewManager(editor, currentUser, readOnly) {
     reviewManager = (0, index_1.createReviewManager)(editor, currentUser, createRandomComments(), (updatedComments) => renderComments(updatedComments), {
         editButtonEnableRemove: true,
