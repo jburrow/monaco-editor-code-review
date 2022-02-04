@@ -49,7 +49,7 @@ Features
 
 - Add comment
 - Reply to comment
-- Delete comment [optionally disabl]
+- Delete comment [optionally disable/disable]
 - Navigate between comments [ forward, back]
 - Displays comment marker in scrollbar
 - Supports Monaco Themes

@@ -28,7 +28,7 @@ function ensureMonacoIsAvailable() {
             for (const p of [github, ""]) {
                 try {
                     console.log("trying", p);
-                    const response = yield fetch(p + loader, { method: "HEAD" });
+                    const response = yield fetch(p + loader, { method: "GET" });
                     prefix = p;
                 }
                 catch (_a) { }
