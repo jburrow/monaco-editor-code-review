@@ -157,18 +157,20 @@ async function init() {
     window.dispatchEvent(new Event("monaco-ready"));
   });
 }
-
+console.log("asfds");
 function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, readOnly: boolean) {
   reviewManager = createReviewManager(
     editor,
     currentUser,
     createRandomComments(),
     (updatedComments) => renderComments(updatedComments),
+
     {
       editButtonEnableRemove: true,
       formatDate: (createdAt: Date | string) => moment(createdAt).format("YY-MM-DD HH:mm"),
       readOnly: readOnly,
-    }
+    },
+    true
   );
 
   setCurrentUser();

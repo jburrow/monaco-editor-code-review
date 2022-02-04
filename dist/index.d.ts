@@ -88,6 +88,7 @@ export declare class ReviewManager {
     inlineToolbarElements: InlineToolbarElements;
     verbose: boolean;
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
+    canCancelCondition: monacoEditor.editor.IContextKey<boolean>;
     renderStore: Record<string, RenderStoreItem>;
     constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
     createCustomCssClasses(): void;
@@ -103,9 +104,10 @@ export declare class ReviewManager {
     handleTextAreaKeyDown(e: KeyboardEvent): void;
     createInlineEditorElement(): EditorElements;
     createInlineToolbarWidget(): InlineToolbarElements;
+    calculateConfirmButtonText(): "Reply to Comment" | "Add Comment" | "Edit Comment";
     createInlineEditorWidget(): EditorElements;
     getActivePosition(): number;
-    setActiveComment(comment: ReviewComment): void;
+    setActiveComment(comment: ReviewComment, reason?: string): boolean;
     filterAndMapComments(lineNumbers: number[], fn: {
         (comment: ReviewComment): void;
     }): void;

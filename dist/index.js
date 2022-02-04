@@ -59,6 +59,8 @@ class ReviewManager {
             "reviewComment.text": {},
             reviewCommentEditor: {
                 padding: "5px",
+                border: "1px solid blue",
+                "box-shadow": " 0px 0px 4px 2px lightblue",
                 "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
             },
             "reviewCommentEditor.save": { width: "150px" },
@@ -89,6 +91,7 @@ class ReviewManager {
         this.editor.onDidChangeConfiguration(() => (this.editorConfig = this.editor.getRawOptions()));
         this.editor.onMouseDown(this.handleMouseDown.bind(this));
         this.canAddCondition = this.editor.createContextKey("add-context-key", !this.config.readOnly);
+        this.canCancelCondition = this.editor.createContextKey("cancel-context-key", false);
         this.inlineToolbarElements = this.createInlineToolbarWidget();
         this.editorElements = this.createInlineEditorWidget();
         this.addActions();
@@ -135,7 +138,7 @@ class ReviewManager {
         this.renderAddCommentLineDecoration(null);
     }
     load(events) {
-        const store = events_comments_reducers_1.reduceComments(events);
+        const store = (0, events_comments_reducers_1.reduceComments)(events);
         this.loadFromStore(store, events);
     }
     loadFromStore(store, events) {
@@ -245,6 +248,8 @@ class ReviewManager {
         return { root, add, remove, edit };
     }
     handleCancel() {
+        console.log("[handleCancel]");
+        this.setActiveComment(null, "cancel");
         this.setEditorMode(EditorMode.toolbar, "cancel");
         this.editor.focus();
     }
@@ -281,7 +286,7 @@ class ReviewManager {
         const confirm = document.createElement("button");
         confirm.setAttribute(CONTROL_ATTR_NAME, "");
         this.applyStyles(confirm, "reviewCommentEditor.save");
-        confirm.innerText = "Add Comment";
+        confirm.innerText = "placeholder add";
         confirm.onclick = this.handleAddComment.bind(this);
         const cancel = document.createElement("button");
         cancel.setAttribute(CONTROL_ATTR_NAME, "");
@@ -319,6 +324,14 @@ class ReviewManager {
         this.editor.addContentWidget(this.widgetInlineToolbar);
         return buttonsElement;
     }
+    calculateConfirmButtonText() {
+        if (this.editorMode == EditorMode.insertComment) {
+            return this.activeComment ? "Reply to Comment" : "Add Comment";
+        }
+        else {
+            return "Edit Comment";
+        }
+    }
     createInlineEditorWidget() {
         // doesn't re-theme when
         const editorElement = this.createInlineEditorElement();
@@ -332,6 +345,7 @@ class ReviewManager {
             },
             getPosition: () => {
                 if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
+                    editorElement.confirm.innerText = this.calculateConfirmButtonText();
                     return {
                         position: {
                             lineNumber: this.getActivePosition(),
@@ -346,12 +360,17 @@ class ReviewManager {
         return editorElement;
     }
     getActivePosition() {
+        var _a;
         const position = this.editor.getPosition();
-        return this.activeComment ? this.activeComment.lineNumber : position.lineNumber;
-        //does it need an offset
+        const activePosition = this.activeComment ? this.activeComment.lineNumber : position.lineNumber;
+        //does it need an offset?
+        console.log("[getActivePosition]", activePosition, (_a = this.activeComment) === null || _a === void 0 ? void 0 : _a.lineNumber, position.lineNumber);
+        return activePosition;
     }
-    setActiveComment(comment) {
-        this.verbose && console.debug("setActiveComment", comment);
+    setActiveComment(comment, reason) {
+        this.verbose && console.debug("[setActiveComment]", comment, reason);
+        this.canCancelCondition.set(Boolean(this.activeComment));
+        const isDifferentComment = this.activeComment !== comment;
         const lineNumbersToMakeDirty = [];
         if (this.activeComment && (!comment || this.activeComment.lineNumber !== comment.lineNumber)) {
             lineNumbersToMakeDirty.push(this.activeComment.lineNumber);
@@ -368,6 +387,7 @@ class ReviewManager {
                 }
             });
         }
+        return isDifferentComment;
     }
     filterAndMapComments(lineNumbers, fn) {
         for (const cs of Object.values(this.store.comments)) {
@@ -406,7 +426,7 @@ class ReviewManager {
             this.setEditorMode(EditorMode.insertComment, "mouse-down-1");
         }
         else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
-            let activeComment = null;
+            let activeComment = this.activeComment;
             if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
                 for (const cs of Object.values(this.store.comments)) {
                     const rs = this.getRenderState(cs.comment.id);
@@ -417,9 +437,11 @@ class ReviewManager {
                     }
                 }
             }
-            this.setActiveComment(activeComment);
+            const commentChanged = this.setActiveComment(activeComment, "handleMouseDown");
             this.refreshComments();
-            this.setEditorMode(EditorMode.toolbar, "mouse-down-2");
+            if (commentChanged && this.activeComment) {
+                this.setEditorMode(EditorMode.toolbar, "mouse-down-2");
+            }
         }
     }
     calculateMarginTopOffset(includeActiveCommentHeight) {
@@ -450,7 +472,11 @@ class ReviewManager {
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
     layoutInlineCommentEditor() {
-        [this.editorElements.root, this.editorElements.textarea].forEach((e) => {
+        [this.editorElements.root].forEach((e) => {
+            e.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+            e.style.color = this.getThemedColor("editor.foreground");
+        });
+        [this.editorElements.textarea].forEach((e) => {
             e.style.backgroundColor = this.getThemedColor("editor.background");
             e.style.color = this.getThemedColor("editor.foreground");
         });
@@ -525,7 +551,7 @@ class ReviewManager {
         event.createdAt = this.getDateTimeNow();
         event.id = uuid.v4();
         this.events.push(event);
-        this.store = events_comments_reducers_1.commentReducer(event, this.store);
+        this.store = (0, events_comments_reducers_1.commentReducer)(event, this.store);
         this.setActiveComment(null);
         this.refreshComments();
         this.layoutInlineToolbar();
@@ -692,7 +718,7 @@ class ReviewManager {
             domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history"));
         }
         const n = this.createElement(null, "reviewComment.text", "div");
-        n.innerHTML = comment_1.convertMarkdownToHTML(item.state.comment.text);
+        n.innerHTML = (0, comment_1.convertMarkdownToHTML)(item.state.comment.text);
         domNode.appendChild(n);
         return rootNode;
     }
@@ -701,6 +727,16 @@ class ReviewManager {
     //   text ? text.split(/\r*\n/).length + 1 : 1;
     // }
     addActions() {
+        this.editor.addAction({
+            id: "my-unique-id-cancel",
+            label: "Cancel Comment",
+            keybindings: [monacoWindow.monaco.KeyCode.Escape],
+            precondition: "cancel-context-key",
+            keybindingContext: null,
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 0,
+            run: () => this.handleCancel(),
+        });
         this.editor.addAction({
             id: "my-unique-id-add",
             label: "Add Comment",

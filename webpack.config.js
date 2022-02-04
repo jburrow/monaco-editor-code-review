@@ -4,9 +4,18 @@ const baseConfig = (mode) => {
   return {
     mode,
     devtool: "source-map",
+    output: {
+      //Replaced when expanding
+    },
     devServer: {
-      publicPath: "/dist/",
-      compress: true,
+      client: {
+        overlay: true,
+        logging: "log",
+        progress: true,
+      },
+      static: {
+        directory: path.join(__dirname),
+      },
     },
     plugins: [],
     module: {
@@ -47,6 +56,7 @@ function getConfigs(mode) {
       path: path.join(__dirname, "dist"),
       libraryTarget: "var",
       library: "MonacoEditorCodeReview",
+      publicPath: "",
     },
     entry: {
       index: "./src/index.ts",
@@ -58,6 +68,7 @@ function getConfigs(mode) {
     output: {
       filename: "[name]-commonjs-es2017." + ext,
       path: path.join(__dirname, "dist"),
+      publicPath: "",
     },
     entry: {
       docs: "./src/docs.ts",

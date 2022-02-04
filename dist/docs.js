@@ -19,22 +19,38 @@ let theme = "vs-dark";
 const fooUser = "foo.user";
 const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
-    return new Promise((resolve) => {
+    return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
         if (!win.require) {
             console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
-            var prefix = "https://microsoft.github.io/monaco-editor";
-            const scriptTag = document.createElement("script");
-            scriptTag.src = prefix + "/node_modules/monaco-editor/min/vs/loader.js";
-            scriptTag.onload = () => {
-                console.debug("Monaco loader is initialized");
-                resolve(prefix);
-            };
-            document.body.appendChild(scriptTag);
+            const github = "https://microsoft.github.io/monaco-editor";
+            const loader = "/node_modules/monaco-editor/min/vs/loader.js";
+            let prefix = null;
+            for (const p of [github, ""]) {
+                try {
+                    console.log("trying", p);
+                    const response = yield fetch(p + loader, { method: "HEAD" });
+                    prefix = p;
+                }
+                catch (_a) { }
+            }
+            console.log("prefix", prefix);
+            if (prefix !== null) {
+                const scriptTag = document.createElement("script");
+                scriptTag.src = prefix + loader;
+                scriptTag.onload = () => {
+                    console.debug("Monaco loader is initialized");
+                    resolve(prefix);
+                };
+                document.body.appendChild(scriptTag);
+            }
+            else {
+                document.body.innerHTML = "Unable to find monaco node_modules";
+            }
         }
         else {
             resolve("..");
         }
-    });
+    }));
 }
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
@@ -112,11 +128,11 @@ function init() {
     });
 }
 function initReviewManager(editor, currentUser, readOnly) {
-    reviewManager = index_1.createReviewManager(editor, currentUser, createRandomComments(), (updatedComments) => renderComments(updatedComments), {
+    reviewManager = (0, index_1.createReviewManager)(editor, currentUser, createRandomComments(), (updatedComments) => renderComments(updatedComments), {
         editButtonEnableRemove: true,
         formatDate: (createdAt) => moment(createdAt).format("YY-MM-DD HH:mm"),
         readOnly: readOnly,
-    });
+    }, true);
     setCurrentUser();
     renderComments(reviewManager.events);
 }
