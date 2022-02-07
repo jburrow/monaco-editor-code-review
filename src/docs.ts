@@ -37,16 +37,9 @@ function ensureMonacoIsAvailable() {
       const github = "https://microsoft.github.io/monaco-editor";
       const loader = "/node_modules/monaco-editor/min/vs/loader.js";
 
-      let prefix = null;
-      for (const p of [github, ""]) {
-        try {
-          console.log("trying", p);
-          const response = await fetch(p + loader, { method: "GET" });
-
-          prefix = p;
-        } catch {}
-      }
+      const prefix = window.location.host.indexOf("github") > -1 ? github : "";
       console.log("prefix", prefix);
+
       if (prefix !== null) {
         const scriptTag = document.createElement("script");
         scriptTag.src = prefix + loader;
