@@ -58,6 +58,33 @@ interface OnActionsChanged {
   (actions: ReviewCommentEvent[]): void;
 }
 
+export const defaultStyles: Record<string, {}> = {
+  reviewComment: {
+    "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
+  "Courier New", monospace;`,
+    "font-size": "12px",
+  },
+  "reviewComment.dt": {},
+  "reviewComment.active": { border: "1px solid darkorange" },
+  "reviewComment.inactive": {},
+  "reviewComment.author": {},
+  "reviewComment.text": {},
+  reviewCommentEditor: {
+    padding: "5px",
+    border: "1px solid blue",
+    "margin-left": "1px",
+    "box-shadow": " 0px 0px 4px 2px lightblue",
+    "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
+  },
+  "reviewCommentEditor.save": { width: "150px" },
+  "reviewCommentEditor.cancel": { width: "150px" },
+  "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
+  editButtonsContainer: { cursor: "pointer", fontSize: "12px" },
+  "editButton.add": {},
+  "editButton.remove": {},
+  "editButton.edit": {},
+};
+
 export interface ReviewManagerConfig {
   commentIndent?: number;
   commentIndentOffset?: number;
@@ -71,6 +98,8 @@ export interface ReviewManagerConfig {
   reviewCommentIconSelect?: string;
   showInRuler?: boolean;
   renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
+  styles?: Record<string, {}>;
+  setClassNames?: boolean;
 }
 
 interface ReviewManagerConfigPrivate {
@@ -89,6 +118,8 @@ interface ReviewManagerConfigPrivate {
   showAddCommentGlyph: boolean;
   showInRuler: boolean;
   renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
+  styles: Record<string, {}>;
+  setClassNames: boolean;
 }
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
@@ -106,6 +137,8 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
   rulerMarkerDarkColor: "darkorange",
   showAddCommentGlyph: true,
   showInRuler: true,
+  styles: { ...defaultStyles },
+  setClassNames: true,
 };
 
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
@@ -301,42 +334,18 @@ export class ReviewManager {
     return value;
   }
 
-  styles: Record<string, {}> = {
-    reviewComment: {
-      "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
-    "Courier New", monospace;`,
-      "font-size": "12px",
-    },
-    "reviewComment.dt": {},
-    "reviewComment.active": { border: "1px solid darkorange" },
-    "reviewComment.inactive": {},
-    "reviewComment.author": {},
-    "reviewComment.text": {},
-    reviewCommentEditor: {
-      padding: "5px",
-      border: "1px solid blue",
-      "margin-left": "1px",
-      "box-shadow": " 0px 0px 4px 2px lightblue",
-      "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
-    },
-    "reviewCommentEditor.save": { width: "150px" },
-    "reviewCommentEditor.cancel": { width: "150px" },
-    "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
-    editButtonsContainer: { cursor: "pointer" },
-    "editButton.add": {},
-    "editButton.remove": {},
-    "editButton.edit": {},
-  };
-
   applyStyles(element: HTMLElement, className: string) {
-    if (this.styles[className] === undefined) {
+    if (this.config.styles[className] === undefined) {
       console.log("[CLASSNAME]", className);
     } else {
-      if (this.styles[className]) {
-        for (const [key, value] of Object.entries(this.styles[className])) {
+      if (this.config.styles[className]) {
+        for (const [key, value] of Object.entries(this.config.styles[className])) {
           element.style[key] = value;
         }
-        //debugger;
+      }
+
+      if (this.config.setClassNames) {
+        element.className = className;
       }
     }
   }
@@ -345,6 +354,8 @@ export class ReviewManager {
     var root = document.createElement("div") as HTMLDivElement;
     this.applyStyles(root, "editButtonsContainer");
     root.style.marginLeft = this.config.editButtonOffset;
+    //root.style.marginTop = "100px";
+    //root.style.fontSize = "12px";
 
     const add = document.createElement("span") as HTMLSpanElement;
     add.innerText = this.config.editButtonAddText;

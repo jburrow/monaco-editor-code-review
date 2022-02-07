@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReviewManager = exports.createReviewManager = exports.EditorMode = exports.reduceComments = void 0;
+exports.ReviewManager = exports.defaultStyles = exports.createReviewManager = exports.EditorMode = exports.reduceComments = void 0;
 const events_comments_reducers_1 = require("./events-comments-reducers");
 Object.defineProperty(exports, "reduceComments", { enumerable: true, get: function () { return events_comments_reducers_1.reduceComments; } });
 const uuid = require("uuid");
@@ -25,6 +25,32 @@ function createReviewManager(editor, currentUser, actions, onChange, config, ver
     return rm;
 }
 exports.createReviewManager = createReviewManager;
+exports.defaultStyles = {
+    reviewComment: {
+        "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
+  "Courier New", monospace;`,
+        "font-size": "12px",
+    },
+    "reviewComment.dt": {},
+    "reviewComment.active": { border: "1px solid darkorange" },
+    "reviewComment.inactive": {},
+    "reviewComment.author": {},
+    "reviewComment.text": {},
+    reviewCommentEditor: {
+        padding: "5px",
+        border: "1px solid blue",
+        "margin-left": "1px",
+        "box-shadow": " 0px 0px 4px 2px lightblue",
+        "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
+    },
+    "reviewCommentEditor.save": { width: "150px" },
+    "reviewCommentEditor.cancel": { width: "150px" },
+    "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
+    editButtonsContainer: { cursor: "pointer", fontSize: "12px" },
+    "editButton.add": {},
+    "editButton.remove": {},
+    "editButton.edit": {},
+};
 const defaultReviewManagerConfig = {
     commentIndent: 20,
     commentIndentOffset: 20,
@@ -40,6 +66,8 @@ const defaultReviewManagerConfig = {
     rulerMarkerDarkColor: "darkorange",
     showAddCommentGlyph: true,
     showInRuler: true,
+    styles: Object.assign({}, exports.defaultStyles),
+    setClassNames: true,
 };
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
@@ -47,32 +75,6 @@ const POSITION_EXACT = 0;
 class ReviewManager {
     constructor(editor, currentUser, onChange, config, verbose) {
         var _a;
-        this.styles = {
-            reviewComment: {
-                "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
-    "Courier New", monospace;`,
-                "font-size": "12px",
-            },
-            "reviewComment.dt": {},
-            "reviewComment.active": { border: "1px solid darkorange" },
-            "reviewComment.inactive": {},
-            "reviewComment.author": {},
-            "reviewComment.text": {},
-            reviewCommentEditor: {
-                padding: "5px",
-                border: "1px solid blue",
-                "margin-left": "1px",
-                "box-shadow": " 0px 0px 4px 2px lightblue",
-                "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
-            },
-            "reviewCommentEditor.save": { width: "150px" },
-            "reviewCommentEditor.cancel": { width: "150px" },
-            "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
-            editButtonsContainer: { cursor: "pointer" },
-            "editButton.add": {},
-            "editButton.remove": {},
-            "editButton.edit": {},
-        };
         this.commentHeightCache = {};
         this.currentUser = currentUser;
         this.editor = editor;
@@ -200,15 +202,17 @@ class ReviewManager {
         return value;
     }
     applyStyles(element, className) {
-        if (this.styles[className] === undefined) {
+        if (this.config.styles[className] === undefined) {
             console.log("[CLASSNAME]", className);
         }
         else {
-            if (this.styles[className]) {
-                for (const [key, value] of Object.entries(this.styles[className])) {
+            if (this.config.styles[className]) {
+                for (const [key, value] of Object.entries(this.config.styles[className])) {
                     element.style[key] = value;
                 }
-                //debugger;
+            }
+            if (this.config.setClassNames) {
+                element.className = className;
             }
         }
     }
@@ -216,6 +220,8 @@ class ReviewManager {
         var root = document.createElement("div");
         this.applyStyles(root, "editButtonsContainer");
         root.style.marginLeft = this.config.editButtonOffset;
+        //root.style.marginTop = "100px";
+        //root.style.fontSize = "12px";
         const add = document.createElement("span");
         add.innerText = this.config.editButtonAddText;
         this.applyStyles(add, "editButton.add");

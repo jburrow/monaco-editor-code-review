@@ -19,6 +19,7 @@ interface ReviewCommentIterItem {
 interface OnActionsChanged {
     (actions: ReviewCommentEvent[]): void;
 }
+export declare const defaultStyles: Record<string, {}>;
 export interface ReviewManagerConfig {
     commentIndent?: number;
     commentIndentOffset?: number;
@@ -34,6 +35,8 @@ export interface ReviewManagerConfig {
     reviewCommentIconSelect?: string;
     showInRuler?: boolean;
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
+    styles?: Record<string, {}>;
+    setClassNames?: boolean;
 }
 interface ReviewManagerConfigPrivate {
     commentIndent: number;
@@ -53,6 +56,8 @@ interface ReviewManagerConfigPrivate {
     showAddCommentGlyph: boolean;
     showInRuler: boolean;
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
+    styles: Record<string, {}>;
+    setClassNames: boolean;
 }
 interface EditorElements {
     cancel: HTMLButtonElement;
@@ -97,7 +102,6 @@ export declare class ReviewManager {
     load(events: ReviewCommentEvent[]): void;
     loadFromStore(store: ReviewCommentStore, events: ReviewCommentEvent[]): void;
     getThemedColor(name: string): string;
-    styles: Record<string, {}>;
     applyStyles(element: HTMLElement, className: string): void;
     createInlineEditButtonsElement(): InlineToolbarElements;
     handleCancel(): void;
