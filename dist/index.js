@@ -60,6 +60,7 @@ class ReviewManager {
             reviewCommentEditor: {
                 padding: "5px",
                 border: "1px solid blue",
+                "margin-left": "1px",
                 "box-shadow": " 0px 0px 4px 2px lightblue",
                 "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
             },
@@ -325,8 +326,9 @@ class ReviewManager {
         return buttonsElement;
     }
     calculateConfirmButtonText() {
+        var _a;
         if (this.editorMode == EditorMode.insertComment) {
-            return this.activeComment ? "Reply to Comment" : "Add Comment";
+            return ((_a = this.activeComment) === null || _a === void 0 ? void 0 : _a.id) ? "Reply to Comment" : "Add Comment";
         }
         else {
             return "Edit Comment";
@@ -488,20 +490,32 @@ class ReviewManager {
             this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
         this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
     }
+    createEmptyCommentOnCurrentLine() {
+        return {
+            id: null,
+            author: null,
+            lineNumber: this.getActivePosition(),
+            text: null,
+            status: null,
+            dt: null,
+            selection: null,
+        };
+    }
     setEditorMode(mode, why = null) {
+        let activeComment = mode === EditorMode.insertComment ? this.createEmptyCommentOnCurrentLine() : this.activeComment;
         this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
         this.verbose &&
-            console.log("setEditorMode", EditorMode[mode], why, "Comment:", this.activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
+            console.log("setEditorMode", EditorMode[mode], why, "Comment:", activeComment, "ReadOnly:", this.config.readOnly, "Result:", EditorMode[this.editorMode]);
         this.layoutInlineToolbar();
         this.layoutInlineCommentEditor();
-        this.setActiveComment(this.activeComment);
+        this.setActiveComment(activeComment);
         this.refreshComments();
         if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
             if (mode == EditorMode.insertComment) {
                 this.editorElements.textarea.value = "";
             }
             else if (mode == EditorMode.editComment) {
-                this.editorElements.textarea.value = this.activeComment ? this.activeComment.text : "";
+                this.editorElements.textarea.value = (activeComment === null || activeComment === void 0 ? void 0 : activeComment.text) ? activeComment.text : "";
             }
             //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...
             setTimeout(() => this.editorElements.textarea.focus(), 100); //TODO - make configurable
@@ -596,12 +610,12 @@ class ReviewManager {
             var _a;
             const lineNumbers = {};
             if (this.editorMode === EditorMode.insertComment || this.editorMode === EditorMode.editComment) {
+                // This creates a blank section viewZone that makes space for the interactive text file for editing
                 if (this.editId) {
                     changeAccessor.removeZone(this.editId);
                 }
                 const node = document.createElement("div");
                 //node.style.backgroundColor = "orange";
-                //node.innerHTML = "hello";
                 this.editId = changeAccessor.addZone({
                     afterLineNumber: this.getActivePosition(),
                     heightInPx: 100,
@@ -645,7 +659,6 @@ class ReviewManager {
                     const domNode = this.config.renderComment
                         ? this.config.renderComment(isActive, item)
                         : this.renderComment(isActive, item);
-                    //renderComment invoked
                     const heightInPx = this.measureHeighInPx(item, domNode);
                     rs.viewZoneId = changeAccessor.addZone({
                         afterLineNumber: item.state.comment.lineNumber,

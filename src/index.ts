@@ -14,6 +14,7 @@ import * as uuid from "uuid";
 export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
 
 import { convertMarkdownToHTML } from "./comment";
+import { tsNonNullExpression } from "@babel/types";
 //import "./index.css";
 
 interface MonacoWindow {
@@ -313,6 +314,7 @@ export class ReviewManager {
     reviewCommentEditor: {
       padding: "5px",
       border: "1px solid blue",
+      "margin-left": "1px",
       "box-shadow": " 0px 0px 4px 2px lightblue",
       "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
     },
@@ -476,7 +478,7 @@ export class ReviewManager {
 
   calculateConfirmButtonText() {
     if (this.editorMode == EditorMode.insertComment) {
-      return this.activeComment ? "Reply to Comment" : "Add Comment";
+      return this.activeComment?.id ? "Reply to Comment" : "Add Comment";
     } else {
       return "Edit Comment";
     }
@@ -671,7 +673,21 @@ export class ReviewManager {
     this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
   }
 
+  createEmptyCommentOnCurrentLine(): ReviewComment {
+    return {
+      id: null,
+      author: null,
+      lineNumber: this.getActivePosition(),
+      text: null,
+      status: null,
+      dt: null,
+      selection: null,
+    };
+  }
+
   setEditorMode(mode: EditorMode, why: string = null) {
+    let activeComment = mode === EditorMode.insertComment ? this.createEmptyCommentOnCurrentLine() : this.activeComment;
+
     this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
     this.verbose &&
       console.log(
@@ -679,7 +695,7 @@ export class ReviewManager {
         EditorMode[mode],
         why,
         "Comment:",
-        this.activeComment,
+        activeComment,
         "ReadOnly:",
         this.config.readOnly,
         "Result:",
@@ -688,14 +704,14 @@ export class ReviewManager {
 
     this.layoutInlineToolbar();
     this.layoutInlineCommentEditor();
-    this.setActiveComment(this.activeComment);
+    this.setActiveComment(activeComment);
     this.refreshComments();
 
     if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
       if (mode == EditorMode.insertComment) {
         this.editorElements.textarea.value = "";
       } else if (mode == EditorMode.editComment) {
-        this.editorElements.textarea.value = this.activeComment ? this.activeComment.text : "";
+        this.editorElements.textarea.value = activeComment?.text ? activeComment.text : "";
       }
       //HACK - because the event in monaco doesn't have preventdefault which means editor takes focus back...
       setTimeout(() => this.editorElements.textarea.focus(), 100); //TODO - make configurable
@@ -811,12 +827,14 @@ export class ReviewManager {
       const lineNumbers: { [key: number]: CodeSelection } = {};
 
       if (this.editorMode === EditorMode.insertComment || this.editorMode === EditorMode.editComment) {
+        // This creates a blank section viewZone that makes space for the interactive text file for editing
         if (this.editId) {
           changeAccessor.removeZone(this.editId);
         }
+
         const node = document.createElement("div");
         //node.style.backgroundColor = "orange";
-        //node.innerHTML = "hello";
+
         this.editId = changeAccessor.addZone({
           afterLineNumber: this.getActivePosition(),
           heightInPx: 100,
@@ -871,7 +889,6 @@ export class ReviewManager {
           const domNode = this.config.renderComment
             ? this.config.renderComment(isActive, item)
             : this.renderComment(isActive, item);
-          //renderComment invoked
 
           const heightInPx = this.measureHeighInPx(item, domNode);
 

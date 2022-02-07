@@ -49,14 +49,18 @@ const baseConfig = (mode) => {
 
 function getConfigs(mode) {
   const ext = mode === "production" ? "min.js" : "js";
+
+  output = {
+    path: path.join(__dirname, "dist"),
+    publicPath: "/dist",
+  };
   const var_es2017 = {
     ...baseConfig(mode),
     output: {
       filename: "[name]-var-es2017." + ext,
-      path: path.join(__dirname, "dist"),
       libraryTarget: "var",
       library: "MonacoEditorCodeReview",
-      publicPath: "",
+      ...output,
     },
     entry: {
       index: "./src/index.ts",
@@ -67,8 +71,7 @@ function getConfigs(mode) {
     ...baseConfig(mode),
     output: {
       filename: "[name]-commonjs-es2017." + ext,
-      path: path.join(__dirname, "dist"),
-      publicPath: "",
+      ...output,
     },
     entry: {
       docs: "./src/docs.ts",
