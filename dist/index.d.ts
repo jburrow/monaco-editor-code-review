@@ -7,8 +7,9 @@ declare enum NavigationDirection {
 }
 export declare enum EditorMode {
     insertComment = 1,
-    editComment = 2,
-    toolbar = 3
+    replyComment = 2,
+    editComment = 3,
+    toolbar = 4
 }
 export declare function createReviewManager(editor: any, currentUser: string, actions?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
 interface ReviewCommentIterItem {
@@ -104,7 +105,7 @@ export declare class ReviewManager {
     handleTextAreaKeyDown(e: KeyboardEvent): void;
     createInlineEditorElement(): EditorElements;
     createInlineToolbarWidget(): InlineToolbarElements;
-    calculateConfirmButtonText(): "Reply to Comment" | "Add Comment" | "Edit Comment";
+    calculateConfirmButtonText(): "Add Comment" | "Reply to Comment" | "Edit Comment";
     createInlineEditorWidget(): EditorElements;
     getActivePosition(): number;
     setActiveComment(comment: ReviewComment, reason?: string): boolean;

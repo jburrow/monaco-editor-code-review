@@ -30,8 +30,9 @@ enum NavigationDirection {
 
 export enum EditorMode {
   insertComment = 1,
-  editComment = 2,
-  toolbar = 3,
+  replyComment = 2,
+  editComment = 3,
+  toolbar = 4,
 }
 
 export function createReviewManager(
@@ -349,7 +350,7 @@ export class ReviewManager {
     add.innerText = this.config.editButtonAddText;
     this.applyStyles(add, "editButton.add");
     add.setAttribute(CONTROL_ATTR_NAME, "");
-    add.onclick = () => this.setEditorMode(EditorMode.insertComment, "add-comment");
+    add.onclick = () => this.setEditorMode(EditorMode.replyComment, "reply-comment-inline-button");
     root.appendChild(add);
 
     let remove = null;
@@ -380,7 +381,7 @@ export class ReviewManager {
       edit.innerText = this.config.editButtonEditText;
 
       this.applyStyles(edit, "editButton.edit");
-      edit.onclick = () => this.setEditorMode(EditorMode.editComment, "edit");
+      edit.onclick = () => this.setEditorMode(EditorMode.editComment, "edit-comment-button");
       root.appendChild(edit);
     }
 
@@ -478,7 +479,10 @@ export class ReviewManager {
 
   calculateConfirmButtonText() {
     if (this.editorMode == EditorMode.insertComment) {
-      return this.activeComment?.id ? "Reply to Comment" : "Add Comment";
+      return "Add Comment";
+    }
+    if (this.editorMode == EditorMode.replyComment) {
+      return "Reply to Comment";
     } else {
       return "Edit Comment";
     }
@@ -497,7 +501,7 @@ export class ReviewManager {
         return editorElement.root;
       },
       getPosition: () => {
-        if (this.editorMode == EditorMode.insertComment || this.editorMode == EditorMode.editComment) {
+        if (this.editorMode != EditorMode.toolbar) {
           editorElement.confirm.innerText = this.calculateConfirmButtonText();
           return {
             position: {
@@ -667,8 +671,7 @@ export class ReviewManager {
       button.style.color = this.getThemedColor("button.foreground");
     });
 
-    this.editorElements.confirm.innerText =
-      this.editorMode === EditorMode.insertComment ? "Add Comment" : "Edit Comment";
+    this.editorElements.confirm.innerText = this.editorMode === EditorMode.editComment ? "Edit Comment" : "Add Comment";
 
     this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
   }
@@ -707,8 +710,8 @@ export class ReviewManager {
     this.setActiveComment(activeComment);
     this.refreshComments();
 
-    if (mode == EditorMode.insertComment || mode == EditorMode.editComment) {
-      if (mode == EditorMode.insertComment) {
+    if (mode != EditorMode.toolbar) {
+      if (mode == EditorMode.insertComment || mode == EditorMode.replyComment) {
         this.editorElements.textarea.value = "";
       } else if (mode == EditorMode.editComment) {
         this.editorElements.textarea.value = activeComment?.text ? activeComment.text : "";
@@ -826,7 +829,7 @@ export class ReviewManager {
     this.editor.changeViewZones((changeAccessor) => {
       const lineNumbers: { [key: number]: CodeSelection } = {};
 
-      if (this.editorMode === EditorMode.insertComment || this.editorMode === EditorMode.editComment) {
+      if (this.editorMode !== EditorMode.toolbar) {
         // This creates a blank section viewZone that makes space for the interactive text file for editing
         if (this.editId) {
           changeAccessor.removeZone(this.editId);
@@ -1013,7 +1016,7 @@ export class ReviewManager {
       contextMenuOrder: 0,
 
       run: () => {
-        this.setEditorMode(EditorMode.insertComment, "add-comment-x");
+        this.setEditorMode(EditorMode.insertComment, "add-comment-context-menu");
       },
     });
 
