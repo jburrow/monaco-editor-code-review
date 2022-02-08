@@ -37,6 +37,7 @@ export interface ReviewManagerConfig {
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
     styles?: Record<string, {}>;
     setClassNames?: boolean;
+    verticalOffset?: number;
 }
 interface ReviewManagerConfigPrivate {
     commentIndent: number;
@@ -58,6 +59,7 @@ interface ReviewManagerConfigPrivate {
     renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
     styles: Record<string, {}>;
     setClassNames: boolean;
+    verticalOffset: number;
 }
 interface EditorElements {
     cancel: HTMLButtonElement;

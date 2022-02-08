@@ -119,12 +119,13 @@ function init() {
         });
     });
 }
-console.log("asfds");
 function initReviewManager(editor, currentUser, readOnly) {
     reviewManager = (0, index_1.createReviewManager)(editor, currentUser, createRandomComments(), (updatedComments) => renderComments(updatedComments), {
         editButtonEnableRemove: true,
         formatDate: (createdAt) => moment(createdAt).format("YY-MM-DD HH:mm"),
         readOnly: readOnly,
+        verticalOffset: 5,
+        commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
     }, true);
     setCurrentUser();
     renderComments(reviewManager.events);

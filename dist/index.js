@@ -68,6 +68,7 @@ const defaultReviewManagerConfig = {
     showInRuler: true,
     styles: Object.assign({}, exports.defaultStyles),
     setClassNames: true,
+    verticalOffset: 0,
 };
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
@@ -469,7 +470,7 @@ class ReviewManager {
                 }
             }
         }
-        return marginTop;
+        return marginTop + this.config.verticalOffset;
     }
     layoutInlineToolbar() {
         this.inlineToolbarElements.root.style.backgroundColor = this.getThemedColor("editor.background");
@@ -483,14 +484,11 @@ class ReviewManager {
         this.editor.layoutContentWidget(this.widgetInlineToolbar);
     }
     layoutInlineCommentEditor() {
-        [this.editorElements.root].forEach((e) => {
-            e.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
-            e.style.color = this.getThemedColor("editor.foreground");
-        });
-        [this.editorElements.textarea].forEach((e) => {
-            e.style.backgroundColor = this.getThemedColor("editor.background");
-            e.style.color = this.getThemedColor("editor.foreground");
-        });
+        this.editorElements.root.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
+        this.editorElements.root.style.color = this.getThemedColor("editor.foreground");
+        this.editorElements.root.style.marginTop = `${this.config.verticalOffset}px`;
+        this.editorElements.textarea.style.backgroundColor = this.getThemedColor("editor.background");
+        this.editorElements.textarea.style.color = this.getThemedColor("editor.foreground");
         [this.editorElements.confirm, this.editorElements.cancel].forEach((button) => {
             button.style.backgroundColor = this.getThemedColor("button.background");
             button.style.color = this.getThemedColor("button.foreground");
