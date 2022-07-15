@@ -2,6 +2,14 @@
  * @jest-environment jsdom
  */
 
+let uuidCount = 0;
+
+jest.mock("uuid", () => ({
+  v1: () => `${uuidCount++}`,
+  v4: () => `${uuidCount++}`,
+  v5: () => `${uuidCount++}`,
+}));
+
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent } from "./events-comments-reducers";
 

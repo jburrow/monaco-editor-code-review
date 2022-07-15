@@ -1,8 +1,8 @@
 module.exports = {
-  
-    roots: ["<rootDir>/src"],
-    transform: {
-      "^.+\\.tsx?$": "ts-jest"
-    }
-  };
-  
+  roots: ["<rootDir>/src"],
+
+  transform: {
+    "^.+\\.(ts)$": "ts-jest",
+  },
+  transformIgnorePatterns: ["/node_modules/(?!(uuid|xxx)/)"],
+};
