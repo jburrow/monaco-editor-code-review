@@ -20,16 +20,18 @@ export type ReviewCommentEvent =
   | ({ type: "edit"; text: string } & CommonFields)
   | ({ type: "delete" } & CommonFields);
 
-export interface CommentState {
+export interface ReviewCommentStore {
   comments: Record<string, ReviewCommentState>;
   deletedCommentIds?: Set<string>;
   dirtyCommentIds?: Set<string>;
+  events?: ReviewCommentEvent[];
 }
 
-export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
+export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentStore) {
   const dirtyLineNumbers = new Set<number>();
   const deletedCommentIds = new Set<string>();
   const dirtyCommentIds = new Set<string>();
+  const events = (state.events || []).concat([event]);
   let comments = { ...state.comments };
 
   switch (event.type) {
@@ -90,7 +92,7 @@ export function commentReducer(event: ReviewCommentEvent, state: CommentState) {
     }
   }
 
-  return { comments, dirtyCommentIds, deletedCommentIds };
+  return { comments, dirtyCommentIds, deletedCommentIds, events };
 }
 
 export class ReviewCommentState {
@@ -133,8 +135,8 @@ export enum ReviewCommentStatus {
   edit = 3,
 }
 
-export function reduceComments(actions: ReviewCommentEvent[], state: CommentState = null) {
-  state = state || { comments: {} };
+export function reduceComments(actions: ReviewCommentEvent[], state: ReviewCommentStore = null) {
+  state = state || { comments: {}, events: [] };
 
   for (const a of actions) {
     if (!a.id) {

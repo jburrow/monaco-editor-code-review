@@ -4,18 +4,27 @@ import {
   ReviewCommentStatus,
   commentReducer,
   CodeSelection,
-  CommentState as ReviewCommentStore,
+  ReviewCommentStore,
   ReviewCommentState,
   ReviewCommentEvent,
   ReviewComment,
   ReviewCommentRenderState,
 } from "./events-comments-reducers";
-import * as uuid from "uuid";
-export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
 
 import { convertMarkdownToHTML } from "./comment";
-import { tsNonNullExpression } from "@babel/types";
-//import "./index.css";
+import * as uuid from "uuid";
+export {
+  ReviewCommentStore,
+  ReviewCommentEvent,
+  reduceComments,
+  ReviewCommentStatus,
+  commentReducer,
+  CodeSelection,
+  ReviewCommentState,
+  ReviewComment,
+  ReviewCommentRenderState,
+  convertMarkdownToHTML,
+};
 
 interface MonacoWindow {
   monaco: any;

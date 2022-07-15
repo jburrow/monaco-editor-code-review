@@ -61,6 +61,7 @@ test("reduceComments - double delete - create|delete|delete", () => {
   const store3 = reduceComments([{ type: "delete", targetId: "1" }], store2);
   expect(store3).not.toBe(store);
   expect(Object.keys(store2.comments)).toStrictEqual([]);
+  expect(store3.events.length).toBe(3);
 });
 
 test("reduceComments - edit missing", () => {
@@ -68,4 +69,5 @@ test("reduceComments - edit missing", () => {
 
   const store = reduceComments(actions);
   expect(Object.keys(store.comments)).toStrictEqual([]);
+  expect(store.events.length).toBe(1);
 });
