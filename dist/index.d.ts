@@ -1,6 +1,7 @@
 import * as monacoEditor from "monaco-editor";
-import { reduceComments, CodeSelection, CommentState as ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
-export { ReviewCommentStore, ReviewCommentEvent, reduceComments };
+import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
+import { convertMarkdownToHTML } from "./comment";
+export { ReviewCommentStore, ReviewCommentEvent, reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentState, ReviewComment, ReviewCommentRenderState, convertMarkdownToHTML, };
 declare enum NavigationDirection {
     next = 1,
     prev = 2

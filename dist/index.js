@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReviewManager = exports.defaultStyles = exports.createReviewManager = exports.EditorMode = exports.reduceComments = void 0;
+exports.ReviewManager = exports.defaultStyles = exports.createReviewManager = exports.EditorMode = exports.convertMarkdownToHTML = exports.ReviewCommentRenderState = exports.ReviewCommentState = exports.commentReducer = exports.ReviewCommentStatus = exports.reduceComments = void 0;
 const events_comments_reducers_1 = require("./events-comments-reducers");
 Object.defineProperty(exports, "reduceComments", { enumerable: true, get: function () { return events_comments_reducers_1.reduceComments; } });
-const uuid = require("uuid");
+Object.defineProperty(exports, "ReviewCommentStatus", { enumerable: true, get: function () { return events_comments_reducers_1.ReviewCommentStatus; } });
+Object.defineProperty(exports, "commentReducer", { enumerable: true, get: function () { return events_comments_reducers_1.commentReducer; } });
+Object.defineProperty(exports, "ReviewCommentState", { enumerable: true, get: function () { return events_comments_reducers_1.ReviewCommentState; } });
+Object.defineProperty(exports, "ReviewCommentRenderState", { enumerable: true, get: function () { return events_comments_reducers_1.ReviewCommentRenderState; } });
 const comment_1 = require("./comment");
+Object.defineProperty(exports, "convertMarkdownToHTML", { enumerable: true, get: function () { return comment_1.convertMarkdownToHTML; } });
+const uuid = require("uuid");
 const monacoWindow = window;
 var NavigationDirection;
 (function (NavigationDirection) {

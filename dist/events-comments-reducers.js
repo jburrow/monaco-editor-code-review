@@ -6,6 +6,7 @@ function commentReducer(event, state) {
     const dirtyLineNumbers = new Set();
     const deletedCommentIds = new Set();
     const dirtyCommentIds = new Set();
+    const events = (state.events || []).concat([event]);
     let comments = Object.assign({}, state.comments);
     switch (event.type) {
         case "edit":
@@ -53,7 +54,7 @@ function commentReducer(event, state) {
             }
         }
     }
-    return { comments, dirtyCommentIds, deletedCommentIds };
+    return { comments, dirtyCommentIds, deletedCommentIds, events };
 }
 exports.commentReducer = commentReducer;
 class ReviewCommentState {
@@ -76,7 +77,7 @@ var ReviewCommentStatus;
     ReviewCommentStatus[ReviewCommentStatus["edit"] = 3] = "edit";
 })(ReviewCommentStatus = exports.ReviewCommentStatus || (exports.ReviewCommentStatus = {}));
 function reduceComments(actions, state = null) {
-    state = state || { comments: {} };
+    state = state || { comments: {}, events: [] };
     for (const a of actions) {
         if (!a.id) {
             a.id = uuid.v4();
