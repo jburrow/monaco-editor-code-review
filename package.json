@@ -37,7 +37,7 @@
     "@webpack-cli/serve": "1.7.0",
     "babel-jest": "29.2.1",
     "coveralls": "3.1.1",
-    "dayjs": "1.11.5",
+    "dayjs": "1.11.6",
     "moment": "2.29.4",
     "monaco-editor": "0.34.1",
     "ts-loader": "9.4.1",
