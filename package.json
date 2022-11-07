@@ -25,7 +25,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "jest-environment-jsdom": "29.2.2",
+    "jest-environment-jsdom": "29.3.0",
     "ts-jest": "29.0.3",
     "@babel/core": "7.20.2",
     "@babel/preset-env": "7.20.2",
@@ -35,7 +35,7 @@
     "@types/jest": "29.2.2",
     "@types/uuid": "8.3.4",
     "@webpack-cli/serve": "1.7.0",
-    "babel-jest": "29.2.2",
+    "babel-jest": "29.3.0",
     "coveralls": "3.1.1",
     "dayjs": "1.11.6",
     "moment": "2.29.4",
