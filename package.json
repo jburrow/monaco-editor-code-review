@@ -43,7 +43,7 @@
     "ts-loader": "9.4.3",
     "typedoc": "0.24.7",
     "typescript": "5.0.4",
-    "webpack": "5.84.0",
+    "webpack": "5.84.1",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.15.0"
   }
