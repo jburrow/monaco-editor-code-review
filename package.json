@@ -27,8 +27,8 @@
   "devDependencies": {
     "jest-environment-jsdom": "29.6.0",
     "ts-jest": "29.1.1",
-    "@babel/core": "7.22.6",
-    "@babel/preset-env": "7.22.6",
+    "@babel/core": "7.22.8",
+    "@babel/preset-env": "7.22.7",
     "@babel/preset-typescript": "7.22.5",
     "@babel/runtime": "7.22.6",
     "@babel/types": "7.22.5",
