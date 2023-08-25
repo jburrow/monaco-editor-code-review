@@ -41,7 +41,7 @@
     "moment": "2.29.4",
     "monaco-editor": "0.41.0",
     "ts-loader": "9.4.4",
-    "typedoc": "0.24.8",
+    "typedoc": "0.25.0",
     "typescript": "5.1.6",
     "webpack": "5.88.2",
     "webpack-cli": "4.10.0",
