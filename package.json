@@ -28,7 +28,7 @@
     "jest-environment-jsdom": "29.6.4",
     "ts-jest": "29.1.1",
     "@babel/core": "7.22.11",
-    "@babel/preset-env": "7.22.10",
+    "@babel/preset-env": "7.22.14",
     "@babel/preset-typescript": "7.22.11",
     "@babel/runtime": "7.22.11",
     "@babel/types": "7.22.11",
