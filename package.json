@@ -42,7 +42,7 @@
     "monaco-editor": "0.44.0",
     "ts-loader": "9.5.1",
     "typedoc": "0.25.4",
-    "typescript": "5.2.2",
+    "typescript": "5.3.2",
     "webpack": "5.89.0",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.15.1"
