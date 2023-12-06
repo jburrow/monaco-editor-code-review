@@ -32,7 +32,7 @@
     "@babel/preset-typescript": "7.23.3",
     "@babel/runtime": "7.23.5",
     "@babel/types": "7.23.5",
-    "@types/jest": "29.5.10",
+    "@types/jest": "29.5.11",
     "@types/uuid": "9.0.7",
     "@webpack-cli/serve": "1.7.0",
     "babel-jest": "29.7.0",
