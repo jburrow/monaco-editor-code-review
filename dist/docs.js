@@ -124,7 +124,7 @@ function initReviewManager(editor, currentUser, readOnly) {
         editButtonEnableRemove: true,
         formatDate: (createdAt) => moment(createdAt).format("YY-MM-DD HH:mm"),
         readOnly: readOnly,
-        verticalOffset: 5,
+        verticalOffset: 5, // This are hacks to correct the layout due to parent css
         commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
     }, true);
     setCurrentUser();
@@ -197,6 +197,7 @@ function createRandomComments() {
             text: "I think you will find it is good enough",
         },
         {
+            id: "id-4",
             targetId: "id-3",
             type: "create",
             lineNumber: firstLine + 5,
@@ -205,6 +206,16 @@ function createRandomComments() {
             text: "I think you will find it is good enough",
         },
         {
+            id: "id-5",
+            targetId: "id-3",
+            type: "create",
+            lineNumber: firstLine + 5,
+            createdBy: barUser,
+            createdAt: new Date().getTime(),
+            text: "I think you will find it is good enough",
+        },
+        {
+            id: "id-6",
             targetId: "id-3",
             type: "create",
             lineNumber: firstLine + 5,
@@ -247,7 +258,8 @@ function renderComments(events) {
                 </tr>`)
             .join("") +
         "</table>";
-    document.getElementById("summaryEditor").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Events</h5>${rawHtml}</div>`;
+    document.getElementById("commentsDiv").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
+    document.getElementById("eventsDiv").innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
 }
 function clearComments() {
     reviewManager.load([]);

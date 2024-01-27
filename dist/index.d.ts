@@ -1,7 +1,7 @@
 import * as monacoEditor from "monaco-editor";
-import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentStore, ReviewCommentState, ReviewCommentEvent, ReviewComment, ReviewCommentRenderState } from "./events-comments-reducers";
+import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentStore, ReviewCommentState, ProposedReviewCommentEvent, ReviewComment, ReviewCommentRenderState, ReviewCommentEvent } from "./events-comments-reducers";
 import { convertMarkdownToHTML } from "./comment";
-export { ReviewCommentStore, ReviewCommentEvent, reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentState, ReviewComment, ReviewCommentRenderState, convertMarkdownToHTML, };
+export { ReviewCommentStore, ProposedReviewCommentEvent as ReviewCommentEvent, reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentState, ReviewComment, ReviewCommentRenderState, convertMarkdownToHTML, };
 declare enum NavigationDirection {
     next = 1,
     prev = 2
@@ -12,7 +12,7 @@ export declare enum EditorMode {
     editComment = 3,
     toolbar = 4
 }
-export declare function createReviewManager(editor: any, currentUser: string, actions?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
+export declare function createReviewManager(editor: any, currentUser: string, events?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
 interface ReviewCommentIterItem {
     depth: number;
     state: ReviewCommentState;
@@ -115,7 +115,7 @@ export declare class ReviewManager {
     calculateConfirmButtonText(): "Add Comment" | "Reply to Comment" | "Edit Comment";
     createInlineEditorWidget(): EditorElements;
     getActivePosition(): number;
-    setActiveComment(comment: ReviewComment, reason?: string): boolean;
+    setActiveComment(comment?: ReviewComment, reason?: string): boolean;
     filterAndMapComments(lineNumbers: number[], fn: {
         (comment: ReviewComment): void;
     }): void;
@@ -141,7 +141,7 @@ export declare class ReviewManager {
     private recurseComments;
     private iterateComments;
     removeComment(id: string): ReviewCommentEvent;
-    addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewCommentEvent;
+    addComment(lineNumber: number | undefined, text: string, selection?: CodeSelection): ReviewCommentEvent;
     private addEvent;
     private formatDate;
     private createElement;

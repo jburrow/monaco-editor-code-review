@@ -1,7 +1,7 @@
 import { createReviewManager, ReviewManager } from "./index";
 import * as monacoEditor from "monaco-editor";
 import * as moment from "dayjs";
-import { ReviewCommentEvent } from "./events-comments-reducers";
+import { ProposedReviewCommentEvent, ReviewCommentEvent } from "./events-comments-reducers";
 
 interface WindowDoc {
   require: any;
@@ -244,6 +244,7 @@ function createRandomComments(): ReviewCommentEvent[] {
       text: "I think you will find it is good enough",
     },
     {
+      id: "id-4",
       targetId: "id-3",
       type: "create",
       lineNumber: firstLine + 5,
@@ -252,6 +253,16 @@ function createRandomComments(): ReviewCommentEvent[] {
       text: "I think you will find it is good enough",
     },
     {
+      id: "id-5",
+      targetId: "id-3",
+      type: "create",
+      lineNumber: firstLine + 5,
+      createdBy: barUser,
+      createdAt: new Date().getTime(),
+      text: "I think you will find it is good enough",
+    },
+    {
+      id: "id-6",
       targetId: "id-3",
       type: "create",
       lineNumber: firstLine + 5,
@@ -304,8 +315,12 @@ function renderComments(events: ReviewCommentEvent[]) {
     "</table>";
 
   document.getElementById(
-    "summaryEditor"
-  ).innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div><h5>Events</h5>${rawHtml}</div>`;
+    "commentsDiv"
+  ).innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
+
+  document.getElementById(
+    "eventsDiv"
+  ).innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
 }
 
 function clearComments() {

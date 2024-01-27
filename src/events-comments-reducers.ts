@@ -1,30 +1,28 @@
-import * as uuid from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 
-export type CommonFields = {
-  id?: string;
-  targetId?: string;
-  createdBy?: string;
-  createdAt?: number;
-  // script on here maybe?
-  //type:''
-  //status
-};
 
-export type ReviewCommentEvent =
+
+export type ProposedReviewCommentEvent =
   | ({
-      type: "create";
-      lineNumber: number;
-      text: string;
-      selection?: CodeSelection;
-    } & CommonFields)
-  | ({ type: "edit"; text: string } & CommonFields)
-  | ({ type: "delete" } & CommonFields);
+    type: "create";
+    lineNumber: number;
+    text: string;
+    selection?: CodeSelection;
+    commentType?: ReviewCommentType;
+    typeState?: ReviewCommentTypeState;
+    targetId?: string;
+  })
+  | ({ type: "edit"; text?: string, typeState?: ReviewCommentTypeState, targetId: string })
+  | ({ type: "delete", targetId: string });
+
+
+export type ReviewCommentEvent = ProposedReviewCommentEvent & { id: string, createdAt: number, createdBy: string };
 
 export interface ReviewCommentStore {
   comments: Record<string, ReviewCommentState>;
   deletedCommentIds?: Set<string>;
   dirtyCommentIds?: Set<string>;
-  events?: ReviewCommentEvent[];
+  events: ReviewCommentEvent[];
 }
 
 export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentStore) {
@@ -44,7 +42,8 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
           ...parent.comment,
           author: event.createdBy,
           dt: event.createdAt,
-          text: event.text,
+          text: event.text ?? parent.comment.text,
+          typeState: event.typeState === undefined ? parent.comment.typeState : event.typeState
         },
         history: parent.history.concat(parent.comment),
       };
@@ -59,7 +58,8 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
       const selected = comments[event.targetId];
       if (!selected) break;
 
-      delete comments[event.targetId];
+      const { [event.targetId]: _, ...remainingComments } = comments;
+      comments = remainingComments;
 
       deletedCommentIds.add(selected.comment.id);
       dirtyLineNumbers.add(selected.comment.lineNumber);
@@ -77,6 +77,8 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
           text: event.text,
           parentId: event.targetId,
           status: ReviewCommentStatus.active,
+          type: event.commentType ?? ReviewCommentType.comment,
+          typeState: event.typeState
         });
         //console.debug("insert", event);
         dirtyLineNumbers.add(event.lineNumber);
@@ -111,6 +113,14 @@ export enum ReviewCommentRenderState {
   normal = 3,
 }
 
+export enum ReviewCommentType {
+  comment = 1,
+  suggestion = 2,
+  task = 3,
+}
+
+export type ReviewCommentTypeState = unknown;
+
 export interface CodeSelection {
   startColumn: number;
   endColumn: number;
@@ -121,12 +131,14 @@ export interface CodeSelection {
 export interface ReviewComment {
   id: string;
   parentId?: string;
-  author: string;
-  dt: number;
+  author: string | undefined;
+  dt: number | undefined;
   lineNumber: number;
   text: string;
-  selection: CodeSelection;
+  selection: CodeSelection | undefined;
   status: ReviewCommentStatus;
+  type: ReviewCommentType;
+  typeState: ReviewCommentTypeState;
 }
 
 export enum ReviewCommentStatus {
@@ -135,15 +147,7 @@ export enum ReviewCommentStatus {
   edit = 3,
 }
 
-export function reduceComments(actions: ReviewCommentEvent[], state: ReviewCommentStore = null) {
-  state = state || { comments: {}, events: [] };
 
-  for (const a of actions) {
-    if (!a.id) {
-      a.id = uuid.v4();
-    }
-    state = commentReducer(a, state);
-  }
-
-  return state;
+export function reduceComments(events: ReviewCommentEvent[], state: ReviewCommentStore = { comments: {}, events: [] }): ReviewCommentStore {
+  return events.reduce((accState, event) => commentReducer(event, accState), state);
 }

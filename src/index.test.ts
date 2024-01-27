@@ -5,20 +5,20 @@
 let uuidCount = 0;
 
 jest.mock("uuid", () => ({
-  v1: () => `${uuidCount++}`,
-  v4: () => `${uuidCount++}`,
-  v5: () => `${uuidCount++}`,
+  v1: () => `${--uuidCount}`,
+  v4: () => `${--uuidCount}`,
+  v5: () => `${--uuidCount}`,
 }));
 
 import { createReviewManager, EditorMode } from "./index";
-import { ReviewCommentEvent } from "./events-comments-reducers";
+import { ReviewCommentEvent, ReviewCommentType } from "./events-comments-reducers";
 
 interface MonacoWindow {
   monaco: any;
 }
 
 class Range {
-  constructor() {}
+  constructor() { }
 }
 
 const monacoWindow = window as any as MonacoWindow;
@@ -35,7 +35,7 @@ function getMockEditor() {
     _zones: {},
     _actions: [],
     focus: () => null,
-    addAction: (action) => editor._actions.push(action),
+    addAction: (action: never) => editor._actions.push(action),
     createContextKey: (name) => {
       return { set: () => null };
     },
@@ -85,7 +85,7 @@ function getMockEditor() {
 
 test("Widget Coverage", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(editor, "current.user", [], (comments) => {});
+  const rm = createReviewManager(editor, "current.user", [], (comments) => { });
   rm.activeComment = {
     selection: undefined,
     status: 1,
@@ -94,6 +94,8 @@ test("Widget Coverage", () => {
     dt: 0,
     text: "",
     lineNumber: 1,
+    type: ReviewCommentType.comment,
+    typeState: undefined
   };
   rm.widgetInlineToolbar.getId();
   rm.widgetInlineToolbar.getPosition();
@@ -102,24 +104,27 @@ test("Widget Coverage", () => {
   rm.widgetInlineCommentEditor.getId();
   rm.widgetInlineCommentEditor.getPosition();
 
-  rm.activeComment = null;
+  rm.activeComment = undefined;
   rm.widgetInlineCommentEditor.getPosition();
 
-  editor._actions.map((action) => action.run());
+  editor._actions.map((action: never) => (action as any as { run(): void }).run());
 });
 
 test("createReviewManager to editor and add comments", () => {
   const editor = getMockEditor();
   const comment: ReviewCommentEvent = {
+    id: "1",
     type: "create",
     lineNumber: 1,
     createdBy: "author",
     createdAt: new Date("2019-01-01").getTime(),
     text: "#1",
+    commentType: ReviewCommentType.comment,
+    typeState: undefined
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
-
+  const rm = createReviewManager(editor, "current.user", [comment], (comments) => { });
+  expect(Object.keys(rm.store.comments)).toEqual([comment.id]);
   expect(Object.keys(editor._zones).length).toBe(1);
   expect(rm.activeComment).toBe(null);
   expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
@@ -127,33 +132,37 @@ test("createReviewManager to editor and add comments", () => {
 
   const num2 = rm.addComment(2, "#2");
   expect(num2.targetId).toBe(null);
-  expect(Object.keys(rm.store.comments).length).toBe(2);
+  expect(Object.keys(rm.store.comments)).toEqual([comment.id, num2.id]);
   expect(Object.keys(editor._zones).length).toBe(2);
 
-  rm.setActiveComment(rm.store.comments[num2.id].comment);
+  const activeComment = rm.store.comments[num2.id].comment;
+  rm.setActiveComment(activeComment);
 
-  const num3 = rm.addComment(null, "#2.2");
+  const num3 = rm.addComment(undefined, "#2.2");
   expect(num3.targetId).toBe(num2.id);
-  expect(Object.keys(rm.store.comments).length).toBe(3);
+  expect(Object.keys(rm.store.comments).sort()).toEqual([comment.id, num2.id, num3.id].sort());
   expect(Object.keys(editor._zones).length).toBe(3);
 
-  rm.setActiveComment(null);
+  rm.setActiveComment(undefined);
   const num4 = rm.addComment(4, "#4");
-  expect(num4.targetId).toBe(null);
+  expect(num4.targetId).toBe(undefined)
   expect(Object.keys(editor._zones).length).toBe(4);
 });
 
 test("load clears the comments", () => {
   const editor = getMockEditor();
   const comment: ReviewCommentEvent = {
+    id: "1",
     type: "create",
     lineNumber: 1,
     createdBy: "author",
     createdAt: new Date("2019-01-01").getTime(),
     text: "#1",
+    commentType: ReviewCommentType.comment,
+    typeState: undefined
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
+  const rm = createReviewManager(editor, "current.user", [comment], (comments) => { });
   rm.load([]);
   expect(Object.keys(editor._zones).length).toBe(0);
   expect(Object.keys(rm.store.comments).length).toBe(0);
@@ -161,7 +170,7 @@ test("load clears the comments", () => {
 
 test("Remove a comment via the widgets", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(editor, "current.user", null, null, null, true);
+  const rm = createReviewManager(editor, "current.user", [], undefined, undefined, true);
 
   expect(rm.activeComment).toBe(null);
   expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
@@ -178,14 +187,14 @@ test("Remove a comment via the widgets", () => {
       detail: { viewZoneId },
     },
   });
-  expect(rm.activeComment.id).toBe(comment.id);
+  expect(rm.activeComment?.id).toBe(comment.id);
   //TODO - expect(rm.widgetInlineToolbar.getPosition().position.lineNumber).toBe(comment.lineNumber);
   expect(rm.widgetInlineCommentEditor.getPosition()).toBe(undefined);
 
   const deletedComment = rm.removeComment(comment.id);
   expect(deletedComment.targetId).toBe(comment.id);
   expect(Object.values(rm.store.comments).length).toBe(0);
-  //expect(rm.store.viewZoneIdsToDelete.length).toBe(0);
+
   expect(Object.keys(editor._zones).length).toBe(0);
   expect(rm.activeComment).toBe(null);
   expect(rm.widgetInlineToolbar.getPosition()).toBe(undefined);
@@ -238,7 +247,7 @@ test("Edited Comments", () => {
   const comment = Object.values(rm.store.comments)[0].comment;
   rm.setActiveComment(comment);
   rm.setEditorMode(EditorMode.editComment);
-  rm.addComment(null, "editted");
+  rm.addComment(undefined, "editted");
 
   const expectedEdittedComment = {
     selection: undefined,
@@ -249,6 +258,8 @@ test("Edited Comments", () => {
     lineNumber: comment.lineNumber,
     text: "editted", //Copied from edit
     parentId: undefined,
+    type: ReviewCommentType.comment,
+    typeState: undefined
   };
 
   const comments = Object.values(rm.store.comments);
@@ -291,12 +302,7 @@ test("Enter Comment Widgets", () => {
   //expect(cs.viewZoneId).toBe(0);
 });
 
-// test("Count number of lines", () => {
-//   const editor = getMockEditor();
-//   const rm = createReviewManager(editor, "current.user");
-//   const lines = rm.calculateNumberOfLines("line\nline");
-//   expect(lines).toBe(3);
-// });
+
 
 test("Navigation - Forward and Back", () => {
   const editor = getMockEditor();
@@ -316,11 +322,11 @@ test("Navigation - Forward and Back", () => {
   rm.setActiveComment(rm.store.comments[c3.id].comment);
 
   rm.navigateToComment(2);
-  expect(rm.activeComment.id).toBe(c1.id);
+  expect(rm.activeComment?.id).toBe(c1.id);
 
   rm.navigateToComment(2);
-  expect(rm.activeComment.id).toBe(c1.id); // Should this wrap around to the end?
+  expect(rm.activeComment?.id).toBe(c1.id); // Should this wrap around to the end?
 
   rm.navigateToComment(1);
-  expect(rm.activeComment.id).toBe(c3.id);
+  expect(rm.activeComment?.id).toBe(c3.id);
 });

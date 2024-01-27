@@ -6,16 +6,18 @@ import {
   CodeSelection,
   ReviewCommentStore,
   ReviewCommentState,
-  ReviewCommentEvent,
+  ProposedReviewCommentEvent,
   ReviewComment,
   ReviewCommentRenderState,
+  ReviewCommentType,
+  ReviewCommentEvent,
 } from "./events-comments-reducers";
 
 import { convertMarkdownToHTML } from "./comment";
 import * as uuid from "uuid";
 export {
   ReviewCommentStore,
-  ReviewCommentEvent,
+  ProposedReviewCommentEvent as ReviewCommentEvent,
   reduceComments,
   ReviewCommentStatus,
   commentReducer,
@@ -47,14 +49,14 @@ export enum EditorMode {
 export function createReviewManager(
   editor: any,
   currentUser: string,
-  actions?: ReviewCommentEvent[],
+  events?: ReviewCommentEvent[],
   onChange?: OnActionsChanged,
   config?: ReviewManagerConfig,
   verbose?: boolean
 ): ReviewManager {
   //For Debug: (window as any).editor = editor;
   const rm = new ReviewManager(editor, currentUser, onChange, config, verbose);
-  rm.load(actions || []);
+  rm.load(events || []);
   return rm;
 }
 
@@ -155,7 +157,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
 
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
-const POSITION_EXACT = 0;
+
 
 interface EditorElements {
   cancel: HTMLButtonElement;
@@ -217,7 +219,7 @@ export class ReviewManager {
     this.currentCommentDecorations = [];
     this.currentLineDecorationLineNumber = null;
     this.events = [];
-    this.store = { comments: {} }; //, viewZoneIdsToDelete: [] };
+    this.store = { comments: {}, events: [] };
     this.renderStore = {};
 
     this.verbose = verbose;
@@ -549,7 +551,7 @@ export class ReviewManager {
     return activePosition;
   }
 
-  setActiveComment(comment: ReviewComment, reason?: string) {
+  setActiveComment(comment?: ReviewComment, reason?: string) {
     this.verbose && console.debug("[setActiveComment]", comment, reason);
 
     this.canCancelCondition.set(Boolean(this.activeComment));
@@ -595,14 +597,14 @@ export class ReviewManager {
   renderAddCommentLineDecoration(lineNumber?: number) {
     const lines: monacoEditor.editor.IModelDeltaDecoration[] = lineNumber
       ? [
-          {
-            range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
-            options: {
-              marginClassName: "activeLineMarginClass", //TODO - fix the creation of this style
-              zIndex: 100,
-            },
+        {
+          range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
+          options: {
+            marginClassName: "activeLineMarginClass", //TODO - fix the creation of this style
+            zIndex: 100,
           },
-        ]
+        },
+      ]
       : [];
     this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, lines);
   }
@@ -705,6 +707,8 @@ export class ReviewManager {
       status: null,
       dt: null,
       selection: null,
+      type: ReviewCommentType.comment,
+      typeState: undefined
     };
   }
 
@@ -764,7 +768,7 @@ export class ReviewManager {
     }
   }
 
-  private iterateComments(filterFn?: { (c: ReviewCommentState): boolean }) {
+  private iterateComments(filterFn?: { (c: ReviewCommentState): boolean }): ReviewCommentIterItem[] {
     if (!filterFn) {
       filterFn = (cs: ReviewCommentState) => !cs.comment.parentId;
     }
@@ -774,32 +778,30 @@ export class ReviewManager {
     return results;
   }
 
-  removeComment(id: string) {
+  removeComment(id: string): ReviewCommentEvent {
     return this.addEvent({ type: "delete", targetId: id });
   }
 
-  addComment(lineNumber: number, text: string, selection?: CodeSelection) {
-    const event: ReviewCommentEvent =
+  addComment(lineNumber: number | undefined, text: string, selection?: CodeSelection): ReviewCommentEvent {
+    const event: ProposedReviewCommentEvent =
       this.editorMode === EditorMode.editComment
         ? { type: "edit", text, targetId: this.activeComment.id }
         : {
-            type: "create",
-            text,
-            lineNumber,
-            selection,
-            targetId: this.activeComment && this.activeComment.id,
-          };
+          type: "create",
+          text,
+          lineNumber,
+          selection,
+          targetId: this.activeComment && this.activeComment.id,
+        };
 
     return this.addEvent(event);
   }
 
-  private addEvent(event: ReviewCommentEvent) {
-    event.createdBy = this.currentUser;
-    event.createdAt = this.getDateTimeNow();
-    event.id = uuid.v4();
+  private addEvent(event: ProposedReviewCommentEvent): ReviewCommentEvent {
+    const populatedEvent = { ...event, createdBy: this.currentUser, createdAt: this.getDateTimeNow(), id: uuid.v4() };
 
-    this.events.push(event);
-    this.store = commentReducer(event, this.store);
+    this.events.push(populatedEvent);
+    this.store = commentReducer(populatedEvent, this.store);
 
     this.setActiveComment(null);
     this.refreshComments();
@@ -809,10 +811,10 @@ export class ReviewManager {
       this.onChange(this.events);
     }
 
-    return event;
+    return populatedEvent as ReviewCommentEvent;
   }
 
-  private formatDate(dt: number) {
+  private formatDate(dt: number): string {
     if (Number.isInteger(dt)) {
       try {
         const d = new Date(dt);

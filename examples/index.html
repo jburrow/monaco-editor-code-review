@@ -1,88 +1,87 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      .editButtonsContainer {
-        color: red;
-        margin-top: 200px;
-      }
-      body {
-        height: calc(100% - 20px);
-        display: flex;
-        flex-direction: column;
-        margin: 5px;
-      }
 
-      .editor {
-        flex: auto;
-        overflow: hidden;
-        margin: 5px;
-        height: 400px;
-      }
+<head>
+  <style>
+    .editButtonsContainer {
+      color: red;
+      margin-top: 200px;
+    }
 
-      h5 {
-        height: 20px;
-        margin-bottom: 5px;
-        margin-top: 5px;
-      }
 
-      .summary {
-        height: auto;
-        max-height: 300px;
-        min-height: 300px;
-        padding: 10px;
-        overflow: auto;
-        display: flex;
-        flex-direction: row;
-      }
 
-      .btn {
-        margin-top: 5px;
-      }
+    .editor {
+      height: calc(100vh - 430px);
+    }
 
-      td {
-        font-size: 12px;
-      }
+    h5 {
+      height: 20px;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
 
-      .comment_text {
-        background-color: #222222;
-        color: white;
-      }
-    </style>
-  </head>
+    .summary {
+      max-height: 300px;
+      overflow: auto;
+    }
 
-  <body>
-    <div class="buttons alert alert-light">
-      Editor Mode:<select id="option_editor_mode">
-        <option>diff-mode</option>
-        <option>editor-mode</option>
-      </select>
-      Diff Mode:<select id="option_diff_mode">
-        <option>side-by-side</option>
-        <option selected>inline-diff</option>
-      </select>
-      User:<select id="option_current_user" onchange="setCurrentUser()">
-        <option selected>foo.user</option>
-        <option>bar.user</option>
-      </select>
+    .btn {
+      margin-top: 5px;
+    }
 
-      Theme:<select id="option_theme">
-        <option>vs-dark</option>
-        <option>vs-light</option>
-      </select>
-      <input id="option_editor_readonly" type="checkbox" />Editor Readonly
-      <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()" />Comments Readonly
-      <button onclick="updateSettings()" class="btn btn-primary">Update Editor</button>
-      <button onclick="clearComments()" class="btn btn-secondary">Clear Comments</button>
-    </div>
-    <h5>Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment</h5>
-    <div class="editor" id="containerEditor"></div>
+    td {
+      font-size: 12px;
+    }
 
-    <div class="summary" id="summaryEditor"></div>
-  </body>
+    .comment_text {
+      background-color: #DDDDDD;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="buttons alert alert-light">
+    Editor Mode:<select id="option_editor_mode">
+      <option>diff-mode</option>
+      <option>editor-mode</option>
+    </select>
+    Diff Mode:<select id="option_diff_mode">
+      <option>side-by-side</option>
+      <option selected>inline-diff</option>
+    </select>
+    User:<select id="option_current_user" onchange="setCurrentUser()">
+      <option selected>foo.user</option>
+      <option>bar.user</option>
+    </select>
+
+    Theme:<select id="option_theme">
+      <option>vs-dark</option>
+      <option>vs-light</option>
+    </select>
+    <input id="option_editor_readonly" type="checkbox" />Editor Readonly
+    <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()" />Comments Readonly
+    <button onclick="updateSettings()" class="btn btn-primary">Update Editor</button>
+    <button onclick="clearComments()" class="btn btn-secondary">Clear Comments</button>
+  </div>
+  <h5>Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment</h5>
+  <div class="editor" id="containerEditor"></div>
+  <div style="display: flex;flex-direction:row;justify-content: space-around;">
+    <h5>Comments</h5>
+    <h5>Events</h5>
+  </div>
+  <div style="display: flex;flex-direction:row;">
+
+    <div class="summary" id="commentsDiv"></div>
+
+    <div class="summary" id="eventsDiv"></div>
+  </div>
+</body>
+
 </html>
 
 <script type="module" src="../dist/docs-commonjs-es2017.js"></script>
+
 <script>
   function updateSettings() {
     window.setView(

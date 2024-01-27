@@ -1,8 +1,19 @@
 "use strict";
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reduceComments = exports.ReviewCommentStatus = exports.ReviewCommentRenderState = exports.ReviewCommentState = exports.commentReducer = void 0;
-const uuid = require("uuid");
+exports.reduceComments = exports.ReviewCommentStatus = exports.ReviewCommentType = exports.ReviewCommentRenderState = exports.ReviewCommentState = exports.commentReducer = void 0;
 function commentReducer(event, state) {
+    var _a, _b;
     const dirtyLineNumbers = new Set();
     const deletedCommentIds = new Set();
     const dirtyCommentIds = new Set();
@@ -14,7 +25,7 @@ function commentReducer(event, state) {
             if (!parent)
                 break;
             const edit = {
-                comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: event.text }),
+                comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: (_a = event.text) !== null && _a !== void 0 ? _a : parent.comment.text, typeState: event.typeState === undefined ? parent.comment.typeState : event.typeState }),
                 history: parent.history.concat(parent.comment),
             };
             dirtyLineNumbers.add(edit.comment.lineNumber);
@@ -25,7 +36,8 @@ function commentReducer(event, state) {
             const selected = comments[event.targetId];
             if (!selected)
                 break;
-            delete comments[event.targetId];
+            const _c = comments, _d = event.targetId, _ = _c[_d], remainingComments = __rest(_c, [typeof _d === "symbol" ? _d : _d + ""]);
+            comments = remainingComments;
             deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
             //console.debug("delete", event);
@@ -41,6 +53,8 @@ function commentReducer(event, state) {
                     text: event.text,
                     parentId: event.targetId,
                     status: ReviewCommentStatus.active,
+                    type: (_b = event.commentType) !== null && _b !== void 0 ? _b : ReviewCommentType.comment,
+                    typeState: event.typeState
                 });
                 //console.debug("insert", event);
                 dirtyLineNumbers.add(event.lineNumber);
@@ -69,22 +83,21 @@ var ReviewCommentRenderState;
     ReviewCommentRenderState[ReviewCommentRenderState["dirty"] = 1] = "dirty";
     ReviewCommentRenderState[ReviewCommentRenderState["hidden"] = 2] = "hidden";
     ReviewCommentRenderState[ReviewCommentRenderState["normal"] = 3] = "normal";
-})(ReviewCommentRenderState = exports.ReviewCommentRenderState || (exports.ReviewCommentRenderState = {}));
+})(ReviewCommentRenderState || (exports.ReviewCommentRenderState = ReviewCommentRenderState = {}));
+var ReviewCommentType;
+(function (ReviewCommentType) {
+    ReviewCommentType[ReviewCommentType["comment"] = 1] = "comment";
+    ReviewCommentType[ReviewCommentType["suggestion"] = 2] = "suggestion";
+    ReviewCommentType[ReviewCommentType["task"] = 3] = "task";
+})(ReviewCommentType || (exports.ReviewCommentType = ReviewCommentType = {}));
 var ReviewCommentStatus;
 (function (ReviewCommentStatus) {
     ReviewCommentStatus[ReviewCommentStatus["active"] = 1] = "active";
     ReviewCommentStatus[ReviewCommentStatus["deleted"] = 2] = "deleted";
     ReviewCommentStatus[ReviewCommentStatus["edit"] = 3] = "edit";
-})(ReviewCommentStatus = exports.ReviewCommentStatus || (exports.ReviewCommentStatus = {}));
-function reduceComments(actions, state = null) {
-    state = state || { comments: {}, events: [] };
-    for (const a of actions) {
-        if (!a.id) {
-            a.id = uuid.v4();
-        }
-        state = commentReducer(a, state);
-    }
-    return state;
+})(ReviewCommentStatus || (exports.ReviewCommentStatus = ReviewCommentStatus = {}));
+function reduceComments(events, state = { comments: {}, events: [] }) {
+    return events.reduce((accState, event) => commentReducer(event, accState), state);
 }
 exports.reduceComments = reduceComments;
 //# sourceMappingURL=events-comments-reducers.js.map

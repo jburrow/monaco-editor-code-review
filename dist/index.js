@@ -22,11 +22,11 @@ var EditorMode;
     EditorMode[EditorMode["replyComment"] = 2] = "replyComment";
     EditorMode[EditorMode["editComment"] = 3] = "editComment";
     EditorMode[EditorMode["toolbar"] = 4] = "toolbar";
-})(EditorMode = exports.EditorMode || (exports.EditorMode = {}));
-function createReviewManager(editor, currentUser, actions, onChange, config, verbose) {
+})(EditorMode || (exports.EditorMode = EditorMode = {}));
+function createReviewManager(editor, currentUser, events, onChange, config, verbose) {
     //For Debug: (window as any).editor = editor;
     const rm = new ReviewManager(editor, currentUser, onChange, config, verbose);
-    rm.load(actions || []);
+    rm.load(events || []);
     return rm;
 }
 exports.createReviewManager = createReviewManager;
@@ -77,7 +77,6 @@ const defaultReviewManagerConfig = {
 };
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
-const POSITION_EXACT = 0;
 class ReviewManager {
     constructor(editor, currentUser, onChange, config, verbose) {
         var _a;
@@ -94,7 +93,7 @@ class ReviewManager {
         this.currentCommentDecorations = [];
         this.currentLineDecorationLineNumber = null;
         this.events = [];
-        this.store = { comments: {} }; //, viewZoneIdsToDelete: [] };
+        this.store = { comments: {}, events: [] };
         this.renderStore = {};
         this.verbose = verbose;
         this.editorConfig = (_a = this.editor.getRawOptions()) !== null && _a !== void 0 ? _a : {};
@@ -425,7 +424,7 @@ class ReviewManager {
                 {
                     range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
                     options: {
-                        marginClassName: "activeLineMarginClass",
+                        marginClassName: "activeLineMarginClass", //TODO - fix the creation of this style
                         zIndex: 100,
                     },
                 },
@@ -510,6 +509,8 @@ class ReviewManager {
             status: null,
             dt: null,
             selection: null,
+            type: events_comments_reducers_1.ReviewCommentType.comment,
+            typeState: undefined
         };
     }
     setEditorMode(mode, why = null) {
@@ -572,18 +573,16 @@ class ReviewManager {
         return this.addEvent(event);
     }
     addEvent(event) {
-        event.createdBy = this.currentUser;
-        event.createdAt = this.getDateTimeNow();
-        event.id = uuid.v4();
-        this.events.push(event);
-        this.store = (0, events_comments_reducers_1.commentReducer)(event, this.store);
+        const populatedEvent = Object.assign(Object.assign({}, event), { createdBy: this.currentUser, createdAt: this.getDateTimeNow(), id: uuid.v4() });
+        this.events.push(populatedEvent);
+        this.store = (0, events_comments_reducers_1.commentReducer)(populatedEvent, this.store);
         this.setActiveComment(null);
         this.refreshComments();
         this.layoutInlineToolbar();
         if (this.onChange) {
             this.onChange(this.events);
         }
-        return event;
+        return populatedEvent;
     }
     formatDate(dt) {
         if (Number.isInteger(dt)) {
