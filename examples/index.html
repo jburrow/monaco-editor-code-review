@@ -5,13 +5,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <style>
-    .editButtonsContainer {
-      color: red;
-      margin-top: 200px;
+    body {
+      margin: 5px;
     }
 
     .editor {
       height: calc(100vh - 430px);
+      width: calc(100vw - 10px);
+
     }
 
     h5 {
@@ -37,10 +38,6 @@
       background-color: #DDDDDD;
       color: black;
     }
-
-    .buttons {
-      height: 50px;
-    }
   </style>
 </head>
 
@@ -60,8 +57,9 @@
     </select>
 
     Theme:<select id="option_theme">
-      <option>vs-dark</option>
       <option>vs-light</option>
+      <option>vs-dark</option>
+
     </select>
     <input id="option_editor_readonly" type="checkbox" />Editor Readonly
     <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()" />Comments Readonly

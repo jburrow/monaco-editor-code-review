@@ -112,6 +112,7 @@ export interface ReviewManagerConfig {
   styles?: Record<string, {}>;
   setClassNames?: boolean;
   verticalOffset?: number;
+  enableMarkdown?: boolean;
 }
 
 interface ReviewManagerConfigPrivate {
@@ -133,6 +134,7 @@ interface ReviewManagerConfigPrivate {
   styles: Record<string, {}>;
   setClassNames: boolean;
   verticalOffset: number;
+  enableMarkdown: boolean;
 }
 
 const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
@@ -153,6 +155,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
   styles: { ...defaultStyles },
   setClassNames: true,
   verticalOffset: 0,
+  enableMarkdown: false,
 };
 
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
@@ -1004,9 +1007,15 @@ export class ReviewManager {
       );
     }
 
-    const n = this.createElement(null, "reviewComment.text", "div");
-    n.innerHTML = convertMarkdownToHTML(item.state.comment.text);
-    domNode.appendChild(n);
+    const textNode = this.createElement(null, "reviewComment.text", "div");
+    textNode.style.width = "70vw";
+    if (this.config.enableMarkdown) {
+      textNode.innerHTML = convertMarkdownToHTML(item.state.comment.text);
+    } else {
+      textNode.innerText = item.state.comment.text
+    }
+
+    rootNode.appendChild(textNode);
 
     return rootNode;
   }

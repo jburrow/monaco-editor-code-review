@@ -221,8 +221,12 @@ function createRandomComments(): ReviewCommentEvent[] {
       createdBy: fooUser,
       createdAt: new Date().getTime(),
       text: `###  Markdown Example
-<script>alert()</script>
-      This sampcle is loaded from theThis sampcle is loaded from theThis sampcle is loaded from the the \`innerHTML of the\` \`<wc-markdown>\` tag
+
+      Sample. This sampcle is loaded from the
+      
+      This sampcle is loaded from the the \`innerHTML of the\` \`<wc-markdown>\` tag
+      
+      <script>alert()</script>
       `,
     },
     {
