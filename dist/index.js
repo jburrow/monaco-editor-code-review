@@ -74,6 +74,7 @@ const defaultReviewManagerConfig = {
     styles: Object.assign({}, exports.defaultStyles),
     setClassNames: true,
     verticalOffset: 0,
+    enableMarkdown: false,
 };
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
@@ -740,9 +741,15 @@ class ReviewManager {
         if (item.state.history.length > 1) {
             domNode.appendChild(this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history"));
         }
-        const n = this.createElement(null, "reviewComment.text", "div");
-        n.innerHTML = (0, comment_1.convertMarkdownToHTML)(item.state.comment.text);
-        domNode.appendChild(n);
+        const textNode = this.createElement(null, "reviewComment.text", "div");
+        textNode.style.width = "70vw";
+        if (this.config.enableMarkdown) {
+            textNode.innerHTML = (0, comment_1.convertMarkdownToHTML)(item.state.comment.text);
+        }
+        else {
+            textNode.innerText = item.state.comment.text;
+        }
+        rootNode.appendChild(textNode);
         return rootNode;
     }
     // calculateNumberOfLines(text: string): number {

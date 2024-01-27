@@ -39,6 +39,7 @@ export interface ReviewManagerConfig {
     styles?: Record<string, {}>;
     setClassNames?: boolean;
     verticalOffset?: number;
+    enableMarkdown?: boolean;
 }
 interface ReviewManagerConfigPrivate {
     commentIndent: number;
@@ -61,6 +62,7 @@ interface ReviewManagerConfigPrivate {
     styles: Record<string, {}>;
     setClassNames: boolean;
     verticalOffset: number;
+    enableMarkdown: boolean;
 }
 interface EditorElements {
     cancel: HTMLButtonElement;
