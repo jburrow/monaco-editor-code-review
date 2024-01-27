@@ -2,13 +2,13 @@
 <html>
 
 <head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <style>
     .editButtonsContainer {
       color: red;
       margin-top: 200px;
     }
-
-
 
     .editor {
       height: calc(100vh - 430px);
@@ -37,11 +37,15 @@
       background-color: #DDDDDD;
       color: black;
     }
+
+    .buttons {
+      height: 50px;
+    }
   </style>
 </head>
 
 <body>
-  <div class="buttons alert alert-light">
+  <div class="buttons">
     Editor Mode:<select id="option_editor_mode">
       <option>diff-mode</option>
       <option>editor-mode</option>
