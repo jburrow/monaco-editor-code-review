@@ -267,7 +267,7 @@ export class ReviewManager {
    </g>
   </svg>`
   
-  console.log(`.activeLineMarginClass{    
+  console.debug(`.activeLineMarginClass{    
     background-image: url("data:image/svg+xml;base64,${btoa(svg)}");
   }`);
   
@@ -307,7 +307,7 @@ export class ReviewManager {
       this.refreshComments();
 
       this.verbose &&
-        console.debug("Events Loaded:", events.length, "Review Comments:", Object.values(this.store.comments).length);
+        console.debug("[monaco-review] Events Loaded:", events.length, "Review Comments:", Object.values(this.store.comments).length);
     });
   }
 
@@ -353,7 +353,7 @@ export class ReviewManager {
 
   applyStyles(element: HTMLElement, className: string) {
     if (this.config.styles[className] === undefined) {
-      console.log("[CLASSNAME]", className);
+      console.warn("[monaco-review] [CLASSNAME]", className);
     } else {
       if (this.config.styles[className]) {
         for (const [key, value] of Object.entries(this.config.styles[className])) {
@@ -417,7 +417,7 @@ export class ReviewManager {
   }
 
   handleCancel() {
-    console.log("[handleCancel]");
+    console.debug("[monaco-review] [handleCancel]");
     this.setActiveComment(null, "cancel");
     this.setEditorMode(EditorMode.toolbar, "cancel");
     this.editor.focus();
@@ -550,12 +550,12 @@ export class ReviewManager {
     const position = this.editor.getPosition();
     const activePosition = this.activeComment ? this.activeComment.lineNumber : position.lineNumber;
     //does it need an offset?
-    console.log("[getActivePosition]", activePosition, this.activeComment?.lineNumber, position.lineNumber);
+    console.debug("[monaco-review] [getActivePosition]", activePosition, this.activeComment?.lineNumber, position.lineNumber);
     return activePosition;
   }
 
   setActiveComment(comment?: ReviewComment, reason?: string) {
-    this.verbose && console.debug("[setActiveComment]", comment, reason);
+    this.verbose && console.debug("[monaco-review] [setActiveComment]", comment, reason);
 
     this.canCancelCondition.set(Boolean(this.activeComment));
 
@@ -633,7 +633,7 @@ export class ReviewManager {
           const rs = this.getRenderState(cs.comment.id);
           if (rs.viewZoneId == ev.target.detail.viewZoneId) {
             activeComment = cs.comment;
-            console.log(cs.comment.text, cs.history.length);
+            console.debug("[monaco-review]", cs.comment.text, cs.history.length);
             break;
           }
         }
@@ -720,8 +720,8 @@ export class ReviewManager {
 
     this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
     this.verbose &&
-      console.log(
-        "setEditorMode",
+      console.debug(
+        "[monaco-review] setEditorMode",
         EditorMode[mode],
         why,
         "Comment:",
@@ -876,7 +876,7 @@ export class ReviewManager {
       for (const cid of Array.from(this.store.deletedCommentIds || [])) {
         const viewZoneId = this.renderStore[cid]?.viewZoneId;
         changeAccessor.removeZone(viewZoneId);
-        this.verbose && console.debug("Zone.Delete", viewZoneId);
+        this.verbose && console.debug("[monaco-review] Zone.Delete", viewZoneId);
       }
       this.store.deletedCommentIds = null;
 
@@ -889,7 +889,7 @@ export class ReviewManager {
         const rs = this.getRenderState(item.state.comment.id);
 
         if (rs.renderStatus === ReviewCommentRenderState.hidden) {
-          this.verbose && console.debug("Zone.Hidden", item.state.comment.id);
+          this.verbose && console.debug("[monaco-review] Zone.Hidden", item.state.comment.id);
 
           changeAccessor.removeZone(rs.viewZoneId);
           rs.viewZoneId = null;
@@ -898,7 +898,7 @@ export class ReviewManager {
         }
 
         if (rs.renderStatus === ReviewCommentRenderState.dirty) {
-          this.verbose && console.debug("Zone.Dirty", item.state.comment.id);
+          this.verbose && console.debug("[monaco-review] Zone.Dirty", item.state.comment.id);
 
           changeAccessor.removeZone(rs.viewZoneId);
           rs.viewZoneId = null;
@@ -910,7 +910,7 @@ export class ReviewManager {
         }
 
         if (rs.viewZoneId == null) {
-          this.verbose && console.debug("Zone.Create", item.state.comment.id);
+          this.verbose && console.debug("[monaco-review] Zone.Create", item.state.comment.id);
 
           const isActive = this.activeComment == item.state.comment;
 
@@ -979,9 +979,9 @@ export class ReviewManager {
 
       this.commentHeightCache[cacheKey] = height;
 
-      console.log("calculated height", height);
+      console.debug("[monaco-review] calculated height", height);
     } else {
-      console.log("using cached height", cacheKey, this.commentHeightCache[item.state.comment.id]);
+      console.debug("[monaco-review] using cached height", cacheKey, this.commentHeightCache[item.state.comment.id]);
     }
     return this.commentHeightCache[cacheKey];
   }

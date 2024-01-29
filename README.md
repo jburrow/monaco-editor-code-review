@@ -28,9 +28,9 @@ var overriddenConfig = {};
 //Type: ./src/types/index.ts#ReviewComment
 var existingComments = [{id:"1",
                          createdBy:'developer-1',
-                         createdAt:1234,
+                         createdAt:new Date().getTime(),
                          text:'',
-                         lineNumber:10 }];
+                         lineNumber:1 }];
 
 var editor = monaco.editor.create(document.getElementById("container"), {
         value: '...some source code ''',

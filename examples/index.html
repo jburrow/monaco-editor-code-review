@@ -2,15 +2,14 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="bootstrap.min.css">
   <style>
     body {
       margin: 5px;
     }
 
     .editor {
-      height: calc(100vh - 430px);
+      height: calc(100vh - 450px);
       width: calc(100vw - 10px);
 
     }
@@ -24,6 +23,7 @@
     .summary {
       max-height: 300px;
       overflow: auto;
+      padding: 5px
     }
 
     .btn {
@@ -42,37 +42,54 @@
 </head>
 
 <body>
-  <div class="buttons">
-    Editor Mode:<select id="option_editor_mode">
-      <option>diff-mode</option>
-      <option>editor-mode</option>
-    </select>
-    Diff Mode:<select id="option_diff_mode">
-      <option>side-by-side</option>
-      <option selected>inline-diff</option>
-    </select>
-    User:<select id="option_current_user" onchange="setCurrentUser()">
-      <option selected>foo.user</option>
-      <option>bar.user</option>
-    </select>
+  <nav class="navbar navbar-light bg-light">
+    <div class="mb-3">
+      <label for="option_editor_mode" class="form-label">Editor Mode</label>
+      <select id="option_editor_mode" class="form-select form-select-sm" onchange="updateSettings()">
+        <option>diff-mode</option>
+        <option>editor-mode</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="option_diff_mode" class="form-label">Diff Mode</label>
+      <select id="option_diff_mode" class="form-select form-select-sm" onchange="updateSettings()">
+        <option>side-by-side</option>
+        <option selected>inline-diff</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="option_current_user" class="form-label">Current User:</label>
+      <select id="option_current_user" onchange="updateSettings()" class="form-select">
+        <option selected>foo.user</option>
+        <option>bar.user</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="option_theme" class="form-label">Theme:</label>
+      <select id="option_theme" class="form-select" onchange="updateSettings()">
+        <option>vs-light</option>
+        <option>vs-dark</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="option_editor_readonly" class="form-label">Editor Readonly</label>
+      <input id="option_editor_readonly" type="checkbox" onchange="updateSettings()" />
+    </div>
+    <div class="mb-3">
+      <label for="option_comments_readonly" class="form-label">Comments Readonly</label>
+      <input id="option_comments_readonly" type="checkbox" onchange="updateSettings()" />
+    </div>
+    <div class="mb-3">
 
-    Theme:<select id="option_theme">
-      <option>vs-light</option>
-      <option>vs-dark</option>
+      <button onclick="clearComments()" class="btn btn-secondary btn-sm">Clear Comments</button>
+    </div>
+    </div>
+  </nav>
+  <i>Press CTRL+F10 to add comment, CTRL+Enter to save comment</i>
 
-    </select>
-    <input id="option_editor_readonly" type="checkbox" />Editor Readonly
-    <input id="option_comments_readonly" type="checkbox" onchange="handleCommentReadonlyChange()" />Comments Readonly
-    <button onclick="updateSettings()" class="btn btn-primary">Update Editor</button>
-    <button onclick="clearComments()" class="btn btn-secondary">Clear Comments</button>
-  </div>
-  <h5>Regular Editor - Press CTRL+F10 to add comment, CTRL+Enter to save comment</h5>
   <div class="editor" id="containerEditor"></div>
-  <div style="display: flex;flex-direction:row;justify-content: space-around;">
-    <h5>Comments</h5>
-    <h5>Events</h5>
-  </div>
-  <div style="display: flex;flex-direction:row;">
+
+  <div style="display: flex;flex-direction:row;gap:5px">
 
     <div class="summary" id="commentsDiv"></div>
 
@@ -86,6 +103,11 @@
 
 <script>
   function updateSettings() {
+
+
+
+
+
     window.setView(
       document.getElementById("option_editor_mode").value,
       document.getElementById("option_diff_mode").value,

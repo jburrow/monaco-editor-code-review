@@ -17,7 +17,7 @@ interface WindowDoc {
   generateDifferentComments: () => void;
   generateDifferentContents: () => void;
   clearComments: () => void;
-  setCurrentUser: () => void;
+  setCurrentUser: (user: string) => void;
   handleCommentReadonlyChange: () => void;
   toggleSummaryView: () => void;
 }
@@ -25,8 +25,9 @@ interface WindowDoc {
 const win = window as any as WindowDoc;
 let reviewManager: ReviewManager = null;
 let currentMode: string = "";
+let currentDiffMode: string = "";
 let currentEditor: monacoEditor.editor.IStandaloneCodeEditor = null;
-let theme = "vs-dark";
+
 const fooUser = "foo.user";
 const barUser = "bar.user";
 
@@ -71,38 +72,48 @@ function setView(
 ) {
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
-  // currentMode = mode;
-  document.getElementById("containerEditor").innerHTML = "";
-  if (editorMode == "editor-mode") {
-    currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
-      value: exampleSourceCode[idx],
-      language: "typescript",
-      glyphMargin: true,
-      contextmenu: true,
-      automaticLayout: true,
-      readOnly: editorReadonly,
-      theme: theme,
-    });
-    initReviewManager(currentEditor, currentUser, commentsReadonly);
+  if (editorMode !== currentMode || diffMode !== currentDiffMode) {
+    document.getElementById("containerEditor").innerHTML = "";
+    if (editorMode === "editor-mode") {
+      currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
+        value: exampleSourceCode[idx],
+        language: "typescript",
+        glyphMargin: true,
+        contextmenu: true,
+        automaticLayout: true,
+        readOnly: editorReadonly,
+        theme: theme,
+      });
+      initReviewManager(currentEditor, currentUser, commentsReadonly);
+    } else {
+      var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
+      var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
+
+      const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
+        renderSideBySide: diffMode !== "inline-diff",
+        theme: theme,
+        readOnly: editorReadonly,
+        glyphMargin: true,
+        contextmenu: true,
+        automaticLayout: true,
+      });
+      e.setModel({
+        original: originalModel,
+        modified: modifiedModel,
+      });
+
+      initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
+    }
+
+    currentMode = editorMode;
+    currentDiffMode = diffMode;
   } else {
-    var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
-    var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
-
-    const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
-      renderSideBySide: diffMode !== "inline-diff",
-      theme: theme,
-      readOnly: editorReadonly,
-      glyphMargin: true,
-      contextmenu: true,
-      automaticLayout: true,
-    });
-    e.setModel({
-      original: originalModel,
-      modified: modifiedModel,
-    });
-
-    initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
+    reviewManager.currentUser = currentUser
+    reviewManager.setReadOnlyMode(commentsReadonly);
   }
+
+
+
 }
 
 function generateDifferentContents() {
@@ -167,9 +178,6 @@ function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, cu
     },
     true
   );
-
-  setCurrentUser();
-
   renderComments(reviewManager.events);
 }
 
@@ -182,9 +190,9 @@ function generateDifferentComments() {
   renderComments(reviewManager.events);
 }
 
-function setCurrentUser() {
-  if (reviewManager && event) {
-    reviewManager.currentUser = (event.srcElement as HTMLSelectElement).value;
+function setCurrentUser(user: string) {
+  if (reviewManager) {
+    reviewManager.currentUser = user;
   }
 }
 

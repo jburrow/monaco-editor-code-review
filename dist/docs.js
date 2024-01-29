@@ -14,8 +14,8 @@ const moment = require("dayjs");
 const win = window;
 let reviewManager = null;
 let currentMode = "";
+let currentDiffMode = "";
 let currentEditor = null;
-let theme = "vs-dark";
 const fooUser = "foo.user";
 const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
@@ -49,36 +49,43 @@ function getRandomInt(max) {
 }
 function setView(editorMode, diffMode, theme, currentUser, editorReadonly, commentsReadonly) {
     const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
-    // currentMode = mode;
-    document.getElementById("containerEditor").innerHTML = "";
-    if (editorMode == "editor-mode") {
-        currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
-            value: exampleSourceCode[idx],
-            language: "typescript",
-            glyphMargin: true,
-            contextmenu: true,
-            automaticLayout: true,
-            readOnly: editorReadonly,
-            theme: theme,
-        });
-        initReviewManager(currentEditor, currentUser, commentsReadonly);
+    if (editorMode !== currentMode || diffMode !== currentDiffMode) {
+        document.getElementById("containerEditor").innerHTML = "";
+        if (editorMode === "editor-mode") {
+            currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
+                value: exampleSourceCode[idx],
+                language: "typescript",
+                glyphMargin: true,
+                contextmenu: true,
+                automaticLayout: true,
+                readOnly: editorReadonly,
+                theme: theme,
+            });
+            initReviewManager(currentEditor, currentUser, commentsReadonly);
+        }
+        else {
+            var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
+            var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
+            const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
+                renderSideBySide: diffMode !== "inline-diff",
+                theme: theme,
+                readOnly: editorReadonly,
+                glyphMargin: true,
+                contextmenu: true,
+                automaticLayout: true,
+            });
+            e.setModel({
+                original: originalModel,
+                modified: modifiedModel,
+            });
+            initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
+        }
+        currentMode = editorMode;
+        currentDiffMode = diffMode;
     }
     else {
-        var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
-        var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
-        const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
-            renderSideBySide: diffMode !== "inline-diff",
-            theme: theme,
-            readOnly: editorReadonly,
-            glyphMargin: true,
-            contextmenu: true,
-            automaticLayout: true,
-        });
-        e.setModel({
-            original: originalModel,
-            modified: modifiedModel,
-        });
-        initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
+        reviewManager.currentUser = currentUser;
+        reviewManager.setReadOnlyMode(commentsReadonly);
     }
 }
 function generateDifferentContents() {
@@ -127,7 +134,6 @@ function initReviewManager(editor, currentUser, readOnly) {
         verticalOffset: 5, // This are hacks to correct the layout due to parent css
         commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
     }, true);
-    setCurrentUser();
     renderComments(reviewManager.events);
 }
 function handleCommentReadonlyChange() {
@@ -137,9 +143,9 @@ function generateDifferentComments() {
     reviewManager.load(createRandomComments());
     renderComments(reviewManager.events);
 }
-function setCurrentUser() {
-    if (reviewManager && event) {
-        reviewManager.currentUser = event.srcElement.value;
+function setCurrentUser(user) {
+    if (reviewManager) {
+        reviewManager.currentUser = user;
     }
 }
 function createRandomComments() {
