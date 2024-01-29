@@ -1,6 +1,6 @@
 {
   "name": "monaco-review",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "description": "Code review extension for Monaco",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
