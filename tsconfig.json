@@ -6,13 +6,18 @@
         "declaration": true,
         "module": "commonjs",
         "target": "es6",
-        "lib":["es2017","dom"],
+        "lib": [
+            "es2021",
+            "es2020",
+            "es2017",
+            "dom"
+        ],
         "jsx": "react"
     },
     "include": [
         "./src/**/*"
     ],
-    "exclude":[
+    "exclude": [
         "./src/*.test.ts"
     ]
 }

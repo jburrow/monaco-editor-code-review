@@ -1,20 +1,19 @@
 # monaco-editor-code-review
 
-
 ![Build Status](https://github.com/jburrow/monaco-editor-code-review/actions/workflows/node.js.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/jburrow/monaco-editor-code-review/badge.svg?branch=master)](https://coveralls.io/github/jburrow/monaco-editor-code-review?branch=master) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjburrow%2Fmonaco-editor-code-review?ref=badge_shield)
 
 ![screenshot](https://github.com/jburrow/monaco-editor-code-review/blob/master/examples/screenshot.png?raw=true)
 
-Lightweight extension (31KiB) for monaco-editor to allow commenting off code.
+Lightweight extension (45KiB) for monaco-editor to allow the creation, editing of "comments" in code.
 This module has 2 explicit dependencies (uuid + moment). There is an peer-dependency dependency on monaco-editor.
 
 For a working examplple of all the features and the behaviours
 
-- Try it out: https://jburrow.github.io/monaco-editor-code-review/examples/index.html
+- Read the Api-Docs: https://jburrow.github.io/monaco-editor-code-review/docs/
+- Try it out: DEMO: https://jburrow.github.io/monaco-editor-code-review/examples/index.html
 - See example source-code
   - [docs/index.html](examples/index.html)
   - [src/docs.ts](src/docs.ts)
-- Read the Api-Docs: https://jburrow.github.io/monaco-editor-code-review/docs/
 
 Simply add the monaco-editor-code-review/index.js to your .html page.
 
@@ -27,8 +26,9 @@ Simply add the monaco-editor-code-review/index.js to your .html page.
 var overriddenConfig = {};
 
 //Type: ./src/types/index.ts#ReviewComment
-var existingComments = [{author:'',
-                         dt:'',
+var existingComments = [{id:"1",
+                         createdBy:'developer-1',
+                         createdAt:1234,
                          text:'',
                          lineNumber:10 }];
 
@@ -37,10 +37,10 @@ var editor = monaco.editor.create(document.getElementById("container"), {
         language: "javascript",
         contextmenu: true
     });
-var rm = MonacoEditorCodeReview.createReviewManager(editor,
+var reviewManager = MonacoEditorCodeReview.createReviewManager(editor,
                                                     "name-of-current-user",
                                                     existingComments,
-                                                    (newComments)=>{console.info(newComments);},
+                                                    (newComments)=>{console.info("** new comments **", newComments);},
                                                     overriddenConfig);
 ```
 
