@@ -23,21 +23,21 @@ Simply add the monaco-editor-code-review/index.js to your .html page.
 
 ```javascript
 //Type: ./src/types/index.ts#ReviewManagerConfig
-var overriddenConfig = {};
+const overriddenConfig = {};
 
 //Type: ./src/types/index.ts#ReviewComment
-var existingComments = [{id:"1",
+const existingComments = [{id:"1",
                          createdBy:'developer-1',
                          createdAt:new Date().getTime(),
                          text:'',
                          lineNumber:1 }];
 
-var editor = monaco.editor.create(document.getElementById("container"), {
+const editor = monaco.editor.create(document.getElementById("container"), {
         value: '...some source code ''',
         language: "javascript",
         contextmenu: true
     });
-var reviewManager = MonacoEditorCodeReview.createReviewManager(editor,
+const reviewManager = MonacoEditorCodeReview.createReviewManager(editor,
                                                     "name-of-current-user",
                                                     existingComments,
                                                     (newComments)=>{console.info("** new comments **", newComments);},

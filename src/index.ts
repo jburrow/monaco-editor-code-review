@@ -9,12 +9,12 @@ import {
   ProposedReviewCommentEvent,
   ReviewComment,
   ReviewCommentRenderState,
-  ReviewCommentType,
   ReviewCommentEvent,
 } from "./events-comments-reducers";
 
 import { convertMarkdownToHTML } from "./comment";
 import * as uuid from "uuid";
+
 export {
   ReviewCommentStore,
   ProposedReviewCommentEvent as ReviewCommentEvent,
@@ -60,7 +60,7 @@ export function createReviewManager(
   return rm;
 }
 
-interface ReviewCommentIterItem {
+export interface ReviewCommentIterItem {
   depth: number;
   state: ReviewCommentState;
 }
@@ -103,7 +103,7 @@ export interface ReviewManagerConfig {
   editButtonEnableRemove?: boolean;
   editButtonOffset?: string;
   editButtonRemoveText?: string;
-  formatDate?: { (dt: Date): string };
+  formatDate?: FormatDate;
   readOnly?: boolean;
   reviewCommentIconActive?: string;
   reviewCommentIconSelect?: string;
@@ -115,6 +115,8 @@ export interface ReviewManagerConfig {
   enableMarkdown?: boolean;
 }
 
+export type FormatDate = (dt: Date | string) => string;
+
 interface ReviewManagerConfigPrivate {
   commentIndent: number;
   commentIndentOffset: number;
@@ -124,7 +126,7 @@ interface ReviewManagerConfigPrivate {
   editButtonEnableRemove: boolean;
   editButtonOffset: string;
   editButtonRemoveText: string;
-  formatDate?: { (dt: Date | string): string };
+  formatDate?: FormatDate;
   readOnly: boolean;
   rulerMarkerColor: any;
   rulerMarkerDarkColor: any;
@@ -146,7 +148,7 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
   editButtonEnableRemove: true,
   editButtonOffset: "-10px",
   editButtonRemoveText: "Remove",
-  formatDate: null,
+
   readOnly: false,
   rulerMarkerColor: "darkorange",
   rulerMarkerDarkColor: "darkorange",
@@ -171,13 +173,13 @@ interface EditorElements {
 
 interface InlineToolbarElements {
   add: HTMLSpanElement;
-  edit: HTMLSpanElement;
-  remove: HTMLSpanElement;
+  edit?: HTMLSpanElement;
+  remove?: HTMLSpanElement;
   root: HTMLDivElement;
 }
 interface RenderStoreItem {
-  viewZoneId: string;
-  renderStatus: ReviewCommentRenderState;
+  viewZoneId?: string;
+  renderStatus?: ReviewCommentRenderState;
 }
 
 export class ReviewManager {
@@ -187,9 +189,9 @@ export class ReviewManager {
   events: ReviewCommentEvent[];
   store: ReviewCommentStore;
   activeComment?: ReviewComment;
-  widgetInlineToolbar: monacoEditor.editor.IContentWidget;
-  widgetInlineCommentEditor: monacoEditor.editor.IContentWidget;
-  onChange: OnActionsChanged;
+  widgetInlineToolbar?: monacoEditor.editor.IContentWidget;
+  widgetInlineCommentEditor?: monacoEditor.editor.IContentWidget;
+  onChange?: OnActionsChanged;
   editorMode: EditorMode;
   config: ReviewManagerConfigPrivate;
   currentLineDecorations: string[];
@@ -206,26 +208,26 @@ export class ReviewManager {
   constructor(
     editor: monacoEditor.editor.IStandaloneCodeEditor,
     currentUser: string,
-    onChange: OnActionsChanged,
+    onChange?: OnActionsChanged,
     config?: ReviewManagerConfig,
     verbose?: boolean
   ) {
     this.currentUser = currentUser;
     this.editor = editor;
-    this.activeComment = null; //TODO - consider moving onto the store
-    this.widgetInlineToolbar = null;
-    this.widgetInlineCommentEditor = null;
+    this.activeComment = undefined; //TODO - consider moving onto the store
+    this.widgetInlineToolbar = undefined;
+    this.widgetInlineCommentEditor = undefined;
     this.onChange = onChange;
     this.editorMode = EditorMode.toolbar;
     this.config = { ...defaultReviewManagerConfig, ...(config || {}) };
     this.currentLineDecorations = [];
     this.currentCommentDecorations = [];
-    this.currentLineDecorationLineNumber = null;
+    this.currentLineDecorationLineNumber = undefined;
     this.events = [];
-    this.store = { comments: {}, events: [] };
+    this.store = { comments: {}, events: [] }
     this.renderStore = {};
 
-    this.verbose = verbose;
+    this.verbose = verbose === true;
     this.editorConfig = this.editor.getRawOptions() ?? {};
     this.editor.onDidChangeConfiguration(() => (this.editorConfig = this.editor.getRawOptions()));
     this.editor.onMouseDown(this.handleMouseDown.bind(this));
@@ -247,31 +249,12 @@ export class ReviewManager {
     if (!document.getElementById(id)) {
       const style = document.createElement("style");
       style.id = "monaco_review_custom_styles";
-      style.type = "text/css";
       style.innerHTML = `
 
     .activeLineMarginClass {
       z-index:10;
       background-image: url("data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KIDxnPgogIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICA8ZyBpZD0ic3ZnXzIiPgogICA8cGF0aCBmaWxsPSJkYXJrb3JhbmdlIiBkPSJtMTIuNDAxMzUsMTUuMjE0NzlsLTkuMjY4MjIsMHEtMS4xNTU3NSwwIC0xLjk2Njk5LC0wLjcyNzJ0LTAuODExMjUsLTEuNzYzMjFsMCwtOS45NjE2NXEwLC0xLjAzNjAxIDAuODExMjUsLTEuNzYzMjF0MS45NjY5OSwtMC43MjcybDkuMjY4MjIsMHExLjE1NTc0LDAgMS45NjY5OSwwLjcyNzJ0MC44MTEyNSwxLjc2MzIxbDAsOS45NjE2NXEwLDEuMDM2MDEgLTAuODExMjUsMS43NjMyMXQtMS45NjY5OSwwLjcyNzJ6bS05LjI2ODIyLC0xMy4yODg4M3EtMC4zNzc4NCwwIC0wLjY1NTY2LDAuMjQ5MDR0LTAuMjc3ODMsMC41ODc3M2wwLDkuOTYxNjVxMCwwLjMzODcgMC4yNzc4MywwLjU4Nzc0dDAuNjU1NjYsMC4yNDkwNGw5LjI2ODIyLDBxMC4zNzc4NCwwIDAuNjQ0NTUsLTAuMjQ5MDR0MC4yNjY3MSwtMC41ODc3NGwwLC05Ljk2MTY1cTAsLTAuMzM4NjkgLTAuMjY2NzEsLTAuNTg3NzN0LTAuNjQ0NTUsLTAuMjQ5MDRsLTkuMjY4MjIsMHptOC4zMzQ3Myw0Ljk4MDgybC03LjQwMTI0LDBxLTAuNDY2NzQsMCAtMC40NjY3NCwtMC4zOTg0N3EwLC0wLjE3OTMxIDAuMTMzMzUsLTAuMjk4ODV0MC4zMzMzOSwtMC4xMTk1NGw3LjQwMTI0LDBxMC4yMDAwMywwIDAuMzMzMzksMC4xMTk1NHQwLjEzMzM1LDAuMjk4ODVxMCwwLjM5ODQ3IC0wLjQ2Njc0LDAuMzk4NDd6bTAsLTIuNDkwNDFsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDcgMC40NjY3NCwtMC4zOTg0N2w3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0N3EwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDQuOTgwODJsLTcuNDAxMjQsMHEtMC4yMDAwMywwIC0wLjMzMzM5LC0wLjExOTU0dC0wLjEzMzM1LC0wLjI5ODg1cTAsLTAuMzk4NDYgMC40NjY3NCwtMC4zOTg0Nmw3LjQwMTI0LDBxMC40NjY3NCwwIDAuNDY2NzQsMC4zOTg0NnEwLDAuMTc5MzEgLTAuMTMzMzUsMC4yOTg4NXQtMC4zMzMzOSwwLjExOTU0em0wLDIuNDkwNDFsLTcuNDAxMjQsMHEtMC40NjY3NCwwIC0wLjQ2Njc0LC0wLjM5ODQ2cTAsLTAuMTc5MzEgMC4xMzMzNSwtMC4yOTg4NXQwLjMzMzM5LC0wLjExOTU0bDcuNDAxMjQsMHEwLjIwMDAzLDAgMC4zMzMzOSwwLjExOTU0dDAuMTMzMzUsMC4yOTg4NXEwLDAuMzk4NDYgLTAuNDY2NzQsMC4zOTg0NnoiIGlkPSJzdmdfMSIgc3Ryb2tlPSJudWxsIi8+CiAgPC9nPgogPC9nPgo8L3N2Zz4=");
     }`;
-
-      /*
-  
-  svg = `
-  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-   <g>
-    <title>Layer 1</title>
-    <g id="svg_2">
-     <path fill="#re d="m12.40135,15.21479l-9.26822,0q-1.15575,0 -1.96699,-0.7272t-0.81125,-1.76321l0,-9.96165q0,-1.03601 0.81125,-1.76321t1.96699,-0.7272l9.26822,0q1.15574,0 1.96699,0.7272t0.81125,1.76321l0,9.96165q0,1.03601 -0.81125,1.76321t-1.96699,0.7272zm-9.26822,-13.28883q-0.37784,0 -0.65566,0.24904t-0.27783,0.58773l0,9.96165q0,0.3387 0.27783,0.58774t0.65566,0.24904l9.26822,0q0.37784,0 0.64455,-0.24904t0.26671,-0.58774l0,-9.96165q0,-0.33869 -0.26671,-0.58773t-0.64455,-0.24904l-9.26822,0zm8.33473,4.98082l-7.40124,0q-0.46674,0 -0.46674,-0.39847q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39847 -0.46674,0.39847zm0,-2.49041l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39847 0.46674,-0.39847l7.40124,0q0.46674,0 0.46674,0.39847q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,4.98082l-7.40124,0q-0.20003,0 -0.33339,-0.11954t-0.13335,-0.29885q0,-0.39846 0.46674,-0.39846l7.40124,0q0.46674,0 0.46674,0.39846q0,0.17931 -0.13335,0.29885t-0.33339,0.11954zm0,2.49041l-7.40124,0q-0.46674,0 -0.46674,-0.39846q0,-0.17931 0.13335,-0.29885t0.33339,-0.11954l7.40124,0q0.20003,0 0.33339,0.11954t0.13335,0.29885q0,0.39846 -0.46674,0.39846z" id="svg_1" stroke="null"/>
-    </g>
-   </g>
-  </svg>`
-  
-  console.debug(`.activeLineMarginClass{    
-    background-image: url("data:image/svg+xml;base64,${btoa(svg)}");
-  }`);
-  
-  */
 
       document.getElementsByTagName("head")[0].appendChild(style);
     }
@@ -280,7 +263,7 @@ export class ReviewManager {
   setReadOnlyMode(value: boolean) {
     this.config.readOnly = value;
     this.canAddCondition.set(!value);
-    this.renderAddCommentLineDecoration(null);
+    this.renderAddCommentLineDecoration(undefined);
   }
 
   load(events: ReviewCommentEvent[]): void {
@@ -292,16 +275,16 @@ export class ReviewManager {
     this.editor.changeViewZones((changeAccessor: monacoEditor.editor.IViewZoneChangeAccessor) => {
       // Remove all the existing comments
       for (const viewState of Object.values(this.store.comments)) {
-        const x = this.getRenderState(viewState.comment.id);
-        if (x && x.viewZoneId !== null) {
-          changeAccessor.removeZone(x.viewZoneId);
+        const rs = this.getRenderState(viewState.comment.id);
+        if (rs.viewZoneId) {
+          changeAccessor.removeZone(rs.viewZoneId);
         }
       }
 
       this.events = events;
       this.store = store;
-      this.store.deletedCommentIds = null;
-      this.store.dirtyCommentIds = null;
+      this.store.deletedCommentIds = undefined;
+      this.store.dirtyCommentIds = undefined;
       this.renderStore = {};
 
       this.refreshComments();
@@ -335,7 +318,7 @@ export class ReviewManager {
     value = theme.getColor(name);
 
     // HACK - Buttons themes are not in monaco ... so just hack in theme for dark
-    const missingThemes = {
+    const missingThemes: { [key: string]: { [key: string]: string } } = {
       dark: {
         "button.background": "#0e639c",
         "button.foreground": "#ffffff",
@@ -356,8 +339,8 @@ export class ReviewManager {
       console.warn("[monaco-review] [CLASSNAME]", className);
     } else {
       if (this.config.styles[className]) {
-        for (const [key, value] of Object.entries(this.config.styles[className])) {
-          element.style[key] = value;
+        for (const [key, value] of Object.entries<string>(this.config.styles[className])) {
+          element.style[key as any] = value;
         }
       }
 
@@ -381,8 +364,8 @@ export class ReviewManager {
     add.onclick = () => this.setEditorMode(EditorMode.replyComment, "reply-comment-inline-button");
     root.appendChild(add);
 
-    let remove = null;
-    let edit = null;
+    let remove = undefined;
+    let edit = undefined;
     let spacer = null;
 
     if (this.config.editButtonEnableRemove) {
@@ -418,15 +401,16 @@ export class ReviewManager {
 
   handleCancel() {
     console.debug("[monaco-review] [handleCancel]");
-    this.setActiveComment(null, "cancel");
+    this.setActiveComment(undefined, "cancel");
     this.setEditorMode(EditorMode.toolbar, "cancel");
     this.editor.focus();
   }
 
   handleAddComment() {
-    const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection().endLineNumber;
+    //FIX - this isn't right.
+    const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection()?.endLineNumber ?? 1;
     const text = this.editorElements.textarea.value;
-    const selection = this.activeComment ? null : (this.editor.getSelection() as CodeSelection);
+    const selection = this.activeComment ? undefined : (this.editor.getSelection() as CodeSelection);
     this.addComment(lineNumber, text, selection);
     this.setEditorMode(EditorMode.toolbar, "add-comment-1");
     this.editor.focus();
@@ -498,6 +482,7 @@ export class ReviewManager {
             preference: [POSITION_BELOW],
           };
         }
+        return null;
       },
     };
 
@@ -529,16 +514,21 @@ export class ReviewManager {
         return editorElement.root;
       },
       getPosition: () => {
+
         if (this.editorMode != EditorMode.toolbar) {
-          editorElement.confirm.innerText = this.calculateConfirmButtonText();
-          return {
-            position: {
-              lineNumber: this.getActivePosition(),
-              column: 1,
-            },
-            preference: [2],
-          };
+          const lineNumber = this.getActivePosition();
+          if (lineNumber !== undefined) {
+            editorElement.confirm.innerText = this.calculateConfirmButtonText();
+            return {
+              position: {
+                lineNumber,
+                column: 1,
+              },
+              preference: [2],
+            };
+          }
         }
+        return null;
       },
     };
 
@@ -546,11 +536,11 @@ export class ReviewManager {
     return editorElement;
   }
 
-  getActivePosition(): number {
+  getActivePosition(): number | undefined {
     const position = this.editor.getPosition();
-    const activePosition = this.activeComment ? this.activeComment.lineNumber : position.lineNumber;
+    const activePosition = this.activeComment ? this.activeComment.lineNumber : position?.lineNumber;
     //does it need an offset?
-    console.debug("[monaco-review] [getActivePosition]", activePosition, this.activeComment?.lineNumber, position.lineNumber);
+    console.debug("[monaco-review] [getActivePosition]", activePosition, this.activeComment?.lineNumber, position?.lineNumber);
     return activePosition;
   }
 
@@ -593,7 +583,7 @@ export class ReviewManager {
   handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent) {
     if (ev.target && ev.target.position && ev.target.position.lineNumber) {
       this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
-      this.renderAddCommentLineDecoration(this.config.readOnly === true ? null : this.currentLineDecorationLineNumber);
+      this.renderAddCommentLineDecoration(this.config.readOnly === true ? undefined : this.currentLineDecorationLineNumber);
     }
   }
 
@@ -612,26 +602,23 @@ export class ReviewManager {
     this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, lines);
   }
 
-  handleMouseDown(ev: {
-    target: {
-      element: { className: string; hasAttribute: { (string): boolean } };
-      detail: any;
-    };
-  }) {
+  handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent) {
     // Not ideal - but couldn't figure out a different way to identify the glyph event
-    if (ev.target.element.className && ev.target.element.className.indexOf("activeLineMarginClass") > -1) {
+
+    if (ev?.target?.element?.className && ev?.target?.element?.className.indexOf("activeLineMarginClass") > -1 && this.currentLineDecorationLineNumber !== undefined) {
       this.editor.setPosition({
         lineNumber: this.currentLineDecorationLineNumber,
         column: 1,
       });
       this.setEditorMode(EditorMode.insertComment, "mouse-down-1");
-    } else if (!ev.target.element.hasAttribute(CONTROL_ATTR_NAME)) {
-      let activeComment: ReviewComment = this.activeComment;
+    } else if (!ev?.target?.element?.hasAttribute(CONTROL_ATTR_NAME)) {
+      let activeComment: ReviewComment | undefined = undefined;
 
-      if (ev.target.detail && ev.target.detail.viewZoneId !== null) {
+      const detail = (ev?.target as any)?.detail as any;
+      if (detail?.viewZoneId) {
         for (const cs of Object.values(this.store.comments)) {
           const rs = this.getRenderState(cs.comment.id);
-          if (rs.viewZoneId == ev.target.detail.viewZoneId) {
+          if (rs.viewZoneId == detail?.viewZoneId) {
             activeComment = cs.comment;
             console.debug("[monaco-review]", cs.comment.text, cs.history.length);
             break;
@@ -674,13 +661,16 @@ export class ReviewManager {
 
     if (this.inlineToolbarElements.remove) {
       const hasChildren =
-        this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment.id).length > 1;
+        this.activeComment && this.iterateComments((c) => c.comment.id === this.activeComment?.id).length > 1;
       const isSameUser = this.activeComment && this.activeComment.author === this.currentUser;
       this.inlineToolbarElements.remove.style.display = hasChildren ? "none" : "";
-      this.inlineToolbarElements.edit.style.display = hasChildren || !isSameUser ? "none" : "";
+      if (this.inlineToolbarElements.edit) {
+        this.inlineToolbarElements.edit.style.display = hasChildren || !isSameUser ? "none" : "";
+      }
     }
-
-    this.editor.layoutContentWidget(this.widgetInlineToolbar);
+    if (this.widgetInlineToolbar) {
+      this.editor.layoutContentWidget(this.widgetInlineToolbar);
+    }
   }
 
   layoutInlineCommentEditor() {
@@ -698,25 +688,13 @@ export class ReviewManager {
 
     this.editorElements.confirm.innerText = this.editorMode === EditorMode.editComment ? "Edit Comment" : "Add Comment";
 
-    this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
+    if (this.widgetInlineCommentEditor) {
+      this.editor.layoutContentWidget(this.widgetInlineCommentEditor);
+    }
   }
 
-  createEmptyCommentOnCurrentLine(): ReviewComment {
-    return {
-      id: null,
-      author: null,
-      lineNumber: this.getActivePosition(),
-      text: null,
-      status: null,
-      dt: null,
-      selection: null,
-      type: ReviewCommentType.comment,
-      typeState: undefined
-    };
-  }
-
-  setEditorMode(mode: EditorMode, why: string = null) {
-    let activeComment = mode === EditorMode.insertComment ? this.createEmptyCommentOnCurrentLine() : this.activeComment;
+  setEditorMode(mode: EditorMode, why: string = "") {
+    let activeComment = mode === EditorMode.insertComment ? undefined : this.activeComment;
 
     this.editorMode = this.config.readOnly ? EditorMode.toolbar : mode;
     this.verbose &&
@@ -767,7 +745,7 @@ export class ReviewManager {
         depth,
         state: cs,
       });
-      this.recurseComments(allComments, (x) => x.comment.parentId === comment.id, depth + 1, results);
+      this.recurseComments(allComments, (rcs) => rcs.comment.parentId === comment.id, depth + 1, results);
     }
   }
 
@@ -785,9 +763,9 @@ export class ReviewManager {
     return this.addEvent({ type: "delete", targetId: id });
   }
 
-  addComment(lineNumber: number | undefined, text: string, selection?: CodeSelection): ReviewCommentEvent {
+  addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewCommentEvent {
     const event: ProposedReviewCommentEvent =
-      this.editorMode === EditorMode.editComment
+      this.editorMode === EditorMode.editComment && this.activeComment?.id
         ? { type: "edit", text, targetId: this.activeComment.id }
         : {
           type: "create",
@@ -801,12 +779,14 @@ export class ReviewManager {
   }
 
   private addEvent(event: ProposedReviewCommentEvent): ReviewCommentEvent {
-    const populatedEvent = { ...event, createdBy: this.currentUser, createdAt: this.getDateTimeNow(), id: uuid.v4() };
+    const populatedEvent: ReviewCommentEvent = { ...event, createdBy: this.currentUser, createdAt: this.getDateTimeNow(), id: uuid.v4() };
+
+    console.debug('[addEvent]', populatedEvent);
 
     this.events.push(populatedEvent);
     this.store = commentReducer(populatedEvent, this.store);
 
-    this.setActiveComment(null);
+    this.setActiveComment(undefined);
     this.refreshComments();
     this.layoutInlineToolbar();
 
@@ -814,7 +794,7 @@ export class ReviewManager {
       this.onChange(this.events);
     }
 
-    return populatedEvent as ReviewCommentEvent;
+    return populatedEvent;
   }
 
   private formatDate(dt: number): string {
@@ -833,7 +813,7 @@ export class ReviewManager {
     return `${dt}`;
   }
 
-  private createElement(text: string, className: string, tagName: string = null) {
+  private createElement(text: string, className: string, tagName: string | undefined = undefined) {
     const span = document.createElement(tagName || "span") as HTMLSpanElement;
     this.applyStyles(span, className);
     if (text) {
@@ -844,15 +824,17 @@ export class ReviewManager {
 
   getRenderState(commentId: string): RenderStoreItem {
     if (!this.renderStore[commentId]) {
-      this.renderStore[commentId] = { viewZoneId: null, renderStatus: null };
+      this.renderStore[commentId] = { viewZoneId: undefined, renderStatus: undefined };
     }
     return this.renderStore[commentId];
   }
-  editId: string;
+
+  editId: string = "";
   commentHeightCache: Record<string, number> = {};
+
   refreshComments() {
     this.editor.changeViewZones((changeAccessor) => {
-      const lineNumbers: { [key: number]: CodeSelection } = {};
+      const lineNumbers: { [key: number]: CodeSelection | undefined } = {};
 
       if (this.editorMode !== EditorMode.toolbar) {
         // This creates a blank section viewZone that makes space for the interactive text file for editing
@@ -862,46 +844,50 @@ export class ReviewManager {
 
         const node = document.createElement("div");
         //node.style.backgroundColor = "orange";
-
-        this.editId = changeAccessor.addZone({
-          afterLineNumber: this.getActivePosition(),
-          heightInPx: 100,
-          domNode: node,
-          suppressMouseDown: true,
-        });
+        const afterLineNumber = this.getActivePosition();
+        if (afterLineNumber !== undefined) {
+          this.editId = changeAccessor.addZone({
+            afterLineNumber,
+            heightInPx: 100,
+            domNode: node,
+            suppressMouseDown: true,
+          });
+        }
       } else if (this.editId) {
         changeAccessor.removeZone(this.editId);
       }
 
       for (const cid of Array.from(this.store.deletedCommentIds || [])) {
         const viewZoneId = this.renderStore[cid]?.viewZoneId;
-        changeAccessor.removeZone(viewZoneId);
-        this.verbose && console.debug("[monaco-review] Zone.Delete", viewZoneId);
+        if (viewZoneId) {
+          changeAccessor.removeZone(viewZoneId);
+          this.verbose && console.debug("[monaco-review] Zone.Delete", viewZoneId);
+        }
       }
-      this.store.deletedCommentIds = null;
+      this.store.deletedCommentIds = undefined;
 
       for (const cid of Array.from(this.store.dirtyCommentIds || [])) {
         this.getRenderState(cid).renderStatus = ReviewCommentRenderState.dirty;
       }
-      this.store.dirtyCommentIds = null;
+      this.store.dirtyCommentIds = undefined;
 
       for (const item of this.iterateComments()) {
         const rs = this.getRenderState(item.state.comment.id);
 
-        if (rs.renderStatus === ReviewCommentRenderState.hidden) {
+        if (rs.renderStatus === ReviewCommentRenderState.hidden && rs.viewZoneId) {
           this.verbose && console.debug("[monaco-review] Zone.Hidden", item.state.comment.id);
 
           changeAccessor.removeZone(rs.viewZoneId);
-          rs.viewZoneId = null;
+          rs.viewZoneId = undefined;
 
           continue;
         }
 
-        if (rs.renderStatus === ReviewCommentRenderState.dirty) {
+        if (rs.renderStatus === ReviewCommentRenderState.dirty && rs.viewZoneId) {
           this.verbose && console.debug("[monaco-review] Zone.Dirty", item.state.comment.id);
 
           changeAccessor.removeZone(rs.viewZoneId);
-          rs.viewZoneId = null;
+          rs.viewZoneId = undefined;
           rs.renderStatus = ReviewCommentRenderState.normal;
         }
 
@@ -909,7 +895,7 @@ export class ReviewManager {
           lineNumbers[item.state.comment.lineNumber] = item.state.comment.selection;
         }
 
-        if (rs.viewZoneId == null) {
+        if (rs.viewZoneId == undefined) {
           this.verbose && console.debug("[monaco-review] Zone.Create", item.state.comment.id);
 
           const isActive = this.activeComment == item.state.comment;
@@ -990,24 +976,26 @@ export class ReviewManager {
     return `${item.state.comment.id}-${item.state.history.length}`;
   }
 
-  private renderComment(isActive: boolean, item: ReviewCommentIterItem) {
-    const rootNode = this.createElement(null, `reviewComment`); //.${isActive ? "active" : "inactive"}`);
+  private renderComment(isActive: boolean, item: ReviewCommentIterItem): HTMLElement {
+    const rootNode = this.createElement("", `reviewComment`); //.${isActive ? "active" : "inactive"}`);
     rootNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
     rootNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
 
-    const domNode = this.createElement(null, `reviewComment.${isActive ? "active" : "inactive"}`);
+    const domNode = this.createElement("", `reviewComment.${isActive ? "active" : "inactive"}`);
     rootNode.appendChild(domNode);
 
     // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
     domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment.author"));
-    domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment.dt"));
+    if (item.state.comment.dt) {
+      domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment.dt"));
+    }
     if (item.state.history.length > 1) {
       domNode.appendChild(
         this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history")
       );
     }
 
-    const textNode = this.createElement(null, "reviewComment.text", "div");
+    const textNode = this.createElement("", "reviewComment.text", "div");
     textNode.style.width = "70vw";
     if (this.config.enableMarkdown) {
       textNode.innerHTML = convertMarkdownToHTML(item.state.comment.text);
@@ -1020,18 +1008,13 @@ export class ReviewManager {
     return rootNode;
   }
 
-  // calculateNumberOfLines(text: string): number {
-  //   return 10;
-  //   text ? text.split(/\r*\n/).length + 1 : 1;
-  // }
-
   addActions() {
     this.editor.addAction({
       id: "my-unique-id-cancel",
       label: "Cancel Comment",
       keybindings: [monacoWindow.monaco.KeyCode.Escape],
       precondition: "cancel-context-key",
-      keybindingContext: null,
+      keybindingContext: undefined,
       contextMenuGroupId: "navigation",
       contextMenuOrder: 0,
       run: () => this.handleCancel(),
@@ -1042,7 +1025,7 @@ export class ReviewManager {
       label: "Add Comment",
       keybindings: [monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F10],
       precondition: "add-context-key",
-      keybindingContext: null,
+      keybindingContext: undefined,
       contextMenuGroupId: "navigation",
       contextMenuOrder: 0,
 
@@ -1055,8 +1038,8 @@ export class ReviewManager {
       id: "my-unique-id-next",
       label: "Next Comment",
       keybindings: [monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F12],
-      precondition: null,
-      keybindingContext: null,
+      precondition: undefined,
+      keybindingContext: undefined,
       contextMenuGroupId: "navigation",
       contextMenuOrder: 0.101,
 
@@ -1069,8 +1052,8 @@ export class ReviewManager {
       id: "my-unique-id-prev",
       label: "Prev Comment",
       keybindings: [monacoWindow.monaco.KeyMod.CtrlCmd | monacoWindow.monaco.KeyCode.F11],
-      precondition: null,
-      keybindingContext: null,
+      precondition: undefined,
+      keybindingContext: undefined,
       contextMenuGroupId: "navigation",
       contextMenuOrder: 0.102,
 
@@ -1082,10 +1065,13 @@ export class ReviewManager {
 
   navigateToComment(direction: NavigationDirection) {
     let currentLine = 0;
+    const position = this.editor.getPosition();
     if (this.activeComment) {
       currentLine = this.activeComment.lineNumber;
+    } else if (position) {
+      currentLine = position.lineNumber;
     } else {
-      currentLine = this.editor.getPosition().lineNumber;
+      return;
     }
 
     const comments = Object.values(this.store.comments)
@@ -1106,6 +1092,8 @@ export class ReviewManager {
           return a.lineNumber - b.lineNumber;
         } else if (direction === NavigationDirection.prev) {
           return b.lineNumber - a.lineNumber;
+        } else {
+          return 0;
         }
       });
 

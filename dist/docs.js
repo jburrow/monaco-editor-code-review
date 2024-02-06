@@ -12,10 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
 const moment = require("dayjs");
 const win = window;
-let reviewManager = null;
+let reviewManager = undefined;
 let currentMode = "";
 let currentDiffMode = "";
-let currentEditor = null;
+let currentEditor = undefined;
 const fooUser = "foo.user";
 const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
@@ -50,7 +50,10 @@ function getRandomInt(max) {
 function setView(editorMode, diffMode, theme, currentUser, editorReadonly, commentsReadonly) {
     const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
     if (editorMode !== currentMode || diffMode !== currentDiffMode) {
-        document.getElementById("containerEditor").innerHTML = "";
+        const containerEditor = document.getElementById("containerEditor");
+        if (containerEditor) {
+            containerEditor.innerHTML = "";
+        }
         if (editorMode === "editor-mode") {
             currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
                 value: exampleSourceCode[idx],
@@ -61,7 +64,9 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
                 readOnly: editorReadonly,
                 theme: theme,
             });
-            initReviewManager(currentEditor, currentUser, commentsReadonly);
+            if (currentEditor) {
+                initReviewManager(currentEditor, currentUser, commentsReadonly);
+            }
         }
         else {
             var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
@@ -82,8 +87,10 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
         }
         currentMode = editorMode;
         currentDiffMode = diffMode;
+        // reviewManager.config.renderComment = customRenderComment;
+        // reviewManager.refreshComments();
     }
-    else {
+    else if (reviewManager) {
         reviewManager.currentUser = currentUser;
         reviewManager.setReadOnlyMode(commentsReadonly);
     }
@@ -91,7 +98,7 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
 function generateDifferentContents() {
     const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
     if (currentMode.startsWith("standard")) {
-        currentEditor.setValue(exampleSourceCode[idx]);
+        currentEditor === null || currentEditor === void 0 ? void 0 : currentEditor.setValue(exampleSourceCode[idx]);
     }
     else {
         const e = currentEditor;
@@ -136,12 +143,20 @@ function initReviewManager(editor, currentUser, readOnly) {
     }, true);
     renderComments(reviewManager.events);
 }
-function handleCommentReadonlyChange() {
-    reviewManager.setReadOnlyMode(event.srcElement.checked);
-}
+// function customRenderComment(isActive: boolean, comment: ReviewCommentIterItem) {
+//   const div = document.createElement("div")
+//   div.style.backgroundColor = isActive ? "yellow" : "grey";
+//   div.style.border = "1px solid red";
+//   div.style.margin = "2px";
+//   div.style.left = "45px";
+//   div.innerText = JSON.stringify(comment.state.comment.text);
+//   return div as HTMLElement;
+// }
 function generateDifferentComments() {
-    reviewManager.load(createRandomComments());
-    renderComments(reviewManager.events);
+    if (reviewManager) {
+        reviewManager.load(createRandomComments());
+        renderComments(reviewManager.events);
+    }
 }
 function setCurrentUser(user) {
     if (reviewManager) {
@@ -243,47 +258,53 @@ function renderComments(events) {
         events
             .map((comment) => {
             return `<tr>
-                    <td>${comment.type || "&nbsp;"}</td>
-                    <td>${comment.id || "&nbsp;"}</td>
-                    <td>${comment.createdBy}</td> 
-                    <td>${comment.createdAt}</td>                     
-                    </tr>
-                    <tr>
-                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || "&nbsp;"}</td>                    
+                  <td>${comment.type || "&nbsp;"}</td>
+                  <td>${comment.id || "&nbsp;"}</td>
+                  <td>${comment.createdBy}</td> 
+                  <td>${comment.createdAt}</td>                     
+                </tr>
+                <tr>
+                  <td colspan="4" class="comment_text">${JSON.stringify(comment) || "&nbsp;"}</td>                    
                 </tr>`;
         })
             .join("") +
         "</table>";
-    const activeComments = Object.values(reviewManager.store.comments).map((cs) => cs.comment);
+    const activeComments = reviewManager ? Object.values(reviewManager.store.comments).map((cs) => cs.comment) : [];
     const activeHtml = "<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>" +
         activeComments
             .map((comment) => `<tr>
-                    <td>${comment.id || "&nbsp;"}</td>                                     
-                    <td>${comment.lineNumber}</td>
-                    <td>${comment.author}</td> 
-                    <td>${comment.dt}</td> 
-                </tr>
-                <tr>
-                    <td colspan="4" class="comment_text">${comment.text}</td>                                        
-                </tr>`)
+                <td>${comment.id || "&nbsp;"}</td>                                     
+                <td>${comment.lineNumber}</td>
+                <td>${comment.author}</td> 
+                <td>${comment.dt}</td> 
+            </tr>
+            <tr>
+                <td colspan="4" class="comment_text">${comment.text}</td>                                        
+            </tr>`)
             .join("") +
         "</table>";
-    document.getElementById("commentsDiv").innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
-    document.getElementById("eventsDiv").innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
+    const commentsDiv = document.getElementById("commentsDiv");
+    if (commentsDiv)
+        commentsDiv.innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
+    const eventsDiv = document.getElementById("eventsDiv");
+    if (eventsDiv)
+        eventsDiv.innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
 }
 function clearComments() {
-    reviewManager.load([]);
+    reviewManager === null || reviewManager === void 0 ? void 0 : reviewManager.load([]);
     renderComments([]);
 }
 function toggleSummaryView() {
     const o = document.getElementById("summaryEditor");
-    o.style.display = o.style.display === "none" ? "" : "none";
+    if (o) {
+        o.style.display = o.style.display === "none" ? "" : "none";
+    }
     // currentEditor.layout();
 }
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
-win.handleCommentReadonlyChange = handleCommentReadonlyChange;
+// win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
 win.toggleSummaryView = toggleSummaryView;

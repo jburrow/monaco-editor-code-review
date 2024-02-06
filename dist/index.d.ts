@@ -13,7 +13,7 @@ export declare enum EditorMode {
     toolbar = 4
 }
 export declare function createReviewManager(editor: any, currentUser: string, events?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
-interface ReviewCommentIterItem {
+export interface ReviewCommentIterItem {
     depth: number;
     state: ReviewCommentState;
 }
@@ -28,9 +28,7 @@ export interface ReviewManagerConfig {
     editButtonEnableRemove?: boolean;
     editButtonOffset?: string;
     editButtonRemoveText?: string;
-    formatDate?: {
-        (dt: Date): string;
-    };
+    formatDate?: FormatDate;
     readOnly?: boolean;
     reviewCommentIconActive?: string;
     reviewCommentIconSelect?: string;
@@ -41,6 +39,7 @@ export interface ReviewManagerConfig {
     verticalOffset?: number;
     enableMarkdown?: boolean;
 }
+export type FormatDate = (dt: Date | string) => string;
 interface ReviewManagerConfigPrivate {
     commentIndent: number;
     commentIndentOffset: number;
@@ -50,9 +49,7 @@ interface ReviewManagerConfigPrivate {
     editButtonEnableRemove: boolean;
     editButtonOffset: string;
     editButtonRemoveText: string;
-    formatDate?: {
-        (dt: Date | string): string;
-    };
+    formatDate?: FormatDate;
     readOnly: boolean;
     rulerMarkerColor: any;
     rulerMarkerDarkColor: any;
@@ -72,13 +69,13 @@ interface EditorElements {
 }
 interface InlineToolbarElements {
     add: HTMLSpanElement;
-    edit: HTMLSpanElement;
-    remove: HTMLSpanElement;
+    edit?: HTMLSpanElement;
+    remove?: HTMLSpanElement;
     root: HTMLDivElement;
 }
 interface RenderStoreItem {
-    viewZoneId: string;
-    renderStatus: ReviewCommentRenderState;
+    viewZoneId?: string;
+    renderStatus?: ReviewCommentRenderState;
 }
 export declare class ReviewManager {
     currentUser: string;
@@ -87,9 +84,9 @@ export declare class ReviewManager {
     events: ReviewCommentEvent[];
     store: ReviewCommentStore;
     activeComment?: ReviewComment;
-    widgetInlineToolbar: monacoEditor.editor.IContentWidget;
-    widgetInlineCommentEditor: monacoEditor.editor.IContentWidget;
-    onChange: OnActionsChanged;
+    widgetInlineToolbar?: monacoEditor.editor.IContentWidget;
+    widgetInlineCommentEditor?: monacoEditor.editor.IContentWidget;
+    onChange?: OnActionsChanged;
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
     currentLineDecorations: string[];
@@ -101,7 +98,7 @@ export declare class ReviewManager {
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
     canCancelCondition: monacoEditor.editor.IContextKey<boolean>;
     renderStore: Record<string, RenderStoreItem>;
-    constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
+    constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
     createCustomCssClasses(): void;
     setReadOnlyMode(value: boolean): void;
     load(events: ReviewCommentEvent[]): void;
@@ -116,34 +113,23 @@ export declare class ReviewManager {
     createInlineToolbarWidget(): InlineToolbarElements;
     calculateConfirmButtonText(): "Add Comment" | "Reply to Comment" | "Edit Comment";
     createInlineEditorWidget(): EditorElements;
-    getActivePosition(): number;
+    getActivePosition(): number | undefined;
     setActiveComment(comment?: ReviewComment, reason?: string): boolean;
     filterAndMapComments(lineNumbers: number[], fn: {
         (comment: ReviewComment): void;
     }): void;
     handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent): void;
     renderAddCommentLineDecoration(lineNumber?: number): void;
-    handleMouseDown(ev: {
-        target: {
-            element: {
-                className: string;
-                hasAttribute: {
-                    (string: any): boolean;
-                };
-            };
-            detail: any;
-        };
-    }): void;
+    handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent): void;
     private calculateMarginTopOffset;
     layoutInlineToolbar(): void;
     layoutInlineCommentEditor(): void;
-    createEmptyCommentOnCurrentLine(): ReviewComment;
     setEditorMode(mode: EditorMode, why?: string): void;
     getDateTimeNow(): number;
     private recurseComments;
     private iterateComments;
     removeComment(id: string): ReviewCommentEvent;
-    addComment(lineNumber: number | undefined, text: string, selection?: CodeSelection): ReviewCommentEvent;
+    addComment(lineNumber: number, text: string, selection?: CodeSelection): ReviewCommentEvent;
     private addEvent;
     private formatDate;
     private createElement;

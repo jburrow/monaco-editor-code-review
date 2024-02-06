@@ -2,7 +2,8 @@
     "compilerOptions": {
         "outDir": "./dist",
         "sourceMap": true,
-        "noImplicitAny": false,
+        "noImplicitAny": true,
+        "strict": true,
         "declaration": true,
         "module": "commonjs",
         "target": "es6",

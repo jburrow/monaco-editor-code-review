@@ -1,7 +1,7 @@
-import { createReviewManager, ReviewManager } from "./index";
+import { createReviewManager, ReviewCommentIterItem, ReviewManager } from "./index";
 import * as monacoEditor from "monaco-editor";
 import * as moment from "dayjs";
-import { ProposedReviewCommentEvent, ReviewCommentEvent } from "./events-comments-reducers";
+import { ReviewCommentEvent } from "./events-comments-reducers";
 
 interface WindowDoc {
   require: any;
@@ -18,20 +18,20 @@ interface WindowDoc {
   generateDifferentContents: () => void;
   clearComments: () => void;
   setCurrentUser: (user: string) => void;
-  handleCommentReadonlyChange: () => void;
+
   toggleSummaryView: () => void;
 }
 
 const win = window as any as WindowDoc;
-let reviewManager: ReviewManager = null;
+let reviewManager: ReviewManager | undefined = undefined;
 let currentMode: string = "";
 let currentDiffMode: string = "";
-let currentEditor: monacoEditor.editor.IStandaloneCodeEditor = null;
+let currentEditor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
 const fooUser = "foo.user";
 const barUser = "bar.user";
 
-function ensureMonacoIsAvailable() {
+function ensureMonacoIsAvailable(): Promise<string> {
   return new Promise(async (resolve) => {
     if (!win.require) {
       console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
@@ -58,7 +58,7 @@ function ensureMonacoIsAvailable() {
   });
 }
 
-function getRandomInt(max) {
+function getRandomInt(max: number): number {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
@@ -73,7 +73,10 @@ function setView(
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
   if (editorMode !== currentMode || diffMode !== currentDiffMode) {
-    document.getElementById("containerEditor").innerHTML = "";
+    const containerEditor = document.getElementById("containerEditor");
+    if (containerEditor) {
+      containerEditor.innerHTML = "";
+    }
     if (editorMode === "editor-mode") {
       currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
         value: exampleSourceCode[idx],
@@ -84,7 +87,9 @@ function setView(
         readOnly: editorReadonly,
         theme: theme,
       });
-      initReviewManager(currentEditor, currentUser, commentsReadonly);
+      if (currentEditor) {
+        initReviewManager(currentEditor, currentUser, commentsReadonly);
+      }
     } else {
       var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
       var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
@@ -107,20 +112,22 @@ function setView(
 
     currentMode = editorMode;
     currentDiffMode = diffMode;
-  } else {
+
+    // reviewManager.config.renderComment = customRenderComment;
+    // reviewManager.refreshComments();
+
+  } else if (reviewManager) {
     reviewManager.currentUser = currentUser
     reviewManager.setReadOnlyMode(commentsReadonly);
   }
-
-
-
 }
 
-function generateDifferentContents() {
+function generateDifferentContents(): void {
+
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
   if (currentMode.startsWith("standard")) {
-    currentEditor.setValue(exampleSourceCode[idx]);
+    currentEditor?.setValue(exampleSourceCode[idx]);
   } else {
     const e = currentEditor as any;
     e.getModel().modified.setValue(exampleSourceCode[idx]);
@@ -128,7 +135,7 @@ function generateDifferentContents() {
   }
 }
 
-const exampleSourceCode = [];
+const exampleSourceCode: string[] = [];
 
 async function fetchSourceCode(url: string) {
   const response = await fetch(url);
@@ -168,26 +175,35 @@ function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, cu
     currentUser,
     createRandomComments(),
     (updatedComments) => renderComments(updatedComments),
-
     {
       editButtonEnableRemove: true,
       formatDate: (createdAt: Date | string) => moment(createdAt).format("YY-MM-DD HH:mm"),
       readOnly: readOnly,
       verticalOffset: 5, // This are hacks to correct the layout due to parent css
       commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
+
     },
     true
   );
   renderComments(reviewManager.events);
 }
 
-function handleCommentReadonlyChange() {
-  reviewManager.setReadOnlyMode((event.srcElement as HTMLInputElement).checked);
-}
+// function customRenderComment(isActive: boolean, comment: ReviewCommentIterItem) {
+//   const div = document.createElement("div")
+//   div.style.backgroundColor = isActive ? "yellow" : "grey";
+//   div.style.border = "1px solid red";
+//   div.style.margin = "2px";
+//   div.style.left = "45px";
+
+//   div.innerText = JSON.stringify(comment.state.comment.text);
+//   return div as HTMLElement;
+// }
 
 function generateDifferentComments() {
-  reviewManager.load(createRandomComments());
-  renderComments(reviewManager.events);
+  if (reviewManager) {
+    reviewManager.load(createRandomComments());
+    renderComments(reviewManager.events);
+  }
 }
 
 function setCurrentUser(user: string) {
@@ -295,54 +311,60 @@ function renderComments(events: ReviewCommentEvent[]) {
     events
       .map((comment) => {
         return `<tr>
-                    <td>${comment.type || "&nbsp;"}</td>
-                    <td>${comment.id || "&nbsp;"}</td>
-                    <td>${comment.createdBy}</td> 
-                    <td>${comment.createdAt}</td>                     
-                    </tr>
-                    <tr>
-                    <td colspan="4" class="comment_text">${JSON.stringify(comment) || "&nbsp;"}</td>                    
+                  <td>${comment.type || "&nbsp;"}</td>
+                  <td>${comment.id || "&nbsp;"}</td>
+                  <td>${comment.createdBy}</td> 
+                  <td>${comment.createdAt}</td>                     
+                </tr>
+                <tr>
+                  <td colspan="4" class="comment_text">${JSON.stringify(comment) || "&nbsp;"}</td>                    
                 </tr>`;
       })
       .join("") +
     "</table>";
 
-  const activeComments = Object.values(reviewManager.store.comments).map((cs) => cs.comment);
+  const activeComments = reviewManager ? Object.values(reviewManager.store.comments).map((cs) => cs.comment) : [];
   const activeHtml =
     "<table><tr><td>Id</td><td>Line Num</td><td>Created By</td><td>Create At</td></tr>" +
     activeComments
       .map(
         (comment) =>
           `<tr>
-                    <td>${comment.id || "&nbsp;"}</td>                                     
-                    <td>${comment.lineNumber}</td>
-                    <td>${comment.author}</td> 
-                    <td>${comment.dt}</td> 
-                </tr>
-                <tr>
-                    <td colspan="4" class="comment_text">${comment.text}</td>                                        
-                </tr>`
+                <td>${comment.id || "&nbsp;"}</td>                                     
+                <td>${comment.lineNumber}</td>
+                <td>${comment.author}</td> 
+                <td>${comment.dt}</td> 
+            </tr>
+            <tr>
+                <td colspan="4" class="comment_text">${comment.text}</td>                                        
+            </tr>`
       )
       .join("") +
     "</table>";
 
-  document.getElementById(
+  const commentsDiv = document.getElementById(
     "commentsDiv"
-  ).innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
+  )
+  if (commentsDiv)
+    commentsDiv.innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
 
-  document.getElementById(
+  const eventsDiv = document.getElementById(
     "eventsDiv"
-  ).innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
+  );
+  if (eventsDiv)
+    eventsDiv.innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
 }
 
 function clearComments() {
-  reviewManager.load([]);
+  reviewManager?.load([]);
   renderComments([]);
 }
 
 function toggleSummaryView() {
   const o = document.getElementById("summaryEditor");
-  o.style.display = o.style.display === "none" ? "" : "none";
+  if (o) {
+    o.style.display = o.style.display === "none" ? "" : "none";
+  }
 
   // currentEditor.layout();
 }
@@ -350,7 +372,7 @@ function toggleSummaryView() {
 win.setView = setView;
 win.generateDifferentComments = generateDifferentComments;
 win.generateDifferentContents = generateDifferentContents;
-win.handleCommentReadonlyChange = handleCommentReadonlyChange;
+// win.handleCommentReadonlyChange = handleCommentReadonlyChange;
 win.clearComments = clearComments;
 win.setCurrentUser = setCurrentUser;
 win.toggleSummaryView = toggleSummaryView;
