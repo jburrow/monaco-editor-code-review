@@ -97,7 +97,7 @@ export declare class ReviewManager {
     verbose: boolean;
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
     canCancelCondition: monacoEditor.editor.IContextKey<boolean>;
-    renderStore: Record<string, RenderStoreItem>;
+    private _renderStore;
     constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
     createCustomCssClasses(): void;
     setReadOnlyMode(value: boolean): void;
@@ -120,6 +120,7 @@ export declare class ReviewManager {
     }): void;
     handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent): void;
     renderAddCommentLineDecoration(lineNumber?: number): void;
+    private findCommentByViewZoneId;
     handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent): void;
     private calculateMarginTopOffset;
     layoutInlineToolbar(): void;

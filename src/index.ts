@@ -203,7 +203,7 @@ export class ReviewManager {
   verbose: boolean;
   canAddCondition: monacoEditor.editor.IContextKey<boolean>;
   canCancelCondition: monacoEditor.editor.IContextKey<boolean>;
-  renderStore: Record<string, RenderStoreItem>;
+  private _renderStore: Record<string, RenderStoreItem>;
 
   constructor(
     editor: monacoEditor.editor.IStandaloneCodeEditor,
@@ -225,7 +225,7 @@ export class ReviewManager {
     this.currentLineDecorationLineNumber = undefined;
     this.events = [];
     this.store = { comments: {}, events: [] }
-    this.renderStore = {};
+    this._renderStore = {};
 
     this.verbose = verbose === true;
     this.editorConfig = this.editor.getRawOptions() ?? {};
@@ -285,7 +285,7 @@ export class ReviewManager {
       this.store = store;
       this.store.deletedCommentIds = undefined;
       this.store.dirtyCommentIds = undefined;
-      this.renderStore = {};
+      this._renderStore = {};
 
       this.refreshComments();
 
@@ -562,10 +562,8 @@ export class ReviewManager {
     this.activeComment = comment;
     if (lineNumbersToMakeDirty.length > 0) {
       this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-        const cs = this.renderStore[comment.id];
-        if (cs) {
-          cs.renderStatus = ReviewCommentRenderState.dirty;
-        }
+        const rs = this.getRenderState(comment.id);
+        rs.renderStatus = ReviewCommentRenderState.dirty;
       });
     }
 
@@ -581,14 +579,16 @@ export class ReviewManager {
   }
 
   handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent) {
-    if (ev.target && ev.target.position && ev.target.position.lineNumber) {
+    const detail = (ev.target as { detail: RenderStoreItem })?.detail;
+
+    if (!detail?.viewZoneId && ev.target?.position?.lineNumber && ev.target.position.lineNumber !== this.currentLineDecorationLineNumber) {
       this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
       this.renderAddCommentLineDecoration(this.config.readOnly === true ? undefined : this.currentLineDecorationLineNumber);
     }
   }
 
   renderAddCommentLineDecoration(lineNumber?: number) {
-    const lines: monacoEditor.editor.IModelDeltaDecoration[] = lineNumber
+    const modelDeltaDecorations: monacoEditor.editor.IModelDeltaDecoration[] = lineNumber
       ? [
         {
           range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
@@ -599,34 +599,34 @@ export class ReviewManager {
         },
       ]
       : [];
-    this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, lines);
+    this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, modelDeltaDecorations);
+  }
+
+  private findCommentByViewZoneId(viewZoneId: string | undefined): ReviewComment | undefined {
+    if (viewZoneId) {
+      for (const cs of Object.values(this.store.comments)) {
+        const rs = this.getRenderState(cs.comment.id);
+        if (rs.viewZoneId === viewZoneId) {
+          return cs.comment;
+        }
+      }
+    }
   }
 
   handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent) {
     // Not ideal - but couldn't figure out a different way to identify the glyph event
 
-    if (ev?.target?.element?.className && ev?.target?.element?.className.indexOf("activeLineMarginClass") > -1 && this.currentLineDecorationLineNumber !== undefined) {
+    if (ev.target?.element?.className && ev?.target?.element?.className.indexOf("activeLineMarginClass") > -1 && this.currentLineDecorationLineNumber !== undefined) {
       this.editor.setPosition({
         lineNumber: this.currentLineDecorationLineNumber,
         column: 1,
       });
       this.setEditorMode(EditorMode.insertComment, "mouse-down-1");
-    } else if (!ev?.target?.element?.hasAttribute(CONTROL_ATTR_NAME)) {
-      let activeComment: ReviewComment | undefined = undefined;
-
-      const detail = (ev?.target as any)?.detail as any;
-      if (detail?.viewZoneId) {
-        for (const cs of Object.values(this.store.comments)) {
-          const rs = this.getRenderState(cs.comment.id);
-          if (rs.viewZoneId == detail?.viewZoneId) {
-            activeComment = cs.comment;
-            console.debug("[monaco-review]", cs.comment.text, cs.history.length);
-            break;
-          }
-        }
-      }
-
+    } else if (!ev.target?.element?.hasAttribute(CONTROL_ATTR_NAME)) {
+      const detail = (ev.target as { detail: RenderStoreItem })?.detail;
+      const activeComment = this.findCommentByViewZoneId(detail.viewZoneId);
       const commentChanged = this.setActiveComment(activeComment, "handleMouseDown");
+
       this.refreshComments();
 
       if (commentChanged && this.activeComment) {
@@ -823,10 +823,10 @@ export class ReviewManager {
   }
 
   getRenderState(commentId: string): RenderStoreItem {
-    if (!this.renderStore[commentId]) {
-      this.renderStore[commentId] = { viewZoneId: undefined, renderStatus: undefined };
+    if (!this._renderStore[commentId]) {
+      this._renderStore[commentId] = { viewZoneId: undefined, renderStatus: undefined };
     }
-    return this.renderStore[commentId];
+    return this._renderStore[commentId];
   }
 
   editId: string = "";
@@ -858,7 +858,7 @@ export class ReviewManager {
       }
 
       for (const cid of Array.from(this.store.deletedCommentIds || [])) {
-        const viewZoneId = this.renderStore[cid]?.viewZoneId;
+        const viewZoneId = this.getRenderState(cid).viewZoneId;
         if (viewZoneId) {
           changeAccessor.removeZone(viewZoneId);
           this.verbose && console.debug("[monaco-review] Zone.Delete", viewZoneId);
