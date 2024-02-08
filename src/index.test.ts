@@ -12,6 +12,7 @@ jest.mock("uuid", () => ({
 
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent, ReviewCommentType } from "./events-comments-reducers";
+import { exec } from "child_process";
 
 interface MonacoWindow {
   monaco: any;
@@ -34,6 +35,7 @@ function getMockEditor() {
     _zoneId: 0,
     _zones: {} as Record<string, any>,
     _actions: [],
+    _position: null,
     focus: () => null,
     addAction: (action: never) => editor._actions.push(action),
     createContextKey: () => {
@@ -52,7 +54,7 @@ function getMockEditor() {
     onMouseMove: () => null,
     onDidChangeConfiguration: () => null,
     revealLineInCenter: () => null,
-    deltaDecorations: () => null,
+    deltaDecorations: (oldDecorations: any, newDecorations: any): any => newDecorations,
     changeViewZones: (cb: any) =>
       cb({
         removeZone: (zoneId: string): void => {
@@ -67,9 +69,8 @@ function getMockEditor() {
         },
       }),
     layoutContentWidget: () => null,
-    getPosition: () => {
-      return { lineNumber: 1 };
-    },
+    setPosition: (position: any) => editor._position = position,
+    getPosition: () => editor._position,
     _themeService: {
       getTheme: () => {
         return {
@@ -168,6 +169,54 @@ test("load clears the comments", () => {
   expect(Object.keys(rm.store.comments).length).toBe(0);
 });
 
+test("Mouse behaviours", () => {
+  const editor = getMockEditor();
+  const rm = createReviewManager(editor, "current.user", [], undefined, undefined, true);
+
+  expect(rm.activeComment).toBe(undefined);
+  expect(rm.widgetInlineToolbar?.getPosition()).toBe(null);
+  expect(rm.widgetInlineCommentEditor?.getPosition()).toBe(null);
+
+
+  const lineNumber = 789;
+  const comment = rm.addComment(lineNumber, "comment-text");
+  expect(rm.getRenderState(comment.id).viewZoneId?.startsWith('mock-')).toBeTruthy();
+  expect(Object.keys(editor._zones).length).toBe(1);
+  expect(rm.activeComment).toBeFalsy();
+  expect(rm.currentLineDecorations?.length).toBe(0)
+
+
+  rm.handleMouseMove(
+    { target: { position: { lineNumber: 888 } } } as any
+  );
+  expect(rm.currentLineDecorations.length).toBe(1)
+  expect(rm.currentLineDecorationLineNumber).toBe(888)
+
+
+  rm.handleMouseDown({
+    target: {
+      element: { className: "", hasAttribute: () => false },
+      detail: { viewZoneId: rm.getRenderState(comment.id).viewZoneId },
+    },
+  } as any);
+
+  expect(rm.activeComment).toBeTruthy();
+  expect(rm.editorMode).toBe(EditorMode.toolbar);
+
+  rm.handleMouseDown({
+    target: {
+      element: { className: "activeLineMarginClass", hasAttribute: () => false },
+      detail: { viewZoneId: rm.getRenderState(comment.id).viewZoneId },
+    },
+  } as any);
+  expect(rm.editorMode).toBe(EditorMode.insertComment);
+  expect(rm.editor.getPosition()?.lineNumber).toBe(888)
+  expect(rm.activeComment).toBeFalsy();
+
+
+});
+
+
 test("Remove a comment via the widgets", () => {
   const editor = getMockEditor();
   const rm = createReviewManager(editor, "current.user", [], undefined, undefined, true);
@@ -177,7 +226,7 @@ test("Remove a comment via the widgets", () => {
   expect(rm.widgetInlineCommentEditor?.getPosition()).toBe(null);
 
   const comment = rm.addComment(1, "");
-  expect(rm.renderStore[comment.id].viewZoneId?.startsWith('mock-')).toBeTruthy();
+  expect(rm.getRenderState(comment.id).viewZoneId?.startsWith('mock-')).toBeTruthy();
   expect(Object.keys(editor._zones).length).toBe(1);
 
   // Coverage Only - Simulate the mouse moving over a line of code....

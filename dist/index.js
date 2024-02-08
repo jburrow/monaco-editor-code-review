@@ -95,7 +95,7 @@ class ReviewManager {
         this.currentLineDecorationLineNumber = undefined;
         this.events = [];
         this.store = { comments: {}, events: [] };
-        this.renderStore = {};
+        this._renderStore = {};
         this.verbose = verbose === true;
         this.editorConfig = (_a = this.editor.getRawOptions()) !== null && _a !== void 0 ? _a : {};
         this.editor.onDidChangeConfiguration(() => (this.editorConfig = this.editor.getRawOptions()));
@@ -146,7 +146,7 @@ class ReviewManager {
             this.store = store;
             this.store.deletedCommentIds = undefined;
             this.store.dirtyCommentIds = undefined;
-            this.renderStore = {};
+            this._renderStore = {};
             this.refreshComments();
             this.verbose &&
                 console.debug("[monaco-review] Events Loaded:", events.length, "Review Comments:", Object.values(this.store.comments).length);
@@ -387,10 +387,8 @@ class ReviewManager {
         this.activeComment = comment;
         if (lineNumbersToMakeDirty.length > 0) {
             this.filterAndMapComments(lineNumbersToMakeDirty, (comment) => {
-                const cs = this.renderStore[comment.id];
-                if (cs) {
-                    cs.renderStatus = events_comments_reducers_1.ReviewCommentRenderState.dirty;
-                }
+                const rs = this.getRenderState(comment.id);
+                rs.renderStatus = events_comments_reducers_1.ReviewCommentRenderState.dirty;
             });
         }
         return isDifferentComment;
@@ -403,13 +401,15 @@ class ReviewManager {
         }
     }
     handleMouseMove(ev) {
-        if (ev.target && ev.target.position && ev.target.position.lineNumber) {
+        var _a, _b, _c;
+        const detail = (_a = ev.target) === null || _a === void 0 ? void 0 : _a.detail;
+        if (!(detail === null || detail === void 0 ? void 0 : detail.viewZoneId) && ((_c = (_b = ev.target) === null || _b === void 0 ? void 0 : _b.position) === null || _c === void 0 ? void 0 : _c.lineNumber) && ev.target.position.lineNumber !== this.currentLineDecorationLineNumber) {
             this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
             this.renderAddCommentLineDecoration(this.config.readOnly === true ? undefined : this.currentLineDecorationLineNumber);
         }
     }
     renderAddCommentLineDecoration(lineNumber) {
-        const lines = lineNumber
+        const modelDeltaDecorations = lineNumber
             ? [
                 {
                     range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
@@ -420,31 +420,31 @@ class ReviewManager {
                 },
             ]
             : [];
-        this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, lines);
+        this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, modelDeltaDecorations);
+    }
+    findCommentByViewZoneId(viewZoneId) {
+        if (viewZoneId) {
+            for (const cs of Object.values(this.store.comments)) {
+                const rs = this.getRenderState(cs.comment.id);
+                if (rs.viewZoneId === viewZoneId) {
+                    return cs.comment;
+                }
+            }
+        }
     }
     handleMouseDown(ev) {
         // Not ideal - but couldn't figure out a different way to identify the glyph event
         var _a, _b, _c, _d, _e, _f, _g;
-        if (((_b = (_a = ev === null || ev === void 0 ? void 0 : ev.target) === null || _a === void 0 ? void 0 : _a.element) === null || _b === void 0 ? void 0 : _b.className) && ((_d = (_c = ev === null || ev === void 0 ? void 0 : ev.target) === null || _c === void 0 ? void 0 : _c.element) === null || _d === void 0 ? void 0 : _d.className.indexOf("activeLineMarginClass")) > -1 && this.currentLineDecorationLineNumber !== undefined) {
+        if (((_b = (_a = ev.target) === null || _a === void 0 ? void 0 : _a.element) === null || _b === void 0 ? void 0 : _b.className) && ((_d = (_c = ev === null || ev === void 0 ? void 0 : ev.target) === null || _c === void 0 ? void 0 : _c.element) === null || _d === void 0 ? void 0 : _d.className.indexOf("activeLineMarginClass")) > -1 && this.currentLineDecorationLineNumber !== undefined) {
             this.editor.setPosition({
                 lineNumber: this.currentLineDecorationLineNumber,
                 column: 1,
             });
             this.setEditorMode(EditorMode.insertComment, "mouse-down-1");
         }
-        else if (!((_f = (_e = ev === null || ev === void 0 ? void 0 : ev.target) === null || _e === void 0 ? void 0 : _e.element) === null || _f === void 0 ? void 0 : _f.hasAttribute(CONTROL_ATTR_NAME))) {
-            let activeComment = undefined;
-            const detail = (_g = ev === null || ev === void 0 ? void 0 : ev.target) === null || _g === void 0 ? void 0 : _g.detail;
-            if (detail === null || detail === void 0 ? void 0 : detail.viewZoneId) {
-                for (const cs of Object.values(this.store.comments)) {
-                    const rs = this.getRenderState(cs.comment.id);
-                    if (rs.viewZoneId == (detail === null || detail === void 0 ? void 0 : detail.viewZoneId)) {
-                        activeComment = cs.comment;
-                        console.debug("[monaco-review]", cs.comment.text, cs.history.length);
-                        break;
-                    }
-                }
-            }
+        else if (!((_f = (_e = ev.target) === null || _e === void 0 ? void 0 : _e.element) === null || _f === void 0 ? void 0 : _f.hasAttribute(CONTROL_ATTR_NAME))) {
+            const detail = (_g = ev.target) === null || _g === void 0 ? void 0 : _g.detail;
+            const activeComment = this.findCommentByViewZoneId(detail.viewZoneId);
             const commentChanged = this.setActiveComment(activeComment, "handleMouseDown");
             this.refreshComments();
             if (commentChanged && this.activeComment) {
@@ -597,14 +597,13 @@ class ReviewManager {
         return span;
     }
     getRenderState(commentId) {
-        if (!this.renderStore[commentId]) {
-            this.renderStore[commentId] = { viewZoneId: undefined, renderStatus: undefined };
+        if (!this._renderStore[commentId]) {
+            this._renderStore[commentId] = { viewZoneId: undefined, renderStatus: undefined };
         }
-        return this.renderStore[commentId];
+        return this._renderStore[commentId];
     }
     refreshComments() {
         this.editor.changeViewZones((changeAccessor) => {
-            var _a;
             const lineNumbers = {};
             if (this.editorMode !== EditorMode.toolbar) {
                 // This creates a blank section viewZone that makes space for the interactive text file for editing
@@ -627,7 +626,7 @@ class ReviewManager {
                 changeAccessor.removeZone(this.editId);
             }
             for (const cid of Array.from(this.store.deletedCommentIds || [])) {
-                const viewZoneId = (_a = this.renderStore[cid]) === null || _a === void 0 ? void 0 : _a.viewZoneId;
+                const viewZoneId = this.getRenderState(cid).viewZoneId;
                 if (viewZoneId) {
                     changeAccessor.removeZone(viewZoneId);
                     this.verbose && console.debug("[monaco-review] Zone.Delete", viewZoneId);
