@@ -1,13 +1,13 @@
 export type ProposedReviewCommentEvent =
   | {
-      type: "create";
-      lineNumber: number;
-      text: string;
-      selection?: CodeSelection;
-      commentType?: ReviewCommentType;
-      typeState?: ReviewCommentTypeState;
-      targetId?: string;
-    }
+    type: "create";
+    lineNumber: number;
+    text: string;
+    selection?: CodeSelection;
+    commentType?: ReviewCommentType;
+    typeState?: ReviewCommentTypeState;
+    targetId?: string;
+  }
   | { type: "edit"; text?: string; typeState?: ReviewCommentTypeState; targetId: string }
   | { type: "delete"; targetId: string };
 
@@ -28,7 +28,7 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
   let comments = { ...state.comments };
 
   switch (event.type) {
-    case "edit":
+    case "edit": {
       const parent = comments[event.targetId];
       if (!parent) break;
 
@@ -48,21 +48,22 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
 
       comments[event.targetId] = edit;
       break;
-
-    case "delete":
+    }
+    case "delete": {
       const selected = comments[event.targetId];
       if (!selected) break;
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [event.targetId]: _, ...remainingComments } = comments;
       comments = remainingComments;
 
       deletedCommentIds.add(selected.comment.id);
       dirtyLineNumbers.add(selected.comment.lineNumber);
-      //console.debug("delete", event);
+      // console.debug("delete", event);
       break;
-
-    case "create":
-      if (!comments[event.id]) {
+    }
+    case "create": {
+      if (comments[event.id] !== undefined) {
         comments[event.id] = new ReviewCommentState({
           author: event.createdBy,
           dt: event.createdAt,
@@ -75,13 +76,14 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
           type: event.commentType ?? ReviewCommentType.comment,
           typeState: event.typeState,
         });
-        //console.debug("insert", event);
+        // console.debug("insert", event);
         dirtyLineNumbers.add(event.lineNumber);
       }
       break;
+    }
   }
 
-  if (dirtyLineNumbers.size) {
+  if (dirtyLineNumbers.size > 0) {
     for (const cs of Object.values(state.comments)) {
       if (dirtyLineNumbers.has(cs.comment.lineNumber)) {
         dirtyCommentIds.add(cs.comment.id);

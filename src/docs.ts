@@ -1,7 +1,8 @@
-import { createReviewManager, ReviewCommentIterItem, ReviewManager } from "./index";
-import * as monacoEditor from "monaco-editor";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createReviewManager, type ReviewManager } from "./index";
+import type * as monacoEditor from "monaco-editor";
 import * as moment from "dayjs";
-import { ReviewCommentEvent } from "./events-comments-reducers";
+import { type ReviewCommentEvent } from "./events-comments-reducers";
 
 interface WindowDoc {
   require: any;
@@ -23,22 +24,22 @@ interface WindowDoc {
 }
 
 const win = window as any as WindowDoc;
-let reviewManager: ReviewManager | undefined = undefined;
+let reviewManager: ReviewManager | undefined;
 let currentMode: string = "";
 let currentDiffMode: string = "";
-let currentEditor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
+let currentEditor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
 
 const fooUser = "foo.user";
 const barUser = "bar.user";
 
-function ensureMonacoIsAvailable(): Promise<string> {
-  return new Promise(async (resolve) => {
+async function ensureMonacoIsAvailable(): Promise<string> {
+  return await new Promise((resolve) => {
     if (!win.require) {
       console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
       const github = "https://microsoft.github.io/monaco-editor";
       const loader = "/node_modules/monaco-editor/min/vs/loader.js";
 
-      const prefix = window.location.host.indexOf("github") > -1 ? github : "";
+      const prefix = window.location.host.includes("github") ? github : "";
       console.log("prefix", prefix);
 
       if (prefix !== null) {
@@ -85,18 +86,18 @@ function setView(
         contextmenu: true,
         automaticLayout: true,
         readOnly: editorReadonly,
-        theme: theme,
+        theme,
       });
       if (currentEditor) {
         initReviewManager(currentEditor, currentUser, commentsReadonly);
       }
     } else {
-      var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
-      var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
+      const originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
+      const modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
 
       const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
         renderSideBySide: diffMode !== "inline-diff",
-        theme: theme,
+        theme,
         readOnly: editorReadonly,
         glyphMargin: true,
         contextmenu: true,
@@ -151,7 +152,7 @@ async function fetchSourceCode(url: string) {
 async function init() {
   console.log("[init] 123");
 
-  var prefix = await ensureMonacoIsAvailable();
+  const prefix = await ensureMonacoIsAvailable();
   await fetchSourceCode("../src/index.ts");
   await fetchSourceCode("../src/docs.ts");
   await fetchSourceCode("../src/index.test.ts");
@@ -172,11 +173,13 @@ function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, cu
     editor,
     currentUser,
     createRandomComments(),
-    (updatedComments) => renderComments(updatedComments),
+    (updatedComments) => {
+      renderComments(updatedComments);
+    },
     {
       editButtonEnableRemove: true,
       formatDate: (createdAt: Date | string) => moment(createdAt).format("YY-MM-DD HH:mm"),
-      readOnly: readOnly,
+      readOnly,
       verticalOffset: 5, // This are hacks to correct the layout due to parent css
       commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
     },

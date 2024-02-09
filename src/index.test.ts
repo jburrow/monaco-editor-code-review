@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 let uuidCount = 0;
 
 jest.mock("uuid", () => ({
@@ -12,14 +12,14 @@ jest.mock("uuid", () => ({
 
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent, ReviewCommentType } from "./events-comments-reducers";
-import { exec } from "child_process";
+
 
 interface MonacoWindow {
   monaco: any;
 }
 
 class Range {
-  constructor() {}
+  constructor() { }
 }
 
 const monacoWindow = window as any as MonacoWindow;
@@ -30,7 +30,7 @@ monacoWindow.monaco = {
   editor: { ContentWidgetPositionPreference: { BELOW: "BELOW" } },
 };
 
-function getMockEditor() {
+function getMockEditor(): any {
   const editor = {
     _zoneId: 0,
     _zones: {} as Record<string, any>,
@@ -86,7 +86,7 @@ function getMockEditor() {
 
 test("Widget Coverage", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(editor, "current.user", [], (comments) => {});
+  const rm = createReviewManager(editor, "current.user", [], () => { });
   rm.activeComment = {
     selection: undefined,
     status: 1,
@@ -124,7 +124,7 @@ test("createReviewManager to editor and add comments", () => {
     typeState: undefined,
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
+  const rm = createReviewManager(editor, "current.user", [comment], () => { });
   expect(Object.keys(rm.store.comments)).toEqual([comment.id]);
   expect(Object.keys(editor._zones).length).toBe(1);
   expect(rm.activeComment).toBe(undefined);
@@ -163,7 +163,7 @@ test("load clears the comments", () => {
     typeState: undefined,
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
+  const rm = createReviewManager(editor, "current.user", [comment], () => { });
   rm.load([]);
   expect(Object.keys(editor._zones).length).toBe(0);
   expect(Object.keys(rm.store.comments).length).toBe(0);
@@ -353,7 +353,7 @@ test("Navigation - Forward and Back", () => {
   const c2 = rm.addComment(2, "2");
   const c3 = rm.addComment(3, "3");
   const c4 = rm.addComment(4, "4");
-  const c5 = rm.addComment(5, "5");
+  rm.addComment(5, "5");
 
   rm.setActiveComment(rm.store.comments[c1.id].comment);
   rm.addComment(1, "1.1");
