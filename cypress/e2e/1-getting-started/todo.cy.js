@@ -25,7 +25,7 @@ describe("example to-do app", () => {
   it("displays two todo items by default", async () => {
     cy.wait(2000);
 
-    cy.f;
+    // cy.f;
 
     const comment = cy.findByText("Markdown Example", { timeout: 3000 }).first();
     expect(comment);
