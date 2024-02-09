@@ -13,13 +13,12 @@ jest.mock("uuid", () => ({
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent, ReviewCommentType } from "./events-comments-reducers";
 
-
 interface MonacoWindow {
   monaco: any;
 }
 
 class Range {
-  constructor() { }
+  constructor() {}
 }
 
 const monacoWindow = window as any as MonacoWindow;
@@ -86,7 +85,7 @@ function getMockEditor(): any {
 
 test("Widget Coverage", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(editor, "current.user", [], () => { });
+  const rm = createReviewManager(editor, "current.user", [], () => {});
   rm.activeComment = {
     selection: undefined,
     status: 1,
@@ -124,7 +123,7 @@ test("createReviewManager to editor and add comments", () => {
     typeState: undefined,
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], () => { });
+  const rm = createReviewManager(editor, "current.user", [comment], () => {});
   expect(Object.keys(rm.store.comments)).toEqual([comment.id]);
   expect(Object.keys(editor._zones).length).toBe(1);
   expect(rm.activeComment).toBe(undefined);
@@ -163,7 +162,7 @@ test("load clears the comments", () => {
     typeState: undefined,
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], () => { });
+  const rm = createReviewManager(editor, "current.user", [comment], () => {});
   rm.load([]);
   expect(Object.keys(editor._zones).length).toBe(0);
   expect(Object.keys(rm.store.comments).length).toBe(0);
