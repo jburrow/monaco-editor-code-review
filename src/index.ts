@@ -52,7 +52,7 @@ export function createReviewManager(
   events?: ReviewCommentEvent[],
   onChange?: OnActionsChanged,
   config?: ReviewManagerConfig,
-  verbose?: boolean
+  verbose?: boolean,
 ): ReviewManager {
   //For Debug: (window as any).editor = editor;
   const rm = new ReviewManager(editor, currentUser, onChange, config, verbose);
@@ -68,6 +68,8 @@ export interface ReviewCommentIterItem {
 interface OnActionsChanged {
   (actions: ReviewCommentEvent[]): void;
 }
+
+type IEventRenderStoreItem = { target?: { detail?: RenderStoreItem } };
 
 export const defaultStyles: Record<string, {}> = {
   reviewComment: {
@@ -163,7 +165,6 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
 const CONTROL_ATTR_NAME = "ReviewManagerControl";
 const POSITION_BELOW = 2; //above=1, below=2, exact=0
 
-
 interface EditorElements {
   cancel: HTMLButtonElement;
   confirm: HTMLButtonElement;
@@ -210,7 +211,7 @@ export class ReviewManager {
     currentUser: string,
     onChange?: OnActionsChanged,
     config?: ReviewManagerConfig,
-    verbose?: boolean
+    verbose?: boolean,
   ) {
     this.currentUser = currentUser;
     this.editor = editor;
@@ -224,7 +225,7 @@ export class ReviewManager {
     this.currentCommentDecorations = [];
     this.currentLineDecorationLineNumber = undefined;
     this.events = [];
-    this.store = { comments: {}, events: [] }
+    this.store = { comments: {}, events: [] };
     this._renderStore = {};
 
     this.verbose = verbose === true;
@@ -290,7 +291,12 @@ export class ReviewManager {
       this.refreshComments();
 
       this.verbose &&
-        console.debug("[monaco-review] Events Loaded:", events.length, "Review Comments:", Object.values(this.store.comments).length);
+        console.debug(
+          "[monaco-review] Events Loaded:",
+          events.length,
+          "Review Comments:",
+          Object.values(this.store.comments).length,
+        );
     });
   }
 
@@ -408,7 +414,9 @@ export class ReviewManager {
 
   handleAddComment() {
     //FIX - this isn't right.
-    const lineNumber = this.activeComment ? this.activeComment.lineNumber : this.editor.getSelection()?.endLineNumber ?? 1;
+    const lineNumber = this.activeComment
+      ? this.activeComment.lineNumber
+      : this.editor.getSelection()?.endLineNumber ?? 1;
     const text = this.editorElements.textarea.value;
     const selection = this.activeComment ? undefined : (this.editor.getSelection() as CodeSelection);
     this.addComment(lineNumber, text, selection);
@@ -514,7 +522,6 @@ export class ReviewManager {
         return editorElement.root;
       },
       getPosition: () => {
-
         if (this.editorMode != EditorMode.toolbar) {
           const lineNumber = this.getActivePosition();
           if (lineNumber !== undefined) {
@@ -540,7 +547,12 @@ export class ReviewManager {
     const position = this.editor.getPosition();
     const activePosition = this.activeComment ? this.activeComment.lineNumber : position?.lineNumber;
     //does it need an offset?
-    console.debug("[monaco-review] [getActivePosition]", activePosition, this.activeComment?.lineNumber, position?.lineNumber);
+    console.debug(
+      "[monaco-review] [getActivePosition]",
+      activePosition,
+      this.activeComment?.lineNumber,
+      position?.lineNumber,
+    );
     return activePosition;
   }
 
@@ -578,26 +590,30 @@ export class ReviewManager {
     }
   }
 
-  handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent) {
-    const detail = (ev.target as { detail: RenderStoreItem })?.detail;
-
-    if (!detail?.viewZoneId && ev.target?.position?.lineNumber && ev.target.position.lineNumber !== this.currentLineDecorationLineNumber) {
+  handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent & IEventRenderStoreItem) {
+    if (
+      !ev.target?.detail?.viewZoneId &&
+      ev.target?.position?.lineNumber &&
+      ev.target.position.lineNumber !== this.currentLineDecorationLineNumber
+    ) {
       this.currentLineDecorationLineNumber = ev.target.position.lineNumber;
-      this.renderAddCommentLineDecoration(this.config.readOnly === true ? undefined : this.currentLineDecorationLineNumber);
+      this.renderAddCommentLineDecoration(
+        this.config.readOnly === true ? undefined : this.currentLineDecorationLineNumber,
+      );
     }
   }
 
   renderAddCommentLineDecoration(lineNumber?: number) {
     const modelDeltaDecorations: monacoEditor.editor.IModelDeltaDecoration[] = lineNumber
       ? [
-        {
-          range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
-          options: {
-            marginClassName: "activeLineMarginClass", //TODO - fix the creation of this style
-            zIndex: 100,
+          {
+            range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
+            options: {
+              marginClassName: "activeLineMarginClass", //TODO - fix the creation of this style
+              zIndex: 100,
+            },
           },
-        },
-      ]
+        ]
       : [];
     this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, modelDeltaDecorations);
   }
@@ -613,18 +629,22 @@ export class ReviewManager {
     }
   }
 
-  handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent) {
+  handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent & IEventRenderStoreItem) {
     // Not ideal - but couldn't figure out a different way to identify the glyph event
 
-    if (ev.target?.element?.className && ev?.target?.element?.className.indexOf("activeLineMarginClass") > -1 && this.currentLineDecorationLineNumber !== undefined) {
+    if (
+      ev.target?.element?.className &&
+      ev?.target?.element?.className.indexOf("activeLineMarginClass") > -1 &&
+      this.currentLineDecorationLineNumber !== undefined
+    ) {
       this.editor.setPosition({
         lineNumber: this.currentLineDecorationLineNumber,
         column: 1,
       });
       this.setEditorMode(EditorMode.insertComment, "mouse-down-1");
     } else if (!ev.target?.element?.hasAttribute(CONTROL_ATTR_NAME)) {
-      const detail = (ev.target as { detail: RenderStoreItem })?.detail;
-      const activeComment = this.findCommentByViewZoneId(detail.viewZoneId);
+      const detail = ev.target.detail;
+      const activeComment = this.findCommentByViewZoneId(detail?.viewZoneId);
       const commentChanged = this.setActiveComment(activeComment, "handleMouseDown");
 
       this.refreshComments();
@@ -707,7 +727,7 @@ export class ReviewManager {
         "ReadOnly:",
         this.config.readOnly,
         "Result:",
-        EditorMode[this.editorMode]
+        EditorMode[this.editorMode],
       );
 
     this.layoutInlineToolbar();
@@ -734,7 +754,7 @@ export class ReviewManager {
     allComments: { [key: string]: ReviewCommentState },
     filterFn: { (c: ReviewCommentState): boolean },
     depth: number,
-    results: ReviewCommentIterItem[]
+    results: ReviewCommentIterItem[],
   ) {
     const comments = Object.values(allComments).filter(filterFn);
     for (const cs of comments) {
@@ -768,20 +788,25 @@ export class ReviewManager {
       this.editorMode === EditorMode.editComment && this.activeComment?.id
         ? { type: "edit", text, targetId: this.activeComment.id }
         : {
-          type: "create",
-          text,
-          lineNumber,
-          selection,
-          targetId: this.activeComment && this.activeComment.id,
-        };
+            type: "create",
+            text,
+            lineNumber,
+            selection,
+            targetId: this.activeComment && this.activeComment.id,
+          };
 
     return this.addEvent(event);
   }
 
   private addEvent(event: ProposedReviewCommentEvent): ReviewCommentEvent {
-    const populatedEvent: ReviewCommentEvent = { ...event, createdBy: this.currentUser, createdAt: this.getDateTimeNow(), id: uuid.v4() };
+    const populatedEvent: ReviewCommentEvent = {
+      ...event,
+      createdBy: this.currentUser,
+      createdAt: this.getDateTimeNow(),
+      id: uuid.v4(),
+    };
 
-    console.debug('[addEvent]', populatedEvent);
+    console.debug("[addEvent]", populatedEvent);
 
     this.events.push(populatedEvent);
     this.store = commentReducer(populatedEvent, this.store);
@@ -936,7 +961,7 @@ export class ReviewManager {
                 selection.startLineNumber,
                 selection.startColumn,
                 selection.endLineNumber,
-                selection.endColumn
+                selection.endColumn,
               ),
               options: {
                 className: "reviewComment selection",
@@ -991,7 +1016,7 @@ export class ReviewManager {
     }
     if (item.state.history.length > 1) {
       domNode.appendChild(
-        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history")
+        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history"),
       );
     }
 
@@ -1000,7 +1025,7 @@ export class ReviewManager {
     if (this.config.enableMarkdown) {
       textNode.innerHTML = convertMarkdownToHTML(item.state.comment.text);
     } else {
-      textNode.innerText = item.state.comment.text
+      textNode.innerText = item.state.comment.text;
     }
 
     rootNode.appendChild(textNode);

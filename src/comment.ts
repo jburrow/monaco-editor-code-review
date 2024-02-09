@@ -7,4 +7,3 @@ const converter = new showdown.Converter();
 export function convertMarkdownToHTML(text: string): string {
   return converter.makeHtml(text);
 }
-

@@ -1,120 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <link rel="stylesheet" href="bootstrap.min.css" />
+    <style>
+      body {
+        margin: 5px;
+      }
 
-<head>
-  <link rel="stylesheet" href="bootstrap.min.css">
-  <style>
-    body {
-      margin: 5px;
-    }
+      .editor {
+        height: calc(100vh - 450px);
+        width: calc(100vw - 10px);
+      }
 
-    .editor {
-      height: calc(100vh - 450px);
-      width: calc(100vw - 10px);
+      h5 {
+        height: 20px;
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
 
-    }
+      .summary {
+        max-height: 300px;
+        overflow: auto;
+        padding: 5px;
+      }
 
-    h5 {
-      height: 20px;
-      margin-bottom: 5px;
-      margin-top: 5px;
-    }
+      .btn {
+        margin-top: 5px;
+      }
 
-    .summary {
-      max-height: 300px;
-      overflow: auto;
-      padding: 5px
-    }
+      td {
+        font-size: 12px;
+      }
 
-    .btn {
-      margin-top: 5px;
-    }
+      .comment_text {
+        background-color: #dddddd;
+        color: black;
+      }
+    </style>
+  </head>
 
-    td {
-      font-size: 12px;
-    }
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <div class="mb-3">
+        <label for="option_editor_mode" class="form-label">Editor Mode</label>
+        <select id="option_editor_mode" class="form-select form-select-sm" onchange="updateSettings()">
+          <option>diff-mode</option>
+          <option>editor-mode</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="option_diff_mode" class="form-label">Diff Mode</label>
+        <select id="option_diff_mode" class="form-select form-select-sm" onchange="updateSettings()">
+          <option>side-by-side</option>
+          <option selected>inline-diff</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="option_current_user" class="form-label">Current User:</label>
+        <select id="option_current_user" onchange="updateSettings()" class="form-select">
+          <option selected>foo.user</option>
+          <option>bar.user</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="option_theme" class="form-label">Theme:</label>
+        <select id="option_theme" class="form-select" onchange="updateSettings()">
+          <option>vs-light</option>
+          <option>vs-dark</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="option_editor_readonly" class="form-label">Editor Readonly</label>
+        <input id="option_editor_readonly" type="checkbox" onchange="updateSettings()" />
+      </div>
+      <div class="mb-3">
+        <label for="option_comments_readonly" class="form-label">Comments Readonly</label>
+        <input id="option_comments_readonly" type="checkbox" onchange="updateSettings()" />
+      </div>
+      <div class="mb-3">
+        <button onclick="clearComments()" class="btn btn-secondary btn-sm">Clear Comments</button>
+      </div>
+    </nav>
+    <i>Press CTRL+F10 to add comment, CTRL+Enter to save comment</i>
 
-    .comment_text {
-      background-color: #DDDDDD;
-      color: black;
-    }
-  </style>
-</head>
+    <div class="editor" id="containerEditor"></div>
 
-<body>
-  <nav class="navbar navbar-light bg-light">
-    <div class="mb-3">
-      <label for="option_editor_mode" class="form-label">Editor Mode</label>
-      <select id="option_editor_mode" class="form-select form-select-sm" onchange="updateSettings()">
-        <option>diff-mode</option>
-        <option>editor-mode</option>
-      </select>
+    <div style="display: flex; flex-direction: row; gap: 5px">
+      <div class="summary" id="commentsDiv"></div>
+
+      <div class="summary" id="eventsDiv"></div>
     </div>
-    <div class="mb-3">
-      <label for="option_diff_mode" class="form-label">Diff Mode</label>
-      <select id="option_diff_mode" class="form-select form-select-sm" onchange="updateSettings()">
-        <option>side-by-side</option>
-        <option selected>inline-diff</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="option_current_user" class="form-label">Current User:</label>
-      <select id="option_current_user" onchange="updateSettings()" class="form-select">
-        <option selected>foo.user</option>
-        <option>bar.user</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="option_theme" class="form-label">Theme:</label>
-      <select id="option_theme" class="form-select" onchange="updateSettings()">
-        <option>vs-light</option>
-        <option>vs-dark</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="option_editor_readonly" class="form-label">Editor Readonly</label>
-      <input id="option_editor_readonly" type="checkbox" onchange="updateSettings()" />
-    </div>
-    <div class="mb-3">
-      <label for="option_comments_readonly" class="form-label">Comments Readonly</label>
-      <input id="option_comments_readonly" type="checkbox" onchange="updateSettings()" />
-    </div>
-    <div class="mb-3">
-
-      <button onclick="clearComments()" class="btn btn-secondary btn-sm">Clear Comments</button>
-    </div>
-    </div>
-  </nav>
-  <i>Press CTRL+F10 to add comment, CTRL+Enter to save comment</i>
-
-  <div class="editor" id="containerEditor"></div>
-
-  <div style="display: flex;flex-direction:row;gap:5px">
-
-    <div class="summary" id="commentsDiv"></div>
-
-    <div class="summary" id="eventsDiv"></div>
-  </div>
-</body>
-
+  </body>
 </html>
 
 <script type="module" src="../dist/docs-commonjs-es2017.js"></script>
 
 <script>
   function updateSettings() {
-
-
-
-
-
     window.setView(
       document.getElementById("option_editor_mode").value,
       document.getElementById("option_diff_mode").value,
       document.getElementById("option_theme").value,
       document.getElementById("option_current_user").value,
       document.getElementById("option_editor_readonly").checked,
-      document.getElementById("option_comments_readonly").checked
+      document.getElementById("option_comments_readonly").checked,
     );
   }
 

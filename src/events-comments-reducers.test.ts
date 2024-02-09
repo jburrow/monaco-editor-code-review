@@ -1,4 +1,10 @@
-import { ReviewComment, ProposedReviewCommentEvent, ReviewCommentEvent, ReviewCommentType, reduceComments } from "./events-comments-reducers";
+import {
+  ReviewComment,
+  ProposedReviewCommentEvent,
+  ReviewCommentEvent,
+  ReviewCommentType,
+  reduceComments,
+} from "./events-comments-reducers";
 
 test("reduceComments - create|edit|delete", () => {
   const store = reduceComments([{ type: "create", id: "1", text: "t1", lineNumber: 1, createdAt: 1, createdBy: "a" }]);
@@ -13,10 +19,13 @@ test("reduceComments - create|edit|delete", () => {
     text: "t1",
     parentId: undefined,
     type: ReviewCommentType.comment,
-    typeState: undefined
+    typeState: undefined,
   });
 
-  const store2 = reduceComments([{ type: "edit", targetId: "1", text: "t2", id: "1", createdAt: 1, createdBy: "a" }], store);
+  const store2 = reduceComments(
+    [{ type: "edit", targetId: "1", text: "t2", id: "1", createdAt: 1, createdBy: "a" }],
+    store,
+  );
   expect(store2).not.toBe(store);
   expect(store2.comments["1"]).not.toBe(store.comments["1"]);
   expect(store2.comments["1"].history).not.toBe(store.comments["1"].history);
@@ -30,7 +39,9 @@ test("reduceComments - create|edit|delete", () => {
 });
 
 test("reduceComments - double delete - create|delete|delete", () => {
-  const actions: ReviewCommentEvent[] = [{ type: "create", text: "t1", lineNumber: 1, id: "1", createdAt: 1, createdBy: "a" }];
+  const actions: ReviewCommentEvent[] = [
+    { type: "create", text: "t1", lineNumber: 1, id: "1", createdAt: 1, createdBy: "a" },
+  ];
 
   const store = reduceComments(actions);
   expect(Object.keys(store.comments)).toStrictEqual(["1"]);
@@ -44,7 +55,7 @@ test("reduceComments - double delete - create|delete|delete", () => {
     text: "t1",
     parentId: undefined,
     type: ReviewCommentType.comment,
-    typeState: undefined
+    typeState: undefined,
   });
 
   const store2 = reduceComments([{ type: "delete", targetId: "1", id: "1", createdAt: 1, createdBy: "a" }], store);
@@ -58,7 +69,9 @@ test("reduceComments - double delete - create|delete|delete", () => {
 });
 
 test("reduceComments - edit missing", () => {
-  const actions: ReviewCommentEvent[] = [{ type: "edit", text: "t1", targetId: "1", id: "1", createdAt: 1, createdBy: "a" }];
+  const actions: ReviewCommentEvent[] = [
+    { type: "edit", text: "t1", targetId: "1", id: "1", createdAt: 1, createdBy: "a" },
+  ];
 
   const store = reduceComments(actions);
   expect(Object.keys(store.comments)).toStrictEqual([]);

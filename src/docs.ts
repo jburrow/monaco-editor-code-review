@@ -12,7 +12,7 @@ interface WindowDoc {
     theme: string,
     currentUser: string,
     editorReadonly: boolean,
-    commentsReadonly: boolean
+    commentsReadonly: boolean,
   ) => void;
   generateDifferentComments: () => void;
   generateDifferentContents: () => void;
@@ -68,7 +68,7 @@ function setView(
   theme: string,
   currentUser: string,
   editorReadonly: boolean,
-  commentsReadonly: boolean
+  commentsReadonly: boolean,
 ) {
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
@@ -115,15 +115,13 @@ function setView(
 
     // reviewManager.config.renderComment = customRenderComment;
     // reviewManager.refreshComments();
-
   } else if (reviewManager) {
-    reviewManager.currentUser = currentUser
+    reviewManager.currentUser = currentUser;
     reviewManager.setReadOnlyMode(commentsReadonly);
   }
 }
 
 function generateDifferentContents(): void {
-
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
   if (currentMode.startsWith("standard")) {
@@ -181,9 +179,8 @@ function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, cu
       readOnly: readOnly,
       verticalOffset: 5, // This are hacks to correct the layout due to parent css
       commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
-
     },
-    true
+    true,
   );
   renderComments(reviewManager.events);
 }
@@ -337,22 +334,16 @@ function renderComments(events: ReviewCommentEvent[]) {
             </tr>
             <tr>
                 <td colspan="4" class="comment_text">${comment.text}</td>                                        
-            </tr>`
+            </tr>`,
       )
       .join("") +
     "</table>";
 
-  const commentsDiv = document.getElementById(
-    "commentsDiv"
-  )
-  if (commentsDiv)
-    commentsDiv.innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
+  const commentsDiv = document.getElementById("commentsDiv");
+  if (commentsDiv) commentsDiv.innerHTML = `<div><h5>Active Comments</h5>${activeHtml}</div><div>`;
 
-  const eventsDiv = document.getElementById(
-    "eventsDiv"
-  );
-  if (eventsDiv)
-    eventsDiv.innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
+  const eventsDiv = document.getElementById("eventsDiv");
+  if (eventsDiv) eventsDiv.innerHTML = `<div><h5>Events</h5>${rawHtml}</div>`;
 }
 
 function clearComments() {

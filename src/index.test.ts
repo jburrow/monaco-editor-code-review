@@ -19,7 +19,7 @@ interface MonacoWindow {
 }
 
 class Range {
-  constructor() { }
+  constructor() {}
 }
 
 const monacoWindow = window as any as MonacoWindow;
@@ -58,18 +58,18 @@ function getMockEditor() {
     changeViewZones: (cb: any) =>
       cb({
         removeZone: (zoneId: string): void => {
-          console.debug('deleted zone', zoneId);
+          console.debug("deleted zone", zoneId);
           delete editor._zones[zoneId as any];
         },
         addZone: (zone: any): string => {
           const zoneId = `mock-zone-${editor._zoneId++}`;
           editor._zones[zoneId] = zone;
-          console.debug('created', zoneId);
+          console.debug("created", zoneId);
           return zoneId;
         },
       }),
     layoutContentWidget: () => null,
-    setPosition: (position: any) => editor._position = position,
+    setPosition: (position: any) => (editor._position = position),
     getPosition: () => editor._position,
     _themeService: {
       getTheme: () => {
@@ -86,7 +86,7 @@ function getMockEditor() {
 
 test("Widget Coverage", () => {
   const editor = getMockEditor();
-  const rm = createReviewManager(editor, "current.user", [], (comments) => { });
+  const rm = createReviewManager(editor, "current.user", [], (comments) => {});
   rm.activeComment = {
     selection: undefined,
     status: 1,
@@ -96,7 +96,7 @@ test("Widget Coverage", () => {
     text: "",
     lineNumber: 1,
     type: ReviewCommentType.comment,
-    typeState: undefined
+    typeState: undefined,
   };
   rm.widgetInlineToolbar?.getId();
   rm.widgetInlineToolbar?.getPosition();
@@ -121,10 +121,10 @@ test("createReviewManager to editor and add comments", () => {
     createdAt: new Date("2019-01-01").getTime(),
     text: "#1",
     commentType: ReviewCommentType.comment,
-    typeState: undefined
+    typeState: undefined,
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], (comments) => { });
+  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
   expect(Object.keys(rm.store.comments)).toEqual([comment.id]);
   expect(Object.keys(editor._zones).length).toBe(1);
   expect(rm.activeComment).toBe(undefined);
@@ -146,7 +146,7 @@ test("createReviewManager to editor and add comments", () => {
 
   rm.setActiveComment(undefined);
   const num4 = rm.addComment(4, "#4");
-  expect(num4.targetId).toBe(undefined)
+  expect(num4.targetId).toBe(undefined);
   expect(Object.keys(editor._zones).length).toBe(4);
 });
 
@@ -160,10 +160,10 @@ test("load clears the comments", () => {
     createdAt: new Date("2019-01-01").getTime(),
     text: "#1",
     commentType: ReviewCommentType.comment,
-    typeState: undefined
+    typeState: undefined,
   };
 
-  const rm = createReviewManager(editor, "current.user", [comment], (comments) => { });
+  const rm = createReviewManager(editor, "current.user", [comment], (comments) => {});
   rm.load([]);
   expect(Object.keys(editor._zones).length).toBe(0);
   expect(Object.keys(rm.store.comments).length).toBe(0);
@@ -177,21 +177,16 @@ test("Mouse behaviours", () => {
   expect(rm.widgetInlineToolbar?.getPosition()).toBe(null);
   expect(rm.widgetInlineCommentEditor?.getPosition()).toBe(null);
 
-
   const lineNumber = 789;
   const comment = rm.addComment(lineNumber, "comment-text");
-  expect(rm.getRenderState(comment.id).viewZoneId?.startsWith('mock-')).toBeTruthy();
+  expect(rm.getRenderState(comment.id).viewZoneId?.startsWith("mock-")).toBeTruthy();
   expect(Object.keys(editor._zones).length).toBe(1);
   expect(rm.activeComment).toBeFalsy();
-  expect(rm.currentLineDecorations?.length).toBe(0)
+  expect(rm.currentLineDecorations?.length).toBe(0);
 
-
-  rm.handleMouseMove(
-    { target: { position: { lineNumber: 888 } } } as any
-  );
-  expect(rm.currentLineDecorations.length).toBe(1)
-  expect(rm.currentLineDecorationLineNumber).toBe(888)
-
+  rm.handleMouseMove({ target: { position: { lineNumber: 888 } } } as any);
+  expect(rm.currentLineDecorations.length).toBe(1);
+  expect(rm.currentLineDecorationLineNumber).toBe(888);
 
   rm.handleMouseDown({
     target: {
@@ -210,12 +205,9 @@ test("Mouse behaviours", () => {
     },
   } as any);
   expect(rm.editorMode).toBe(EditorMode.insertComment);
-  expect(rm.editor.getPosition()?.lineNumber).toBe(888)
+  expect(rm.editor.getPosition()?.lineNumber).toBe(888);
   expect(rm.activeComment).toBeFalsy();
-
-
 });
-
 
 test("Remove a comment via the widgets", () => {
   const editor = getMockEditor();
@@ -226,13 +218,11 @@ test("Remove a comment via the widgets", () => {
   expect(rm.widgetInlineCommentEditor?.getPosition()).toBe(null);
 
   const comment = rm.addComment(1, "");
-  expect(rm.getRenderState(comment.id).viewZoneId?.startsWith('mock-')).toBeTruthy();
+  expect(rm.getRenderState(comment.id).viewZoneId?.startsWith("mock-")).toBeTruthy();
   expect(Object.keys(editor._zones).length).toBe(1);
 
   // Coverage Only - Simulate the mouse moving over a line of code....
-  rm.handleMouseMove(
-    { target: { position: { lineNumber: 1 } } } as any
-  );
+  rm.handleMouseMove({ target: { position: { lineNumber: 1 } } } as any);
 
   // Coverage Only - Simulate a click on the comment
   rm.handleMouseDown({
@@ -242,7 +232,7 @@ test("Remove a comment via the widgets", () => {
     },
   } as any);
 
-  expect(rm.widgetInlineToolbar?.getPosition()).toBe(null)
+  expect(rm.widgetInlineToolbar?.getPosition()).toBe(null);
   expect(rm.widgetInlineCommentEditor?.getPosition()).toBe(null);
 
   const deletedComment = rm.removeComment(comment.id);
@@ -313,7 +303,7 @@ test("Edited Comments", () => {
     text: "editted", //Copied from edit
     parentId: undefined,
     type: ReviewCommentType.comment,
-    typeState: undefined
+    typeState: undefined,
   };
 
   const comments = Object.values(rm.store.comments);
@@ -355,8 +345,6 @@ test("Enter Comment Widgets", () => {
   expect(cs.comment.text).toBe("#5");
   //expect(cs.viewZoneId).toBe(0);
 });
-
-
 
 test("Navigation - Forward and Back", () => {
   const editor = getMockEditor();

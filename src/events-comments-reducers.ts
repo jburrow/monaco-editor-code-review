@@ -1,18 +1,17 @@
 export type ProposedReviewCommentEvent =
-  | ({
-    type: "create";
-    lineNumber: number;
-    text: string;
-    selection?: CodeSelection;
-    commentType?: ReviewCommentType;
-    typeState?: ReviewCommentTypeState;
-    targetId?: string;
-  })
-  | ({ type: "edit"; text?: string, typeState?: ReviewCommentTypeState, targetId: string })
-  | ({ type: "delete", targetId: string });
+  | {
+      type: "create";
+      lineNumber: number;
+      text: string;
+      selection?: CodeSelection;
+      commentType?: ReviewCommentType;
+      typeState?: ReviewCommentTypeState;
+      targetId?: string;
+    }
+  | { type: "edit"; text?: string; typeState?: ReviewCommentTypeState; targetId: string }
+  | { type: "delete"; targetId: string };
 
-
-export type ReviewCommentEvent = ProposedReviewCommentEvent & { id: string, createdAt: number, createdBy: string };
+export type ReviewCommentEvent = ProposedReviewCommentEvent & { id: string; createdAt: number; createdBy: string };
 
 export interface ReviewCommentStore {
   comments: Record<string, ReviewCommentState>;
@@ -39,7 +38,7 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
           author: event.createdBy,
           dt: event.createdAt,
           text: event.text ?? parent.comment.text,
-          typeState: event.typeState === undefined ? parent.comment.typeState : event.typeState
+          typeState: event.typeState === undefined ? parent.comment.typeState : event.typeState,
         },
         history: parent.history.concat(parent.comment),
       };
@@ -74,7 +73,7 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
           parentId: event.targetId,
           status: ReviewCommentStatus.active,
           type: event.commentType ?? ReviewCommentType.comment,
-          typeState: event.typeState
+          typeState: event.typeState,
         });
         //console.debug("insert", event);
         dirtyLineNumbers.add(event.lineNumber);
@@ -143,7 +142,9 @@ export enum ReviewCommentStatus {
   edit = 3,
 }
 
-
-export function reduceComments(events: ReviewCommentEvent[], state: ReviewCommentStore = { comments: {}, events: [] }): ReviewCommentStore {
+export function reduceComments(
+  events: ReviewCommentEvent[],
+  state: ReviewCommentStore = { comments: {}, events: [] },
+): ReviewCommentStore {
   return events.reduce((accState, event) => commentReducer(event, accState), state);
 }
