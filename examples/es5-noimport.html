@@ -8,21 +8,13 @@
   </body>
 
   <script>
-    const expected = [
-      "reduceComments",
-      "EditorMode",
-      "createReviewManager",
-      "ReviewManager",
-    ];
+    const expected = ["reduceComments", "EditorMode", "createReviewManager", "ReviewManager"];
     const exports = Object.keys(window.MonacoEditorCodeReview);
-    document.getElementById(
-      "output"
-    ).innerHTML = `Expected:<pre>${expected}</pre>
+    document.getElementById("output").innerHTML = `Expected:<pre>${expected}</pre>
                    Exported:<pre>${exports}</pre>`;
 
     window.exports = new Set(exports);
     window.expected = new Set(expected);
-    window.body.style.background =
-      window.exports === window.expected ? "" : "red";
+    window.body.style.background = window.exports === window.expected ? "" : "red";
   </script>
 </html>
