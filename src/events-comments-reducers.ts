@@ -24,7 +24,7 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
   const dirtyLineNumbers = new Set<number>();
   const deletedCommentIds = new Set<string>();
   const dirtyCommentIds = new Set<string>();
-  const events = (state.events || []).concat([event]);
+  const events = (state.events ?? []).concat([event]);
   let comments = { ...state.comments };
 
   switch (event.type) {
@@ -63,7 +63,7 @@ export function commentReducer(event: ReviewCommentEvent, state: ReviewCommentSt
       break;
     }
     case "create": {
-      if (comments[event.id] !== undefined) {
+      if (comments[event.id] === undefined) {
         comments[event.id] = new ReviewCommentState({
           author: event.createdBy,
           dt: event.createdAt,
