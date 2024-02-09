@@ -1,6 +1,5 @@
 import {
   ReviewComment,
-  ProposedReviewCommentEvent,
   ReviewCommentEvent,
   ReviewCommentType,
   reduceComments,
