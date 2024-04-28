@@ -41,7 +41,7 @@
     "babel-jest": "29.7.0",
     "coveralls": "3.1.1",
     "cypress": "^13.6.4",
-    "dayjs": "1.11.10",
+    "dayjs": "1.11.11",
     "eslint": "^8.56.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-import": "^2.29.1",
