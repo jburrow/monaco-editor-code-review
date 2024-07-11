@@ -26,11 +26,11 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.24.7",
-    "@babel/preset-env": "7.24.7",
+    "@babel/core": "7.24.8",
+    "@babel/preset-env": "7.24.8",
     "@babel/preset-typescript": "7.24.7",
-    "@babel/runtime": "7.24.7",
-    "@babel/types": "7.24.7",
+    "@babel/runtime": "7.24.8",
+    "@babel/types": "7.24.8",
     "@testing-library/cypress": "^10.0.1",
     "@types/jest": "29.5.12",
     "@types/showdown": "^2.0.6",
