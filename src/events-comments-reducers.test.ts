@@ -1,9 +1,4 @@
-import {
-  ReviewComment,
-  ReviewCommentEvent,
-  ReviewCommentType,
-  reduceComments,
-} from "./events-comments-reducers";
+import { ReviewComment, ReviewCommentEvent, ReviewCommentType, reduceComments } from "./events-comments-reducers";
 
 test("reduceComments - create|edit|delete", () => {
   const store = reduceComments([{ type: "create", id: "1", text: "t1", lineNumber: 1, createdAt: 1, createdBy: "a" }]);

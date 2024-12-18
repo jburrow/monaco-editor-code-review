@@ -1,13 +1,13 @@
 export type ProposedReviewCommentEvent =
   | {
-    type: "create";
-    lineNumber: number;
-    text: string;
-    selection?: CodeSelection;
-    commentType?: ReviewCommentType;
-    typeState?: ReviewCommentTypeState;
-    targetId?: string;
-  }
+      type: "create";
+      lineNumber: number;
+      text: string;
+      selection?: CodeSelection;
+      commentType?: ReviewCommentType;
+      typeState?: ReviewCommentTypeState;
+      targetId?: string;
+    }
   | { type: "edit"; text?: string; typeState?: ReviewCommentTypeState; targetId: string }
   | { type: "delete"; targetId: string };
 

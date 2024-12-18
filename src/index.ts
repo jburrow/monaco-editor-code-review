@@ -313,14 +313,14 @@ export class ReviewManager {
     let value = null;
     let theme = null;
 
-
-
-    const themeService = (this.editor as unknown as {
-      _themeService: {
-        _theme?: { getColor: (name: string) => string };
-        getTheme: () => { themeName?: string; getColor: (name: string) => string };
+    const themeService = (
+      this.editor as unknown as {
+        _themeService: {
+          _theme?: { getColor: (name: string) => string };
+          getTheme: () => { themeName?: string; getColor: (name: string) => string };
+        };
       }
-    })._themeService;
+    )._themeService;
 
     if (themeService.getTheme !== undefined) {
       // v21
@@ -431,7 +431,7 @@ export class ReviewManager {
     // FIX - this isn't right.
     const lineNumber = this.activeComment
       ? this.activeComment.lineNumber
-      : this.editor.getSelection()?.endLineNumber ?? 1;
+      : (this.editor.getSelection()?.endLineNumber ?? 1);
     const text = this.editorElements.textarea.value;
     const selection = this.activeComment ? undefined : (this.editor.getSelection() as CodeSelection);
     this.addComment(lineNumber, text, selection);
@@ -620,14 +620,14 @@ export class ReviewManager {
   renderAddCommentLineDecoration(lineNumber?: number) {
     const modelDeltaDecorations: monacoEditor.editor.IModelDeltaDecoration[] = lineNumber
       ? [
-        {
-          range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
-          options: {
-            marginClassName: "activeLineMarginClass", // TODO - fix the creation of this style
-            zIndex: 100,
+          {
+            range: new monacoWindow.monaco.Range(lineNumber, 0, lineNumber, 0),
+            options: {
+              marginClassName: "activeLineMarginClass", // TODO - fix the creation of this style
+              zIndex: 100,
+            },
           },
-        },
-      ]
+        ]
       : [];
     this.currentLineDecorations = this.editor.deltaDecorations(this.currentLineDecorations, modelDeltaDecorations);
   }
@@ -804,12 +804,12 @@ export class ReviewManager {
       this.editorMode === EditorMode.editComment && this.activeComment?.id
         ? { type: "edit", text, targetId: this.activeComment.id }
         : {
-          type: "create",
-          text,
-          lineNumber,
-          selection,
-          targetId: this.activeComment?.id,
-        };
+            type: "create",
+            text,
+            lineNumber,
+            selection,
+            targetId: this.activeComment?.id,
+          };
 
     return this.addEvent(event);
   }
