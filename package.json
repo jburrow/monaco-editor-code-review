@@ -51,7 +51,7 @@
     "prettier": "^3.4.2",
     "ts-jest": "29.4.1",
     "ts-loader": "9.5.2",
-    "typedoc": "0.28.9",
+    "typedoc": "0.28.10",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "webpack": "5.101.0",
