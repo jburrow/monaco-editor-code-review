@@ -41,7 +41,7 @@
     "@webpack-cli/serve": "3.0.0",
     "babel-jest": "30.0.5",
     "coveralls": "3.1.1",
-    "dayjs": "1.11.13",
+    "dayjs": "1.11.14",
     "eslint": "^9.17.0",
     "husky": "^9.1.7",
     "jest-environment-jsdom": "30.0.5",
