@@ -35,7 +35,7 @@
     "@testing-library/cypress": "^10.0.2",
     "@types/jest": "29.5.14",
     "@types/showdown": "^2.0.6",
-    "@types/uuid": "10.0.0",
+    "@types/uuid": "11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
     "@webpack-cli/serve": "3.0.0",
