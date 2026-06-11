@@ -1,4 +1,4 @@
-export type ProposedReviewCommentEvent = ({
+export type ProposedReviewCommentEvent = {
     type: "create";
     lineNumber: number;
     text: string;
@@ -6,15 +6,15 @@ export type ProposedReviewCommentEvent = ({
     commentType?: ReviewCommentType;
     typeState?: ReviewCommentTypeState;
     targetId?: string;
-}) | ({
+} | {
     type: "edit";
     text?: string;
     typeState?: ReviewCommentTypeState;
     targetId: string;
-}) | ({
+} | {
     type: "delete";
     targetId: string;
-});
+};
 export type ReviewCommentEvent = ProposedReviewCommentEvent & {
     id: string;
     createdAt: number;

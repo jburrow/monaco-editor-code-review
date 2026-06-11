@@ -1,9 +1,28 @@
 {
   "name": "monaco-review",
-  "version": "0.0.43",
-  "description": "Code review extension for Monaco",
+  "version": "0.1.0",
+  "description": "Code review extension for the Monaco editor - inline comments, replies, edit history",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "!dist/docs*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jburrow/monaco-editor-code-review.git"
+  },
+  "homepage": "https://github.com/jburrow/monaco-editor-code-review#readme",
+  "bugs": {
+    "url": "https://github.com/jburrow/monaco-editor-code-review/issues"
+  },
+  "keywords": [
+    "monaco",
+    "monaco-editor",
+    "code-review",
+    "comments",
+    "annotations"
+  ],
   "prettier": {
     "printWidth": 120
   },
@@ -12,16 +31,18 @@
     "compile": "tsc && webpack --mode=production",
     "tsc": "tsc --watch",
     "doc": "typedoc --out ./docs ./src/index.ts",
+    "lint": "eslint src",
     "test": "jest --coverage",
-    "testpub": "jest --coverage --coverageReporters=text-lcov | coveralls",
-    "prepare": "husky install"
+    "prepublishOnly": "npm run compile",
+    "prepare": "husky"
   },
   "author": "James Burrow",
   "license": "MIT",
   "peerDependencies": {
-    "monaco-editor": ">0.32"
+    "monaco-editor": ">=0.34.0"
   },
   "dependencies": {
+    "dompurify": "^3.4.9",
     "showdown": "^2.1.0",
     "uuid": "^11.0.3"
   },
@@ -32,7 +53,6 @@
     "@babel/runtime": "7.29.2",
     "@babel/types": "7.29.0",
     "@eslint/js": "^9.17.0",
-    "@testing-library/cypress": "^10.0.2",
     "@types/jest": "29.5.14",
     "@types/showdown": "^2.0.6",
     "@types/uuid": "11.0.0",
@@ -40,13 +60,11 @@
     "@typescript-eslint/parser": "^8.18.1",
     "@webpack-cli/serve": "3.0.0",
     "babel-jest": "30.3.0",
-    "coveralls": "3.1.1",
     "dayjs": "1.11.20",
     "eslint": "^9.17.0",
     "husky": "^9.1.7",
     "jest-environment-jsdom": "30.3.0",
     "lint-staged": "^16.0.0",
-    "moment": "2.30.1",
     "monaco-editor": "0.55.1",
     "prettier": "^3.4.2",
     "ts-jest": "29.4.9",
@@ -59,6 +77,10 @@
     "webpack-dev-server": "5.2.4"
   },
   "lint-staged": {
-    "*.{css,md,json}": "prettier . --write"
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,md,json}": "prettier --write"
   }
 }

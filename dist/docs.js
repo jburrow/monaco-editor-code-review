@@ -8,41 +8,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const index_1 = require("./index");
-const moment = require("dayjs");
+const dayjs_1 = __importDefault(require("dayjs"));
 const win = window;
-let reviewManager = undefined;
+let reviewManager;
 let currentMode = "";
 let currentDiffMode = "";
-let currentEditor = undefined;
+let currentEditor;
 const fooUser = "foo.user";
 const barUser = "bar.user";
 function ensureMonacoIsAvailable() {
-    return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-        if (!win.require) {
-            console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
-            const github = "https://microsoft.github.io/monaco-editor";
-            const loader = "/node_modules/monaco-editor/min/vs/loader.js";
-            const prefix = window.location.host.indexOf("github") > -1 ? github : "";
-            console.log("prefix", prefix);
-            if (prefix !== null) {
-                const scriptTag = document.createElement("script");
-                scriptTag.src = prefix + loader;
-                scriptTag.onload = () => {
-                    console.debug("Monaco loader is initialized");
-                    resolve(prefix);
-                };
-                document.body.appendChild(scriptTag);
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield new Promise((resolve) => {
+            if (!win.require) {
+                console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
+                const github = "https://microsoft.github.io/monaco-editor";
+                const loader = "/node_modules/monaco-editor/min/vs/loader.js";
+                const prefix = window.location.host.includes("github") ? github : "";
+                console.log("prefix", prefix);
+                if (prefix !== null) {
+                    const scriptTag = document.createElement("script");
+                    scriptTag.src = prefix + loader;
+                    scriptTag.onload = () => {
+                        console.debug("Monaco loader is initialized");
+                        resolve(prefix);
+                    };
+                    document.body.appendChild(scriptTag);
+                }
+                else {
+                    document.body.innerHTML = "Unable to find monaco node_modules";
+                }
             }
             else {
-                document.body.innerHTML = "Unable to find monaco node_modules";
+                resolve("..");
             }
-        }
-        else {
-            resolve("..");
-        }
-    }));
+        });
+    });
 }
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
@@ -62,18 +68,18 @@ function setView(editorMode, diffMode, theme, currentUser, editorReadonly, comme
                 contextmenu: true,
                 automaticLayout: true,
                 readOnly: editorReadonly,
-                theme: theme,
+                theme,
             });
             if (currentEditor) {
                 initReviewManager(currentEditor, currentUser, commentsReadonly);
             }
         }
         else {
-            var originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
-            var modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
+            const originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
+            const modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
             const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
                 renderSideBySide: diffMode !== "inline-diff",
-                theme: theme,
+                theme,
                 readOnly: editorReadonly,
                 glyphMargin: true,
                 contextmenu: true,
@@ -120,7 +126,7 @@ function fetchSourceCode(url) {
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("[init] 123");
-        var prefix = yield ensureMonacoIsAvailable();
+        const prefix = yield ensureMonacoIsAvailable();
         yield fetchSourceCode("../src/index.ts");
         yield fetchSourceCode("../src/docs.ts");
         yield fetchSourceCode("../src/index.test.ts");
@@ -134,10 +140,12 @@ function init() {
     });
 }
 function initReviewManager(editor, currentUser, readOnly) {
-    reviewManager = (0, index_1.createReviewManager)(editor, currentUser, createRandomComments(), (updatedComments) => renderComments(updatedComments), {
+    reviewManager = (0, index_1.createReviewManager)(editor, currentUser, createRandomComments(), (updatedComments) => {
+        renderComments(updatedComments);
+    }, {
         editButtonEnableRemove: true,
-        formatDate: (createdAt) => moment(createdAt).format("YY-MM-DD HH:mm"),
-        readOnly: readOnly,
+        formatDate: (createdAt) => (0, dayjs_1.default)(createdAt).format("YY-MM-DD HH:mm"),
+        readOnly,
         verticalOffset: 5, // This are hacks to correct the layout due to parent css
         commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
     }, true);

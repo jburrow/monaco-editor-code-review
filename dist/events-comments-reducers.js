@@ -11,39 +11,44 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reduceComments = exports.ReviewCommentStatus = exports.ReviewCommentType = exports.ReviewCommentRenderState = exports.ReviewCommentState = exports.commentReducer = void 0;
+exports.ReviewCommentStatus = exports.ReviewCommentType = exports.ReviewCommentRenderState = exports.ReviewCommentState = void 0;
+exports.commentReducer = commentReducer;
+exports.reduceComments = reduceComments;
 function commentReducer(event, state) {
-    var _a, _b;
+    var _a, _b, _c;
     const dirtyLineNumbers = new Set();
     const deletedCommentIds = new Set();
     const dirtyCommentIds = new Set();
-    const events = (state.events || []).concat([event]);
+    const events = ((_a = state.events) !== null && _a !== void 0 ? _a : []).concat([event]);
     let comments = Object.assign({}, state.comments);
     switch (event.type) {
-        case "edit":
+        case "edit": {
             const parent = comments[event.targetId];
             if (!parent)
                 break;
             const edit = {
-                comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: (_a = event.text) !== null && _a !== void 0 ? _a : parent.comment.text, typeState: event.typeState === undefined ? parent.comment.typeState : event.typeState }),
+                comment: Object.assign(Object.assign({}, parent.comment), { author: event.createdBy, dt: event.createdAt, text: (_b = event.text) !== null && _b !== void 0 ? _b : parent.comment.text, typeState: event.typeState === undefined ? parent.comment.typeState : event.typeState }),
                 history: parent.history.concat(parent.comment),
             };
             dirtyLineNumbers.add(edit.comment.lineNumber);
             // console.debug("edit", event);
             comments[event.targetId] = edit;
             break;
-        case "delete":
+        }
+        case "delete": {
             const selected = comments[event.targetId];
             if (!selected)
                 break;
-            const _c = comments, _d = event.targetId, _ = _c[_d], remainingComments = __rest(_c, [typeof _d === "symbol" ? _d : _d + ""]);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const _d = comments, _e = event.targetId, _ = _d[_e], remainingComments = __rest(_d, [typeof _e === "symbol" ? _e : _e + ""]);
             comments = remainingComments;
             deletedCommentIds.add(selected.comment.id);
             dirtyLineNumbers.add(selected.comment.lineNumber);
-            //console.debug("delete", event);
+            // console.debug("delete", event);
             break;
-        case "create":
-            if (!comments[event.id]) {
+        }
+        case "create": {
+            if (comments[event.id] === undefined) {
                 comments[event.id] = new ReviewCommentState({
                     author: event.createdBy,
                     dt: event.createdAt,
@@ -53,15 +58,16 @@ function commentReducer(event, state) {
                     text: event.text,
                     parentId: event.targetId,
                     status: ReviewCommentStatus.active,
-                    type: (_b = event.commentType) !== null && _b !== void 0 ? _b : ReviewCommentType.comment,
-                    typeState: event.typeState
+                    type: (_c = event.commentType) !== null && _c !== void 0 ? _c : ReviewCommentType.comment,
+                    typeState: event.typeState,
                 });
-                //console.debug("insert", event);
+                // console.debug("insert", event);
                 dirtyLineNumbers.add(event.lineNumber);
             }
             break;
+        }
     }
-    if (dirtyLineNumbers.size) {
+    if (dirtyLineNumbers.size > 0) {
         for (const cs of Object.values(state.comments)) {
             if (dirtyLineNumbers.has(cs.comment.lineNumber)) {
                 dirtyCommentIds.add(cs.comment.id);
@@ -70,7 +76,6 @@ function commentReducer(event, state) {
     }
     return { comments, dirtyCommentIds, deletedCommentIds, events };
 }
-exports.commentReducer = commentReducer;
 class ReviewCommentState {
     constructor(comment) {
         this.comment = comment;
@@ -99,5 +104,4 @@ var ReviewCommentStatus;
 function reduceComments(events, state = { comments: {}, events: [] }) {
     return events.reduce((accState, event) => commentReducer(event, accState), state);
 }
-exports.reduceComments = reduceComments;
 //# sourceMappingURL=events-comments-reducers.js.map

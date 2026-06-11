@@ -1,7 +1,7 @@
-import * as monacoEditor from "monaco-editor";
-import { reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentStore, ReviewCommentState, ProposedReviewCommentEvent, ReviewComment, ReviewCommentRenderState, ReviewCommentEvent } from "./events-comments-reducers";
+import type * as monacoEditor from "monaco-editor";
+import { reduceComments, ReviewCommentStatus, commentReducer, type CodeSelection, type ReviewCommentStore, ReviewCommentState, type ProposedReviewCommentEvent, type ReviewComment, ReviewCommentRenderState, type ReviewCommentEvent } from "./events-comments-reducers";
 import { convertMarkdownToHTML } from "./comment";
-export { ReviewCommentStore, ProposedReviewCommentEvent as ReviewCommentEvent, reduceComments, ReviewCommentStatus, commentReducer, CodeSelection, ReviewCommentState, ReviewComment, ReviewCommentRenderState, convertMarkdownToHTML, };
+export { type ReviewCommentStore, type ProposedReviewCommentEvent as ReviewCommentEvent, reduceComments, ReviewCommentStatus, commentReducer, type CodeSelection, ReviewCommentState, type ReviewComment, ReviewCommentRenderState, convertMarkdownToHTML, };
 declare enum NavigationDirection {
     next = 1,
     prev = 2
@@ -12,15 +12,27 @@ export declare enum EditorMode {
     editComment = 3,
     toolbar = 4
 }
-export declare function createReviewManager(editor: any, currentUser: string, events?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
+export declare function createReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, events?: ReviewCommentEvent[], onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean): ReviewManager;
 export interface ReviewCommentIterItem {
     depth: number;
     state: ReviewCommentState;
 }
-interface OnActionsChanged {
-    (actions: ReviewCommentEvent[]): void;
+type OnActionsChanged = (actions: ReviewCommentEvent[]) => void;
+interface IEventRenderStoreItem {
+    target?: {
+        detail?: RenderStoreItem;
+    };
 }
-export declare const defaultStyles: Record<string, {}>;
+export declare const defaultStyles: Record<string, unknown>;
+/**
+ * Keybindings are monaco keybinding values, e.g. [monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10]
+ */
+export interface ReviewManagerKeybindings {
+    addComment?: number[];
+    cancel?: number[];
+    nextComment?: number[];
+    prevComment?: number[];
+}
 export interface ReviewManagerConfig {
     commentIndent?: number;
     commentIndentOffset?: number;
@@ -33,11 +45,12 @@ export interface ReviewManagerConfig {
     reviewCommentIconActive?: string;
     reviewCommentIconSelect?: string;
     showInRuler?: boolean;
-    renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
-    styles?: Record<string, {}>;
+    renderComment?: (isActive: boolean, comment: ReviewCommentIterItem) => HTMLElement;
+    styles?: Record<string, unknown>;
     setClassNames?: boolean;
     verticalOffset?: number;
     enableMarkdown?: boolean;
+    keybindings?: ReviewManagerKeybindings;
 }
 export type FormatDate = (dt: Date | string) => string;
 interface ReviewManagerConfigPrivate {
@@ -51,15 +64,16 @@ interface ReviewManagerConfigPrivate {
     editButtonRemoveText: string;
     formatDate?: FormatDate;
     readOnly: boolean;
-    rulerMarkerColor: any;
-    rulerMarkerDarkColor: any;
+    rulerMarkerColor: string;
+    rulerMarkerDarkColor: string;
     showAddCommentGlyph: boolean;
     showInRuler: boolean;
-    renderComment?(isActive: boolean, comment: ReviewCommentIterItem): HTMLElement;
-    styles: Record<string, {}>;
+    renderComment?: (isActive: boolean, comment: ReviewCommentIterItem) => HTMLElement;
+    styles: Record<string, unknown>;
     setClassNames: boolean;
     verticalOffset: number;
     enableMarkdown: boolean;
+    keybindings: Required<ReviewManagerKeybindings>;
 }
 interface EditorElements {
     cancel: HTMLButtonElement;
@@ -89,8 +103,8 @@ export declare class ReviewManager {
     onChange?: OnActionsChanged;
     editorMode: EditorMode;
     config: ReviewManagerConfigPrivate;
-    currentLineDecorations: string[];
-    currentCommentDecorations: string[];
+    currentLineDecorations: monacoEditor.editor.IEditorDecorationsCollection;
+    currentCommentDecorations: monacoEditor.editor.IEditorDecorationsCollection;
     currentLineDecorationLineNumber?: number;
     editorElements: EditorElements;
     inlineToolbarElements: InlineToolbarElements;
@@ -98,7 +112,15 @@ export declare class ReviewManager {
     canAddCondition: monacoEditor.editor.IContextKey<boolean>;
     canCancelCondition: monacoEditor.editor.IContextKey<boolean>;
     private _renderStore;
+    private _disposables;
     constructor(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, onChange?: OnActionsChanged, config?: ReviewManagerConfig, verbose?: boolean);
+    /**
+     * Removes all view zones, decorations, widgets, actions and event listeners that this
+     * ReviewManager attached to the editor. Call this when unmounting the editor or the
+     * hosting component.
+     */
+    dispose(): void;
+    private debug;
     createCustomCssClasses(): void;
     setReadOnlyMode(value: boolean): void;
     load(events: ReviewCommentEvent[]): void;
@@ -115,13 +137,11 @@ export declare class ReviewManager {
     createInlineEditorWidget(): EditorElements;
     getActivePosition(): number | undefined;
     setActiveComment(comment?: ReviewComment, reason?: string): boolean;
-    filterAndMapComments(lineNumbers: number[], fn: {
-        (comment: ReviewComment): void;
-    }): void;
-    handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent): void;
+    filterAndMapComments(lineNumbers: number[], fn: (comment: ReviewComment) => void): void;
+    handleMouseMove(ev: monacoEditor.editor.IEditorMouseEvent & IEventRenderStoreItem): void;
     renderAddCommentLineDecoration(lineNumber?: number): void;
     private findCommentByViewZoneId;
-    handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent): void;
+    handleMouseDown(ev: monacoEditor.editor.IEditorMouseEvent & IEventRenderStoreItem): void;
     private calculateMarginTopOffset;
     layoutInlineToolbar(): void;
     layoutInlineCommentEditor(): void;
@@ -138,7 +158,7 @@ export declare class ReviewManager {
     editId: string;
     commentHeightCache: Record<string, number>;
     refreshComments(): void;
-    private measureHeighInPx;
+    private measureHeightInPx;
     private getHeightCacheKey;
     private renderComment;
     addActions(): void;

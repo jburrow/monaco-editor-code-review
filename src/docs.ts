@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createReviewManager, type ReviewManager } from "./index";
 import type * as monacoEditor from "monaco-editor";
-import * as moment from "dayjs";
+import moment from "dayjs";
 import { type ReviewCommentEvent } from "./events-comments-reducers";
 
 interface WindowDoc {

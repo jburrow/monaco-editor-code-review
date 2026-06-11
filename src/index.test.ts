@@ -13,32 +13,36 @@ jest.mock("uuid", () => ({
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent, ReviewCommentType } from "./events-comments-reducers";
 
-interface MonacoWindow {
-  monaco: any;
-}
-
-class Range {
-  constructor() {}
-}
-
-const monacoWindow = window as any as MonacoWindow;
-monacoWindow.monaco = {
-  KeyMod: { CtrlCmd: 0 },
-  KeyCode: { F10: 1 },
-  Range,
-  editor: { ContentWidgetPositionPreference: { BELOW: "BELOW" } },
-};
-
 function getMockEditor(): any {
+  const mockDisposable = () => ({ dispose: () => null });
+
   const editor = {
     _zoneId: 0,
     _zones: {} as Record<string, any>,
     _actions: [],
     _position: null,
     focus: () => null,
-    addAction: (action: never) => editor._actions.push(action),
+    addAction: (action: never) => {
+      editor._actions.push(action);
+      return mockDisposable();
+    },
     createContextKey: () => {
       return { set: () => null };
+    },
+    createDecorationsCollection: () => {
+      const collection = {
+        _decorations: [] as any[],
+        set(decorations: any[]) {
+          collection._decorations = decorations;
+        },
+        clear() {
+          collection._decorations = [];
+        },
+        get length() {
+          return collection._decorations.length;
+        },
+      };
+      return collection;
     },
     getRawOptions: () => ({ lineHeight: 19 }),
     getSelection: () => ({
@@ -48,12 +52,13 @@ function getMockEditor(): any {
       endColumn: 19,
       selectionStartLineNumber: 15,
     }),
+    getDomNode: () => null,
     addContentWidget: () => null,
-    onMouseDown: () => null,
-    onMouseMove: () => null,
-    onDidChangeConfiguration: () => null,
+    removeContentWidget: () => null,
+    onMouseDown: mockDisposable,
+    onMouseMove: mockDisposable,
+    onDidChangeConfiguration: mockDisposable,
     revealLineInCenter: () => null,
-    deltaDecorations: (oldDecorations: any, newDecorations: any): any => newDecorations,
     changeViewZones: (cb: any) =>
       cb({
         removeZone: (zoneId: string): void => {
@@ -70,14 +75,6 @@ function getMockEditor(): any {
     layoutContentWidget: () => null,
     setPosition: (position: any) => (editor._position = position),
     getPosition: () => editor._position,
-    _themeService: {
-      getTheme: () => {
-        return {
-          themeName: "",
-          getColor: () => "",
-        };
-      },
-    },
   };
 
   return editor;
@@ -343,6 +340,29 @@ test("Enter Comment Widgets", () => {
   const cs = Object.values(rm.store.comments)[0];
   expect(cs.comment.text).toBe("#5");
   //expect(cs.viewZoneId).toBe(0);
+});
+
+test("dispose removes zones, decorations and listeners", () => {
+  const editor = getMockEditor();
+  const rm = createReviewManager(editor, "current.user", [
+    {
+      type: "create",
+      id: "id1",
+      createdBy: "author",
+      createdAt: new Date("2019-01-01").getTime(),
+      lineNumber: 1,
+      text: "text",
+    },
+  ]);
+  rm.handleMouseMove({ target: { position: { lineNumber: 888 } } } as any);
+  expect(Object.keys(editor._zones).length).toBe(1);
+  expect(rm.currentLineDecorations.length).toBe(1);
+
+  rm.dispose();
+
+  expect(Object.keys(editor._zones).length).toBe(0);
+  expect(rm.currentLineDecorations.length).toBe(0);
+  expect(rm.currentCommentDecorations.length).toBe(0);
 });
 
 test("Navigation - Forward and Back", () => {
