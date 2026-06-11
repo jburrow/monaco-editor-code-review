@@ -34,10 +34,10 @@ npm install monaco-review
 
 `monaco-editor` (>= 0.34) is a peer dependency. The library works with both ESM-imported monaco (Vite, webpack, etc.) and the classic AMD loader — no `window.monaco` global is required.
 
-Alternatively, load the prebuilt bundle directly in a page — it exposes a `MonacoEditorCodeReview` global:
+The package ships dual ESM/CJS builds with TypeScript declarations. Alternatively, load the prebuilt IIFE bundle directly in a page — it exposes a `MonacoEditorCodeReview` global:
 
 ```html
-<script src="node_modules/monaco-review/dist/index-var-es2017.min.js"></script>
+<script src="node_modules/monaco-review/dist/index.global.js"></script>
 ```
 
 ## Quick start
@@ -139,10 +139,12 @@ useEffect(() => {
 
 ```sh
 npm install
-npm start        # demo at http://localhost:8080/examples/index.html
-npm test         # jest with coverage
-npm run lint     # eslint
-npm run compile  # tsc + webpack production build
+npm start           # vite dev server - demo at http://localhost:5173/examples/index.html
+npm test            # vitest with coverage
+npm run lint        # eslint
+npm run typecheck   # tsc --noEmit
+npm run build       # tsup - builds dist (esm + cjs + iife + d.ts)
+npm run build:demo  # vite build - builds the demo site (deployed to GitHub Pages by CI)
 ```
 
 ## License

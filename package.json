@@ -1,12 +1,26 @@
 {
   "name": "monaco-review",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Code review extension for the Monaco editor - inline comments, replies, edit history",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.global.js",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
   "files": [
-    "dist",
-    "!dist/docs*"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -27,13 +41,14 @@
     "printWidth": 120
   },
   "scripts": {
-    "start": "webpack serve",
-    "compile": "tsc && webpack --mode=production",
-    "tsc": "tsc --watch",
+    "start": "vite",
+    "build": "tsup",
+    "build:demo": "vite build",
+    "typecheck": "tsc --noEmit",
     "doc": "typedoc --out ./docs ./src/index.ts",
     "lint": "eslint src",
-    "test": "jest --coverage",
-    "prepublishOnly": "npm run compile",
+    "test": "vitest run --coverage",
+    "prepublishOnly": "npm run typecheck && npm run build",
     "prepare": "husky"
   },
   "author": "James Burrow",
@@ -47,34 +62,25 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
-    "@babel/preset-env": "7.29.5",
-    "@babel/preset-typescript": "7.28.5",
-    "@babel/runtime": "7.29.2",
-    "@babel/types": "7.29.0",
     "@eslint/js": "^9.17.0",
-    "@types/jest": "29.5.14",
     "@types/showdown": "^2.0.6",
     "@types/uuid": "11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
-    "@webpack-cli/serve": "3.0.0",
-    "babel-jest": "30.3.0",
+    "@vitest/coverage-v8": "^4.1.8",
     "dayjs": "1.11.20",
     "eslint": "^9.17.0",
     "husky": "^9.1.7",
-    "jest-environment-jsdom": "30.3.0",
+    "jsdom": "^29.1.1",
     "lint-staged": "^16.0.0",
     "monaco-editor": "0.55.1",
     "prettier": "^3.4.2",
-    "ts-jest": "29.4.9",
-    "ts-loader": "9.5.7",
+    "tsup": "^8.5.1",
     "typedoc": "0.28.19",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
-    "webpack": "5.106.2",
-    "webpack-cli": "5.1.4",
-    "webpack-dev-server": "5.2.4"
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
   },
   "lint-staged": {
     "*.ts": [

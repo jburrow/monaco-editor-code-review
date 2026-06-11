@@ -1,16 +1,14 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "sourceMap": true,
-    "noImplicitAny": true,
+    "noEmit": true,
     "strict": true,
+    "noImplicitAny": true,
     "esModuleInterop": true,
-    "declaration": true,
-    "module": "commonjs",
-    "target": "es6",
-    "lib": ["es2021", "es2020", "es2017", "dom"],
-    "jsx": "react"
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2020",
+    "lib": ["ES2021", "DOM", "DOM.Iterable"]
   },
-  "include": ["./src/**/*"],
-  "exclude": ["./src/*.test.ts"]
+  "include": ["./src/**/*"]
 }

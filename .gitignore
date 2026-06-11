@@ -59,3 +59,10 @@ typings/
 
 # next.js build output
 .next
+
+# Build output
+dist/
+site/
+
+# Generated API docs (built by the Pages workflow)
+docs/

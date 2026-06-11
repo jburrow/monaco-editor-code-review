@@ -1,12 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createReviewManager, type ReviewManager } from "./index";
-import type * as monacoEditor from "monaco-editor";
+import * as monaco from "monaco-editor";
+import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
+import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import moment from "dayjs";
 import { type ReviewCommentEvent } from "./events-comments-reducers";
 
+import indexSource from "./index.ts?raw";
+import docsSource from "./docs.ts?raw";
+import indexTestSource from "./index.test.ts?raw";
+
+self.MonacoEnvironment = {
+  getWorker(_workerId: string, label: string) {
+    if (label === "typescript" || label === "javascript") {
+      return new tsWorker();
+    }
+    return new editorWorker();
+  },
+};
+
 interface WindowDoc {
-  require: any;
-  monaco: any;
   setView: (
     editorMode: string,
     diffMode: string,
@@ -27,37 +40,11 @@ const win = window as any as WindowDoc;
 let reviewManager: ReviewManager | undefined;
 let currentMode: string = "";
 let currentDiffMode: string = "";
-let currentEditor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
+let currentEditor: monaco.editor.IStandaloneCodeEditor | undefined;
+let currentDiffEditor: monaco.editor.IStandaloneDiffEditor | undefined;
 
 const fooUser = "foo.user";
 const barUser = "bar.user";
-
-async function ensureMonacoIsAvailable(): Promise<string> {
-  return await new Promise((resolve) => {
-    if (!win.require) {
-      console.warn("Unable to find a local node_modules folder - so dynamically using cdn instead");
-      const github = "https://microsoft.github.io/monaco-editor";
-      const loader = "/node_modules/monaco-editor/min/vs/loader.js";
-
-      const prefix = window.location.host.includes("github") ? github : "";
-      console.log("prefix", prefix);
-
-      if (prefix !== null) {
-        const scriptTag = document.createElement("script");
-        scriptTag.src = prefix + loader;
-        scriptTag.onload = () => {
-          console.debug("Monaco loader is initialized");
-          resolve(prefix);
-        };
-        document.body.appendChild(scriptTag);
-      } else {
-        document.body.innerHTML = "Unable to find monaco node_modules";
-      }
-    } else {
-      resolve("..");
-    }
-  });
-}
 
 function getRandomInt(max: number): number {
   return Math.floor(Math.random() * Math.floor(max));
@@ -74,12 +61,19 @@ function setView(
   const idx = getRandomInt(exampleSourceCode.length / 2) * 2;
 
   if (editorMode !== currentMode || diffMode !== currentDiffMode) {
+    reviewManager?.dispose();
+    reviewManager = undefined;
+    currentEditor?.dispose();
+    currentEditor = undefined;
+    currentDiffEditor?.dispose();
+    currentDiffEditor = undefined;
+
     const containerEditor = document.getElementById("containerEditor");
     if (containerEditor) {
       containerEditor.innerHTML = "";
     }
     if (editorMode === "editor-mode") {
-      currentEditor = win.monaco.editor.create(document.getElementById("containerEditor"), {
+      currentEditor = monaco.editor.create(document.getElementById("containerEditor") as HTMLElement, {
         value: exampleSourceCode[idx],
         language: "typescript",
         glyphMargin: true,
@@ -92,10 +86,10 @@ function setView(
         initReviewManager(currentEditor, currentUser, commentsReadonly);
       }
     } else {
-      const originalModel = win.monaco.editor.createModel(exampleSourceCode[idx], "typescript");
-      const modifiedModel = win.monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
+      const originalModel = monaco.editor.createModel(exampleSourceCode[idx], "typescript");
+      const modifiedModel = monaco.editor.createModel(exampleSourceCode[idx + 1], "typescript");
 
-      const e = win.monaco.editor.createDiffEditor(document.getElementById("containerEditor"), {
+      const e = monaco.editor.createDiffEditor(document.getElementById("containerEditor") as HTMLElement, {
         renderSideBySide: diffMode !== "inline-diff",
         theme,
         readOnly: editorReadonly,
@@ -107,6 +101,7 @@ function setView(
         original: originalModel,
         modified: modifiedModel,
       });
+      currentDiffEditor = e;
 
       initReviewManager(e.getModifiedEditor(), currentUser, commentsReadonly);
     }
@@ -136,39 +131,27 @@ function generateDifferentContents(): void {
 
 const exampleSourceCode: string[] = [];
 
-async function fetchSourceCode(url: string) {
-  const response = await fetch(url);
-  const exampleText = await response.text();
-
+function addSourceCode(name: string, exampleText: string) {
   const modifiedText = exampleText.replace(new RegExp("string", "g"), "string /* String!*/");
 
   const longLines =
     "A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text \nA very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text A very very long line of text ";
 
-  exampleSourceCode.push(url + "\n" + longLines + exampleText);
-  exampleSourceCode.push(url + "\n" + longLines + modifiedText);
+  exampleSourceCode.push(name + "\n" + longLines + exampleText);
+  exampleSourceCode.push(name + "\n" + longLines + modifiedText);
 }
 
-async function init() {
-  console.log("[init] 123");
+function init() {
+  addSourceCode("../src/index.ts", indexSource);
+  addSourceCode("../src/docs.ts", docsSource);
+  addSourceCode("../src/index.test.ts", indexTestSource);
 
-  const prefix = await ensureMonacoIsAvailable();
-  await fetchSourceCode("../src/index.ts");
-  await fetchSourceCode("../src/docs.ts");
-  await fetchSourceCode("../src/index.test.ts");
+  setView("editor-mode", "", "vs-dark", fooUser, false, false);
 
-  win.require.config({
-    paths: { vs: prefix + "/node_modules/monaco-editor/min/vs" },
-  });
-
-  win.require(["vs/editor/editor.main"], function () {
-    setView("editor-mode", "", "vs-dark", fooUser, false, false);
-
-    window.dispatchEvent(new Event("monaco-ready"));
-  });
+  window.dispatchEvent(new Event("monaco-ready"));
 }
 
-function initReviewManager(editor: monacoEditor.editor.IStandaloneCodeEditor, currentUser: string, readOnly: boolean) {
+function initReviewManager(editor: monaco.editor.IStandaloneCodeEditor, currentUser: string, readOnly: boolean) {
   reviewManager = createReviewManager(
     editor,
     currentUser,

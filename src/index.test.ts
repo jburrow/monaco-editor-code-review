@@ -1,13 +1,12 @@
-/**
- * @jest-environment jsdom
- */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-let uuidCount = 0;
+import { test, expect, vi } from "vitest";
 
-jest.mock("uuid", () => ({
-  v1: () => `${--uuidCount}`,
-  v4: () => `${--uuidCount}`,
-  v5: () => `${--uuidCount}`,
+const uuid = vi.hoisted(() => ({ count: 0 }));
+
+vi.mock("uuid", () => ({
+  v1: () => `${--uuid.count}`,
+  v4: () => `${--uuid.count}`,
+  v5: () => `${--uuid.count}`,
 }));
 
 import { createReviewManager, EditorMode } from "./index";
