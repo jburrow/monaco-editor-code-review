@@ -1,94 +1,284 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <link rel="stylesheet" href="bootstrap.min.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>monaco-review &mdash; demo</title>
     <style>
+      :root {
+        --bg: #f6f8fa;
+        --panel: #ffffff;
+        --fg: #1f2328;
+        --muted: #59636e;
+        --border: #d1d9e0;
+        --accent: #0969da;
+        --danger: #d1242f;
+        --code-bg: #eff2f5;
+      }
+
+      [data-theme="dark"] {
+        --bg: #0d1117;
+        --panel: #161b22;
+        --fg: #e6edf3;
+        --muted: #8d96a0;
+        --border: #30363d;
+        --accent: #4493f8;
+        --danger: #f85149;
+        --code-bg: #21262d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
       body {
-        margin: 5px;
+        height: 100%;
+        margin: 0;
       }
 
-      .editor {
-        height: calc(100vh - 450px);
-        width: calc(100vw - 10px);
+      body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 16px 12px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+        font-size: 14px;
       }
 
-      h5 {
-        height: 20px;
-        margin-bottom: 5px;
-        margin-top: 5px;
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 20px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
       }
 
-      .summary {
-        max-height: 300px;
-        overflow: auto;
-        padding: 5px;
+      .brand {
+        display: flex;
+        flex-direction: column;
+        margin-right: auto;
       }
 
-      .btn {
-        margin-top: 5px;
+      .brand strong {
+        font-size: 16px;
       }
 
-      td {
+      .brand span {
+        color: var(--muted);
         font-size: 12px;
       }
 
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+      }
+
+      .controls label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      select {
+        padding: 3px 6px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--fg);
+        font-size: 12px;
+      }
+
+      button {
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--fg);
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: var(--accent);
+      }
+
+      button.danger {
+        color: var(--danger);
+      }
+
+      button.danger:hover {
+        border-color: var(--danger);
+      }
+
+      .links {
+        display: flex;
+        gap: 12px;
+        font-size: 12px;
+      }
+
+      .links a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .links a:hover {
+        text-decoration: underline;
+      }
+
+      .hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      kbd {
+        padding: 1px 5px;
+        border: 1px solid var(--border);
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        background: var(--code-bg);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 11px;
+      }
+
+      .editor {
+        flex: 1 1 auto;
+        min-height: 280px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+
+      .panels {
+        display: flex;
+        gap: 10px;
+      }
+
+      .panel {
+        flex: 1 1 50%;
+        height: 220px;
+        min-width: 0;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--panel);
+      }
+
+      .panel h5 {
+        position: sticky;
+        top: 0;
+        margin: 0;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+      }
+
+      .panel table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .panel tr:first-child td {
+        color: var(--muted);
+        font-weight: 600;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .panel td {
+        padding: 4px 10px;
+        vertical-align: top;
+      }
+
       .comment_text {
-        background-color: #dddddd;
-        color: black;
+        background: var(--code-bg);
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 11px;
+        word-break: break-all;
       }
     </style>
   </head>
 
   <body>
-    <nav class="navbar navbar-light bg-light">
-      <div class="mb-3">
-        <label for="option_editor_mode" class="form-label">Editor Mode</label>
-        <select id="option_editor_mode" class="form-select form-select-sm" onchange="updateSettings()">
-          <option>diff-mode</option>
-          <option>editor-mode</option>
-        </select>
+    <header>
+      <div class="brand">
+        <strong>monaco-review</strong>
+        <span>code review extension for the Monaco editor</span>
       </div>
-      <div class="mb-3">
-        <label for="option_diff_mode" class="form-label">Diff Mode</label>
-        <select id="option_diff_mode" class="form-select form-select-sm" onchange="updateSettings()">
-          <option>side-by-side</option>
-          <option selected>inline-diff</option>
-        </select>
+
+      <div class="controls">
+        <label
+          >Mode
+          <select id="option_editor_mode" onchange="updateSettings()">
+            <option>diff-mode</option>
+            <option>editor-mode</option>
+          </select>
+        </label>
+        <label
+          >Diff
+          <select id="option_diff_mode" onchange="updateSettings()">
+            <option>side-by-side</option>
+            <option selected>inline-diff</option>
+          </select>
+        </label>
+        <label
+          >User
+          <select id="option_current_user" onchange="updateSettings()" class="form-select">
+            <option selected>foo.user</option>
+            <option>bar.user</option>
+          </select>
+        </label>
+        <label
+          >Theme
+          <select id="option_theme" onchange="updateSettings()">
+            <option value="vs">Light</option>
+            <option value="vs-dark">Dark</option>
+          </select>
+        </label>
+        <label>
+          <input id="option_editor_readonly" type="checkbox" onchange="updateSettings()" />
+          Editor readonly
+        </label>
+        <label>
+          <input id="option_comments_readonly" type="checkbox" onchange="updateSettings()" />
+          Comments readonly
+        </label>
+        <button type="button" onclick="generateDifferentComments()">Regenerate comments</button>
+        <button type="button" class="danger" onclick="clearComments()">Clear comments</button>
       </div>
-      <div class="mb-3">
-        <label for="option_current_user" class="form-label">Current User:</label>
-        <select id="option_current_user" onchange="updateSettings()" class="form-select">
-          <option selected>foo.user</option>
-          <option>bar.user</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="option_theme" class="form-label">Theme:</label>
-        <select id="option_theme" class="form-select" onchange="updateSettings()">
-          <option>vs-light</option>
-          <option>vs-dark</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="option_editor_readonly" class="form-label">Editor Readonly</label>
-        <input id="option_editor_readonly" type="checkbox" onchange="updateSettings()" />
-      </div>
-      <div class="mb-3">
-        <label for="option_comments_readonly" class="form-label">Comments Readonly</label>
-        <input id="option_comments_readonly" type="checkbox" onchange="updateSettings()" />
-      </div>
-      <div class="mb-3">
-        <button onclick="clearComments()" class="btn btn-secondary btn-sm">Clear Comments</button>
-      </div>
-    </nav>
-    <i>Press CTRL+F10 to add comment, CTRL+Enter to save comment</i>
+
+      <nav class="links">
+        <a href="https://github.com/jburrow/monaco-editor-code-review">GitHub</a>
+        <a href="https://jburrow.github.io/monaco-editor-code-review/docs/">API docs</a>
+        <a href="https://www.npmjs.com/package/monaco-review">npm</a>
+      </nav>
+    </header>
+
+    <p class="hint">
+      Hover a line and click the margin icon or press <kbd>Ctrl</kbd>+<kbd>F10</kbd> to add a comment &middot;
+      <kbd>Ctrl</kbd>+<kbd>Enter</kbd> saves &middot; <kbd>Esc</kbd> cancels &middot; <kbd>Ctrl</kbd>+<kbd>F11</kbd> /
+      <kbd>Ctrl</kbd>+<kbd>F12</kbd> navigate between comments
+    </p>
 
     <div class="editor" id="containerEditor"></div>
 
-    <div style="display: flex; flex-direction: row; gap: 5px">
-      <div class="summary" id="commentsDiv"></div>
-
-      <div class="summary" id="eventsDiv"></div>
+    <div class="panels">
+      <div class="panel" id="commentsDiv"></div>
+      <div class="panel" id="eventsDiv"></div>
     </div>
   </body>
 </html>
@@ -97,10 +287,13 @@
 
 <script>
   function updateSettings() {
+    const theme = document.getElementById("option_theme").value;
+    document.documentElement.dataset.theme = theme === "vs-dark" ? "dark" : "light";
+
     window.setView(
       document.getElementById("option_editor_mode").value,
       document.getElementById("option_diff_mode").value,
-      document.getElementById("option_theme").value,
+      theme,
       document.getElementById("option_current_user").value,
       document.getElementById("option_editor_readonly").checked,
       document.getElementById("option_comments_readonly").checked,
