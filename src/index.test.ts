@@ -1,13 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { test, expect, vi } from "vitest";
-
-const uuid = vi.hoisted(() => ({ count: 0 }));
-
-vi.mock("uuid", () => ({
-  v1: () => `${--uuid.count}`,
-  v4: () => `${--uuid.count}`,
-  v5: () => `${--uuid.count}`,
-}));
+import { test, expect } from "vitest";
 
 import { createReviewManager, EditorMode } from "./index";
 import { ReviewCommentEvent, ReviewCommentType } from "./events-comments-reducers";
@@ -339,6 +331,58 @@ test("Enter Comment Widgets", () => {
   const cs = Object.values(rm.store.comments)[0];
   expect(cs.comment.text).toBe("#5");
   //expect(cs.viewZoneId).toBe(0);
+});
+
+test("generateId produces unique uuid-shaped ids", () => {
+  const editor = getMockEditor();
+  const rm = createReviewManager(editor, "current.user");
+  const a = rm.generateId();
+  const b = rm.generateId();
+  expect(a).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+  expect(a).not.toBe(b);
+});
+
+test("getComments and selectComment with onActiveCommentChanged", () => {
+  const editor = getMockEditor();
+  const changes: (string | undefined)[] = [];
+  const rm = createReviewManager(editor, "current.user", [], undefined, {
+    onActiveCommentChanged: (comment) => changes.push(comment?.id),
+  });
+
+  const c1 = rm.addComment(1, "first");
+  const c2 = rm.addComment(5, "second");
+  expect(
+    rm
+      .getComments()
+      .map((c) => c.id)
+      .sort(),
+  ).toEqual([c1.id, c2.id].sort());
+
+  rm.selectComment(c2.id);
+  expect(rm.activeComment?.id).toBe(c2.id);
+  expect(changes).toEqual([c2.id]);
+
+  rm.selectComment(undefined);
+  expect(rm.activeComment).toBe(undefined);
+  expect(changes).toEqual([c2.id, undefined]);
+
+  rm.selectComment("does-not-exist");
+  expect(rm.activeComment).toBe(undefined);
+  expect(changes).toEqual([c2.id, undefined]);
+});
+
+test("renderText output is sanitized when a string is returned", () => {
+  const editor = getMockEditor();
+  const rm = createReviewManager(editor, "current.user", [], undefined, {
+    renderText: (text) => `<b>${text}</b><img src=x onerror="alert(1)">`,
+  });
+
+  const comment = rm.addComment(1, "hello");
+  const zoneId = rm.getRenderState(comment.id).viewZoneId as string;
+  const html = editor._zones[zoneId].domNode.innerHTML;
+
+  expect(html).toContain("<b>hello</b>");
+  expect(html).not.toContain("onerror");
 });
 
 test("dispose removes zones, decorations and listeners", () => {

@@ -18,8 +18,10 @@ Code review extension for the [Monaco editor](https://github.com/microsoft/monac
 - Navigate between comments (Ctrl/Cmd+F12 next, Ctrl/Cmd+F11 previous)
 - Comment markers in the scrollbar / overview ruler
 - Read-only mode
-- Optional markdown rendering (sanitized with DOMPurify)
-- Customisable rendering, styles, and date formatting
+- Bring-your-own rich text/markdown rendering, sanitized with DOMPurify
+- Programmatic API: `getComments()`, `selectComment(id)`, `onActiveCommentChanged`
+- Customisable rendering, styles (BEM class names), and date formatting
+- Keyboard-accessible toolbar (real `<button>` elements)
 - Follows the active Monaco theme (light/dark)
 
 ## Why?
@@ -32,7 +34,7 @@ GitHub and GitLab already have excellent review tools — but Monaco gets embedd
 npm install monaco-review
 ```
 
-`monaco-editor` (>= 0.34) is a peer dependency. The library works with both ESM-imported monaco (Vite, webpack, etc.) and the classic AMD loader — no `window.monaco` global is required.
+`monaco-editor` (>= 0.34) is a peer dependency. The library works with both ESM-imported monaco (Vite, webpack, etc.) and the classic AMD loader — no `window.monaco` global is required. The only runtime dependency is `dompurify` (used to sanitize rich-text comment rendering).
 
 The package ships dual ESM/CJS builds with TypeScript declarations. Alternatively, load the prebuilt IIFE bundle directly in a page — it exposes a `MonacoEditorCodeReview` global:
 
@@ -94,7 +96,8 @@ All fields of `ReviewManagerConfig` are optional:
 | Option                                       | Default                | Description                                                                                |
 | -------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
 | `readOnly`                                   | `false`                | Disable adding/editing comments (can also toggle via `setReadOnlyMode`)                    |
-| `enableMarkdown`                             | `false`                | Render comment text as markdown (sanitized with DOMPurify)                                 |
+| `renderText`                                 | plain text             | `(text) => string \| HTMLElement` - plug in a markdown renderer (see below)                |
+| `onActiveCommentChanged`                     | -                      | `(comment \| undefined) => void` - fires when the selected comment changes                 |
 | `formatDate`                                 | ISO string             | `(dt: Date \| string) => string` used when rendering timestamps                            |
 | `renderComment`                              | built-in renderer      | Fully replace comment rendering: `(isActive, item) => HTMLElement`                         |
 | `styles`                                     | `defaultStyles`        | Override inline styles per element class                                                   |
@@ -117,6 +120,36 @@ All fields of `ReviewManagerConfig` are optional:
 | Escape         | Cancel (while editing)          |
 
 All shortcuts (except Ctrl+Enter/Escape inside the textarea) can be overridden via `config.keybindings`.
+
+## Markdown / rich text
+
+Comment text renders as plain text by default. To render markdown (or any rich text), plug in your renderer via `renderText`. When it returns a **string**, the library sanitizes it with DOMPurify before injecting; when it returns an **HTMLElement**, it is appended as-is (sanitization is then your responsibility):
+
+```javascript
+import { marked } from "marked";
+
+createReviewManager(editor, user, events, onChange, {
+  renderText: (text) => marked.parse(text, { async: false }),
+});
+```
+
+## Programmatic API
+
+Drive the review UI from your own components (e.g. a comment sidebar):
+
+```javascript
+reviewManager.getComments(); // ReviewComment[] - current state computed from events
+reviewManager.selectComment(id); // activate + scroll into view (undefined clears)
+reviewManager.navigateToComment(direction); // keyboard next/prev equivalent
+
+createReviewManager(editor, user, events, onChange, {
+  onActiveCommentChanged: (comment) => sidebar.highlight(comment?.id),
+});
+```
+
+## Styling
+
+Rendered elements carry BEM class names (`monaco-review-comment`, `monaco-review-comment__author`, `monaco-review-comment--active`, `monaco-review-toolbar__add`, `monaco-review-editor__text`, ...) so you can theme everything from a stylesheet. The inline defaults can be overridden per class via `config.styles`, or disable class names entirely with `setClassNames: false`.
 
 ## Cleanup
 

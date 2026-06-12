@@ -12,8 +12,7 @@ import {
   type ReviewCommentEvent,
 } from "./events-comments-reducers";
 
-import { convertMarkdownToHTML } from "./comment";
-import * as uuid from "uuid";
+import DOMPurify from "dompurify";
 
 export {
   type ReviewCommentStore,
@@ -25,7 +24,6 @@ export {
   ReviewCommentState,
   type ReviewComment,
   ReviewCommentRenderState,
-  convertMarkdownToHTML,
 };
 
 // Numeric values of monaco's KeyMod/KeyCode enums - stable across monaco versions.
@@ -89,31 +87,41 @@ interface IEventRenderStoreItem {
   target?: { detail?: RenderStoreItem };
 }
 
+const toolbarButtonStyle = {
+  background: "none",
+  border: "none",
+  padding: "0",
+  color: "inherit",
+  "font-size": "inherit",
+  "font-family": "inherit",
+  cursor: "pointer",
+};
+
 export const defaultStyles: Record<string, unknown> = {
-  reviewComment: {
-    "font-family": `font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata",
-  "Courier New", monospace;`,
+  "monaco-review-comment": {
+    "font-family": `Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace`,
     "font-size": "12px",
   },
-  "reviewComment.dt": {},
-  "reviewComment.active": { border: "1px solid darkorange" },
-  "reviewComment.inactive": {},
-  "reviewComment.author": {},
-  "reviewComment.text": {},
-  reviewCommentEditor: {
+  "monaco-review-comment__dt": {},
+  "monaco-review-comment--active": { border: "1px solid darkorange" },
+  "monaco-review-comment--inactive": {},
+  "monaco-review-comment__author": {},
+  "monaco-review-comment__history": {},
+  "monaco-review-comment__text": {},
+  "monaco-review-editor": {
     padding: "5px",
     border: "1px solid blue",
     "margin-left": "1px",
     "box-shadow": " 0px 0px 4px 2px lightblue",
-    "font-family": 'font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata"',
+    "font-family": `Monaco, Menlo, Consolas, "Droid Sans Mono", "Inconsolata", "Courier New", monospace`,
   },
-  "reviewCommentEditor.save": { width: "150px" },
-  "reviewCommentEditor.cancel": { width: "150px" },
-  "reviewCommentEditor.text": { width: "calc(100% - 5px)", resize: "none" },
-  editButtonsContainer: { cursor: "pointer", fontSize: "12px" },
-  "editButton.add": {},
-  "editButton.remove": {},
-  "editButton.edit": {},
+  "monaco-review-editor__save": { width: "150px" },
+  "monaco-review-editor__cancel": { width: "150px" },
+  "monaco-review-editor__text": { width: "calc(100% - 5px)", resize: "none" },
+  "monaco-review-toolbar": { cursor: "pointer", "font-size": "12px" },
+  "monaco-review-toolbar__add": { ...toolbarButtonStyle },
+  "monaco-review-toolbar__remove": { ...toolbarButtonStyle },
+  "monaco-review-toolbar__edit": { ...toolbarButtonStyle },
 };
 
 /**
@@ -142,8 +150,16 @@ export interface ReviewManagerConfig {
   styles?: Record<string, unknown>;
   setClassNames?: boolean;
   verticalOffset?: number;
-  enableMarkdown?: boolean;
+  /**
+   * Custom renderer for comment text (e.g. a markdown library). A returned string is
+   * sanitized with DOMPurify before being set as innerHTML; a returned HTMLElement is
+   * appended as-is (sanitization is the caller's responsibility). When omitted,
+   * comment text is rendered as plain text.
+   */
+  renderText?: (text: string) => string | HTMLElement;
   keybindings?: ReviewManagerKeybindings;
+  /** Called when the active (selected) comment changes, including to undefined. */
+  onActiveCommentChanged?: (comment: ReviewComment | undefined) => void;
 }
 
 export type FormatDate = (dt: Date | string) => string;
@@ -167,8 +183,9 @@ interface ReviewManagerConfigPrivate {
   styles: Record<string, unknown>;
   setClassNames: boolean;
   verticalOffset: number;
-  enableMarkdown: boolean;
+  renderText?: (text: string) => string | HTMLElement;
   keybindings: Required<ReviewManagerKeybindings>;
+  onActiveCommentChanged?: (comment: ReviewComment | undefined) => void;
 }
 
 const defaultKeybindings: Required<ReviewManagerKeybindings> = {
@@ -196,7 +213,6 @@ const defaultReviewManagerConfig: ReviewManagerConfigPrivate = {
   styles: { ...defaultStyles },
   setClassNames: true,
   verticalOffset: 0,
-  enableMarkdown: false,
   keybindings: defaultKeybindings,
 };
 
@@ -211,9 +227,9 @@ interface EditorElements {
 }
 
 interface InlineToolbarElements {
-  add: HTMLSpanElement;
-  edit?: HTMLSpanElement;
-  remove?: HTMLSpanElement;
+  add: HTMLButtonElement;
+  edit?: HTMLButtonElement;
+  remove?: HTMLButtonElement;
   root: HTMLDivElement;
 }
 interface RenderStoreItem {
@@ -419,14 +435,13 @@ export class ReviewManager {
 
   createInlineEditButtonsElement(): InlineToolbarElements {
     const root = document.createElement("div");
-    this.applyStyles(root, "editButtonsContainer");
+    this.applyStyles(root, "monaco-review-toolbar");
     root.style.marginLeft = this.config.editButtonOffset;
-    // root.style.marginTop = "100px";
-    // root.style.fontSize = "12px";
 
-    const add = document.createElement("span");
+    const add = document.createElement("button");
+    add.type = "button";
     add.innerText = this.config.editButtonAddText;
-    this.applyStyles(add, "editButton.add");
+    this.applyStyles(add, "monaco-review-toolbar__add");
     add.setAttribute(CONTROL_ATTR_NAME, "");
     add.onclick = () => {
       this.setEditorMode(EditorMode.replyComment, "reply-comment-inline-button");
@@ -442,10 +457,11 @@ export class ReviewManager {
       spacer.innerText = " ";
       root.appendChild(spacer);
 
-      remove = document.createElement("span");
+      remove = document.createElement("button");
+      remove.type = "button";
       remove.setAttribute(CONTROL_ATTR_NAME, "");
       remove.innerText = this.config.editButtonRemoveText;
-      this.applyStyles(remove, "editButton.remove");
+      this.applyStyles(remove, "monaco-review-toolbar__remove");
 
       remove.onclick = () => this.activeComment && this.removeComment(this.activeComment.id);
       root.appendChild(remove);
@@ -456,11 +472,12 @@ export class ReviewManager {
       spacer.innerText = " ";
       root.appendChild(spacer);
 
-      edit = document.createElement("span");
+      edit = document.createElement("button");
+      edit.type = "button";
       edit.setAttribute(CONTROL_ATTR_NAME, "");
       edit.innerText = this.config.editButtonEditText;
 
-      this.applyStyles(edit, "editButton.edit");
+      this.applyStyles(edit, "monaco-review-toolbar__edit");
       edit.onclick = () => {
         this.setEditorMode(EditorMode.editComment, "edit-comment-button");
       };
@@ -503,26 +520,29 @@ export class ReviewManager {
 
   createInlineEditorElement(): EditorElements {
     const root = document.createElement("div");
-    this.applyStyles(root, "reviewCommentEditor");
+    this.applyStyles(root, "monaco-review-editor");
 
     const textarea = document.createElement("textarea");
     textarea.setAttribute(CONTROL_ATTR_NAME, "");
-    this.applyStyles(textarea, "reviewCommentEditor.text");
+    this.applyStyles(textarea, "monaco-review-editor__text");
     textarea.innerText = "";
     textarea.rows = 3;
     textarea.name = "text";
+    textarea.setAttribute("aria-label", "Comment text");
     textarea.onkeydown = this.handleTextAreaKeyDown.bind(this);
 
     const confirm = document.createElement("button");
+    confirm.type = "button";
     confirm.setAttribute(CONTROL_ATTR_NAME, "");
-    this.applyStyles(confirm, "reviewCommentEditor.save");
+    this.applyStyles(confirm, "monaco-review-editor__save");
 
     confirm.innerText = "placeholder add";
     confirm.onclick = this.handleAddComment.bind(this);
 
     const cancel = document.createElement("button");
+    cancel.type = "button";
     cancel.setAttribute(CONTROL_ATTR_NAME, "");
-    this.applyStyles(cancel, "reviewCommentEditor.cancel");
+    this.applyStyles(cancel, "monaco-review-editor__cancel");
     cancel.innerText = "Cancel";
     cancel.onclick = this.handleCancel.bind(this);
 
@@ -640,7 +660,30 @@ export class ReviewManager {
       });
     }
 
+    if (isDifferentComment) {
+      this.config.onActiveCommentChanged?.(comment);
+    }
+
     return isDifferentComment;
+  }
+
+  /** Returns the current comments (computed from the event log). */
+  getComments(): ReviewComment[] {
+    return Object.values(this.store.comments).map((cs) => cs.comment);
+  }
+
+  /**
+   * Programmatically select a comment by id - activates it, shows the toolbar and
+   * scrolls it into view. Pass undefined to clear the selection.
+   */
+  selectComment(commentId: string | undefined): void {
+    const comment = commentId ? this.store.comments[commentId]?.comment : undefined;
+    this.setActiveComment(comment, "selectComment");
+    this.refreshComments();
+    this.layoutInlineToolbar();
+    if (comment) {
+      this.editor.revealLineInCenter(comment.lineNumber);
+    }
   }
 
   filterAndMapComments(lineNumbers: number[], fn: (comment: ReviewComment) => void) {
@@ -810,6 +853,17 @@ export class ReviewManager {
     return new Date().getTime();
   }
 
+  generateId(): string {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    // crypto.randomUUID is only available in secure contexts (https / localhost)
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+    });
+  }
+
   private recurseComments(
     allComments: Record<string, ReviewCommentState>,
     filterFn: (c: ReviewCommentState) => boolean,
@@ -863,7 +917,7 @@ export class ReviewManager {
       ...event,
       createdBy: this.currentUser,
       createdAt: this.getDateTimeNow(),
-      id: uuid.v4(),
+      id: this.generateId(),
     };
 
     this.debug("[addEvent]", populatedEvent);
@@ -1025,7 +1079,7 @@ export class ReviewManager {
                 endColumn: selection.endColumn,
               },
               options: {
-                className: "reviewComment selection",
+                className: "monaco-review-selection",
               },
             });
           }
@@ -1063,35 +1117,43 @@ export class ReviewManager {
   }
 
   private renderComment(isActive: boolean, item: ReviewCommentIterItem): HTMLElement {
-    const rootNode = this.createElement("", "reviewComment"); // .${isActive ? "active" : "inactive"}`);
+    const rootNode = this.createElement("", "monaco-review-comment");
     rootNode.style.marginLeft = this.config.commentIndent * (item.depth + 1) + this.config.commentIndentOffset + "px";
     rootNode.style.backgroundColor = this.getThemedColor("editor.selectionHighlightBackground");
 
-    const domNode = this.createElement("", `reviewComment.${isActive ? "active" : "inactive"}`);
+    const domNode = this.createElement("", `monaco-review-comment--${isActive ? "active" : "inactive"}`);
     rootNode.appendChild(domNode);
 
-    // // For Debug - domNode.appendChild(this.createElement(`${item.state.comment.id}`, 'reviewComment id'))
-    domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "reviewComment.author"));
+    domNode.appendChild(this.createElement(`${item.state.comment.author || " "} at `, "monaco-review-comment__author"));
     if (item.state.comment.dt) {
-      domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "reviewComment.dt"));
+      domNode.appendChild(this.createElement(this.formatDate(item.state.comment.dt), "monaco-review-comment__dt"));
     }
     if (item.state.history.length > 1) {
       domNode.appendChild(
-        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "reviewComment.history"),
+        this.createElement(`(Edited ${item.state.history.length - 1} times)`, "monaco-review-comment__history"),
       );
     }
 
-    const textNode = this.createElement("", "reviewComment.text", "div");
+    const textNode = this.createElement("", "monaco-review-comment__text", "div");
     textNode.style.width = "70vw";
-    if (this.config.enableMarkdown) {
-      textNode.innerHTML = convertMarkdownToHTML(item.state.comment.text);
-    } else {
-      textNode.innerText = item.state.comment.text;
-    }
+    this.renderCommentText(textNode, item.state.comment.text);
 
     rootNode.appendChild(textNode);
 
     return rootNode;
+  }
+
+  private renderCommentText(node: HTMLElement, text: string): void {
+    if (this.config.renderText) {
+      const rendered = this.config.renderText(text);
+      if (typeof rendered === "string") {
+        node.innerHTML = DOMPurify.sanitize(rendered);
+      } else {
+        node.appendChild(rendered);
+      }
+    } else {
+      node.innerText = text;
+    }
   }
 
   addActions() {
@@ -1193,11 +1255,7 @@ export class ReviewManager {
         }
       });
 
-      const comment = comments[0];
-      this.setActiveComment(comment);
-      this.refreshComments();
-      this.layoutInlineToolbar();
-      this.editor.revealLineInCenter(comment.lineNumber);
+      this.selectComment(comments[0].id);
     }
   }
 }

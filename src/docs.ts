@@ -4,6 +4,7 @@ import * as monaco from "monaco-editor";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import moment from "dayjs";
+import { marked } from "marked";
 import { type ReviewCommentEvent } from "./events-comments-reducers";
 
 import indexSource from "./index.ts?raw";
@@ -165,6 +166,9 @@ function initReviewManager(editor: monaco.editor.IStandaloneCodeEditor, currentU
       readOnly,
       verticalOffset: 5, // This are hacks to correct the layout due to parent css
       commentIndentOffset: 10, // This are hacks to correct the layout due to parent css
+      // Bring-your-own markdown - the library sanitizes the returned string with DOMPurify
+      renderText: (text) => marked.parse(text, { async: false }),
+      onActiveCommentChanged: (comment) => console.debug("[docs] active comment changed", comment?.id),
     },
     true,
   );
