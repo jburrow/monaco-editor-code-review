@@ -76,7 +76,7 @@
     "puppeteer-core": "^25.1.0",
     "tsup": "^8.5.1",
     "typedoc": "0.28.20",
-    "typescript": "^5.7.2",
+    "typescript": "^6.0.0",
     "typescript-eslint": "^8.18.1",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
